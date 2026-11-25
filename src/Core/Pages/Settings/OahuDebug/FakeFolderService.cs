@@ -32,6 +32,9 @@ namespace Bit.App.Pages.OahuDebug
             }
         }
 
+        /// <summary>The vault route's folders (FakeVault), with ids the fake ciphers refer to.</summary>
+        public FakeFolderService(IEnumerable<(string Id, string Name)> folders) => _folders.AddRange(folders);
+
         public Task<List<FolderView>> GetAllDecryptedAsync()
         {
             var views = _folders
@@ -91,10 +94,24 @@ namespace Bit.App.Pages.OahuDebug
         public Task ClearAsync(string userId) => Task.CompletedTask;
         public void ClearCache() { }
         public Task<List<Folder>> GetAllAsync() => throw new NotSupportedException("Not used by the folder pages.");
-        public Task<List<TreeNode<FolderView>>> GetAllNestedAsync(List<FolderView> folders = null) =>
-            throw new NotSupportedException("Not used by the folder pages.");
-        public Task<TreeNode<FolderView>> GetNestedAsync(string id) =>
-            throw new NotSupportedException("Not used by the folder pages.");
+        // As FolderService: "Work/Clients" nests under "Work".
+        public async Task<List<TreeNode<FolderView>>> GetAllNestedAsync(List<FolderView> folders = null)
+        {
+            folders ??= await GetAllDecryptedAsync();
+            var nodes = new List<TreeNode<FolderView>>();
+            foreach (var f in folders)
+            {
+                var copy = new FolderView { Id = f.Id, RevisionDate = f.RevisionDate };
+                var parts = f.Name != null
+                    ? System.Text.RegularExpressions.Regex.Replace(f.Name, "^\\/+|\\/+$", string.Empty).Split('/')
+                    : new string[0];
+                Bit.Core.Utilities.CoreHelpers.NestedTraverse(nodes, 0, parts, copy, null, '/');
+            }
+            return nodes;
+        }
+
+        public async Task<TreeNode<FolderView>> GetNestedAsync(string id) =>
+            Bit.Core.Utilities.CoreHelpers.GetTreeNodeObject(await GetAllNestedAsync(), id);
         public Task ReplaceAsync(Dictionary<string, FolderData> folders) => Task.CompletedTask;
         public Task UpsertAsync(FolderData folder) => Task.CompletedTask;
         public Task UpsertAsync(List<FolderData> folder) => Task.CompletedTask;
