@@ -56,7 +56,7 @@
             base.OnPropertyChanged(propertyName);
 
             if (propertyName == TimeProperty.PropertyName || (propertyName == IsFocusedProperty.PropertyName &&
-                                                              !IsFocused && (Time.ToString("t") ==
+                                                              !IsFocused && (Time?.ToString("t") ==
                                                                              DateTime.Now.TimeOfDay.ToString("t"))))
             {
                 NullableTime = Time;
@@ -68,7 +68,7 @@
                 if (NullableTime.HasValue)
                 {
                     Time = NullableTime.Value;
-                    if (Time.ToString(_format) == DateTime.Now.TimeOfDay.ToString(_format))
+                    if (Time?.ToString(_format) == DateTime.Now.TimeOfDay.ToString(_format))
                     {
                         UpdateTime();
                     }

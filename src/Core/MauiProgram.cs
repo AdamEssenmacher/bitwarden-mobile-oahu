@@ -5,7 +5,6 @@ using CommunityToolkit.Maui;
 using FFImageLoading.Maui;
 #endif
 using Microsoft.Extensions.Logging;
-using Microsoft.Maui.Controls.Compatibility.Hosting;
 using Microsoft.Maui.Handlers;
 using SkiaSharp.Views.Maui.Controls.Hosting;
 using AppEffects = Bit.App.Effects;
@@ -23,7 +22,6 @@ public static class MauiProgram
         }
         builder
             .UseMauiCommunityToolkit()
-            .UseMauiCompatibility()
             .UseMauiCameraView()
             .UseSkiaSharp()
 #if !UT

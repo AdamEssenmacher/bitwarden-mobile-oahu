@@ -76,9 +76,9 @@ namespace Bit.App.Pages
     {
         public ScrollView MainScrollView { get; set; }
 
-        public override async ValueTask LoadViewAsync()
+        public override async ValueTask LoadViewAsync(CancellationToken token = default)
         {
-            await base.LoadViewAsync();
+            await base.LoadViewAsync(token);
 
             if (Content is SendAddOnlyOptionsView optionsView)
             {

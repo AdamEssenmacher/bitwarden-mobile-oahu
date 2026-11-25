@@ -56,7 +56,7 @@
             base.OnPropertyChanged(propertyName);
 
             if (propertyName == DateProperty.PropertyName || (propertyName == IsFocusedProperty.PropertyName &&
-                                                              !IsFocused && (Date.ToString("d") ==
+                                                              !IsFocused && (Date?.ToString("d") ==
                                                                              DateTime.Now.ToString("d"))))
             {
                 NullableDate = Date;
@@ -68,7 +68,7 @@
                 if (NullableDate.HasValue)
                 {
                     Date = NullableDate.Value;
-                    if (Date.ToString(_format) == DateTime.Now.ToString(_format))
+                    if (Date?.ToString(_format) == DateTime.Now.ToString(_format))
                     {
                         UpdateDate();
                     }
