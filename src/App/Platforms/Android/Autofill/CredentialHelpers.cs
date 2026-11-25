@@ -274,7 +274,7 @@ namespace Bit.App.Platforms.Android.Autofill
 
         public static async Task<string> ValidateCallingAppInfoAndGetOriginAsync(CallingAppInfo callingAppInfo, string rpId)
         {
-            if (callingAppInfo.Origin is null)
+            if (!callingAppInfo.IsOriginPopulated)
             {
                 return await ValidateAssetLinksAndGetOriginAsync(callingAppInfo, rpId);
             }

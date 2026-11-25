@@ -18,7 +18,7 @@ using Bit.Core.Abstractions;
 using Bit.App.Droid.Utilities;
 using Bit.App.Models;
 using Bit.Droid.Autofill;
-using Microsoft.Maui.Controls.Compatibility.Platform.Android;
+using Microsoft.Maui.Platform;
 using Resource = Bit.Core.Resource;
 using Application = Android.App.Application;
 using Bit.Core.Services;
@@ -323,8 +323,8 @@ namespace Bit.Droid.Services
                 var error = config.ValidateText(input.Text);
                 if (error != null)
                 {
-                    lblHeader.SetTextColor(ThemeManager.GetResourceColor("DangerColor").ToAndroid());
-                    lblValueSubinfo.SetTextColor(ThemeManager.GetResourceColor("DangerColor").ToAndroid());
+                    lblHeader.SetTextColor(ThemeManager.GetResourceColor("DangerColor").ToPlatform());
+                    lblValueSubinfo.SetTextColor(ThemeManager.GetResourceColor("DangerColor").ToPlatform());
                     lblValueSubinfo.Text = error;
                     lblValueSubinfo.SendAccessibilityEvent(Android.Views.Accessibility.EventTypes.ViewFocused);
                     return;

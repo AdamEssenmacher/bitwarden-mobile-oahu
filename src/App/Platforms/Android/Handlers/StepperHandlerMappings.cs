@@ -1,7 +1,7 @@
 ﻿using Android.Graphics;
 using Android.OS;
 using Bit.App.Controls;
-using Microsoft.Maui.Controls.Compatibility.Platform.Android;
+using Microsoft.Maui.Platform;
 
 namespace Bit.App.Handlers
 {
@@ -16,16 +16,16 @@ namespace Bit.App.Handlers
                     if (Build.VERSION.SdkInt >= BuildVersionCodes.Q)
                     {
                         handler.PlatformView.GetChildAt(0)?.Background?.SetColorFilter(
-                            new BlendModeColorFilter(extStepper.StepperBackgroundColor.ToAndroid(), Android.Graphics.BlendMode.Multiply));
+                            new BlendModeColorFilter(extStepper.StepperBackgroundColor.ToPlatform(), Android.Graphics.BlendMode.Multiply));
                         handler.PlatformView.GetChildAt(1)?.Background?.SetColorFilter(
-                            new BlendModeColorFilter(extStepper.StepperBackgroundColor.ToAndroid(), Android.Graphics.BlendMode.Multiply));
+                            new BlendModeColorFilter(extStepper.StepperBackgroundColor.ToPlatform(), Android.Graphics.BlendMode.Multiply));
                     }
                     else
                     {
                         handler.PlatformView.GetChildAt(0)?.Background?.SetColorFilter(
-                            extStepper.StepperBackgroundColor.ToAndroid(), PorterDuff.Mode.Multiply);
+                            extStepper.StepperBackgroundColor.ToPlatform(), PorterDuff.Mode.Multiply);
                         handler.PlatformView.GetChildAt(1)?.Background?.SetColorFilter(
-                            extStepper.StepperBackgroundColor.ToAndroid(), PorterDuff.Mode.Multiply);
+                            extStepper.StepperBackgroundColor.ToPlatform(), PorterDuff.Mode.Multiply);
                     }
                 }
             });
@@ -35,9 +35,9 @@ namespace Bit.App.Handlers
                 if (stepper is ExtendedStepper extStepper)
                 {
                     var btn0 = handler.PlatformView.GetChildAt(0) as Android.Widget.Button;
-                    btn0?.SetTextColor(extStepper.StepperForegroundColor.ToAndroid());
+                    btn0?.SetTextColor(extStepper.StepperForegroundColor.ToPlatform());
                     var btn1 = handler.PlatformView.GetChildAt(1) as Android.Widget.Button;
-                    btn1?.SetTextColor(extStepper.StepperForegroundColor.ToAndroid());
+                    btn1?.SetTextColor(extStepper.StepperForegroundColor.ToPlatform());
                 }
             });
         }

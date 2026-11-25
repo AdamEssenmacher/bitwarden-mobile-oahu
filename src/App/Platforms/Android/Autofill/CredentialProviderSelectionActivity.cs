@@ -115,7 +115,7 @@ namespace Bit.Droid.Autofill
 
                 var extraAssertParams = new Fido2ExtraAssertCredentialParams
                 (
-                    getRequest.CallingAppInfo.Origin != null ? credentialPublic.GetClientDataHash() : null,
+                    getRequest.CallingAppInfo.IsOriginPopulated ? credentialPublic.GetClientDataHash() : null,
                     packageName
                 );
 

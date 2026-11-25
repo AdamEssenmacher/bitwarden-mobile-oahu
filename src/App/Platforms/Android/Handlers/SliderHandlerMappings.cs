@@ -1,7 +1,7 @@
 ﻿using Android.Graphics.Drawables;
 using AndroidX.Core.Content.Resources;
 using Bit.App.Controls;
-using Microsoft.Maui.Controls.Compatibility.Platform.Android;
+using Microsoft.Maui.Platform;
 
 namespace Bit.App.Handlers
 {
@@ -14,8 +14,8 @@ namespace Bit.App.Handlers
                 var t = ResourcesCompat.GetDrawable(handler.PlatformView.Resources, Resource.Drawable.slider_thumb, null);
                 if (t is GradientDrawable thumb && slider is ExtendedSlider extSlider)
                 {
-                    thumb.SetColor(extSlider.ThumbColor.ToAndroid());
-                    thumb.SetStroke(3, extSlider.ThumbBorderColor.ToAndroid());
+                    thumb.SetColor(extSlider.ThumbColor.ToPlatform());
+                    thumb.SetStroke(3, extSlider.ThumbBorderColor.ToPlatform());
                     handler.PlatformView.SetThumb(thumb);
                 }
             });

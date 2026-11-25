@@ -6,7 +6,7 @@ using Android.OS;
 using Android.Views;
 using Android.Views.Accessibility;
 using Android.Widget;
-using Microsoft.Maui.Controls.Compatibility.Platform.Android;
+using Microsoft.Maui.Platform;
 using static System.OperatingSystem;
 using AView = Android.Views.View;
 using Color = Android.Graphics.Color;
@@ -233,7 +233,7 @@ public partial class TouchBehavior
 
 		return new ColorStateList(
 			new[] {Array.Empty<int>()},
-			new[] {(int) animationColor.ToAndroid()});
+			new[] {(int) animationColor.ToPlatform()});
 	}
 
 	private void UpdateClickHandler()

@@ -1,6 +1,6 @@
 ﻿using Android.Content.Res;
 using Bit.App.Utilities;
-using Microsoft.Maui.Controls.Compatibility.Platform.Android;
+using Microsoft.Maui.Platform;
 using Color = Android.Graphics.Color;
 
 namespace Bit.App.Droid.Utilities
@@ -11,35 +11,35 @@ namespace Bit.App.Droid.Utilities
         
         public static Color PrimaryColor
         {
-            get => ThemeManager.GetResourceColor("PrimaryColor").ToAndroid();
+            get => ThemeManager.GetResourceColor("PrimaryColor").ToPlatform();
         }
         public static Color MutedColor
         {
-            get => ThemeManager.GetResourceColor("MutedColor").ToAndroid();
+            get => ThemeManager.GetResourceColor("MutedColor").ToPlatform();
         }
         public static Color BackgroundColor
         {
-            get => ThemeManager.GetResourceColor("BackgroundColor").ToAndroid();
+            get => ThemeManager.GetResourceColor("BackgroundColor").ToPlatform();
         }
         public static Color NavBarBackgroundColor
         {
-            get => ThemeManager.GetResourceColor("NavigationBarBackgroundColor").ToAndroid();
+            get => ThemeManager.GetResourceColor("NavigationBarBackgroundColor").ToPlatform();
         }
         public static Color FabColor
         {
-            get => ThemeManager.GetResourceColor("FabColor").ToAndroid();
+            get => ThemeManager.GetResourceColor("FabColor").ToPlatform();
         }
         public static Color SwitchOnColor
         {
-            get => ThemeManager.GetResourceColor("SwitchOnColor").ToAndroid();
+            get => ThemeManager.GetResourceColor("SwitchOnColor").ToPlatform();
         }
         public static Color SwitchThumbColor
         {
-            get => ThemeManager.GetResourceColor("SwitchThumbColor").ToAndroid();
+            get => ThemeManager.GetResourceColor("SwitchThumbColor").ToPlatform();
         }
         public static Color TextColor
         {
-            get => ThemeManager.GetResourceColor("TextColor").ToAndroid();
+            get => ThemeManager.GetResourceColor("TextColor").ToPlatform();
         }
         
         public static void SetAppearance(string theme, bool osDarkModeEnabled)
