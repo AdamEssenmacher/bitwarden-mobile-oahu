@@ -1,4 +1,4 @@
-using Foundation;
+﻿using Foundation;
 using UIKit;
 
 namespace Bit.iOS
@@ -29,10 +29,12 @@ namespace Bit.iOS
             }
         }
 
-        [Export("sceneWillResignActive:")]
-        public void WillResignActive(UIScene scene)
+        // Override MAUI's own handlers (and call them): exporting the selectors on new methods hid them, so MAUI never
+        // saw the window activate, and on MAUI 11 a modal page pushed before activation is never presented.
+        public override void OnResignActivation(UIScene scene)
         {
             AppDelegate?.OnResignActivation(UIApplication.SharedApplication);
+            base.OnResignActivation(scene);
         }
 
         public override void DidEnterBackground(UIScene scene)
@@ -47,14 +49,20 @@ namespace Bit.iOS
             base.WillEnterForeground(scene);
         }
 
-        [Export("sceneDidBecomeActive:")]
-        public void DidBecomeActive(UIScene scene)
+        public override void OnActivated(UIScene scene)
         {
+            base.OnActivated(scene);
             AppDelegate?.OnActivated(UIApplication.SharedApplication);
         }
 
-        [Export("scene:openURLContexts:")]
-        public void OpenUrlContexts(UIScene scene, NSSet<UIOpenUrlContext> urlContexts)
+        public override bool OpenUrl(UIScene scene, NSSet<UIOpenUrlContext> urlContexts)
+        {
+            var handled = base.OpenUrl(scene, urlContexts);
+            OpenUrlContexts(scene, urlContexts);
+            return handled;
+        }
+
+        private static void OpenUrlContexts(UIScene scene, NSSet<UIOpenUrlContext> urlContexts)
         {
             foreach (UIOpenUrlContext urlContext in urlContexts)
             {
