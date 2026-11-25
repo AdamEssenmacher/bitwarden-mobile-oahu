@@ -126,6 +126,18 @@
 	  <PackageReference Include="Xamarin.Kotlin.StdLib.Jdk8" Version="2.4.0.1" />
 	  <PackageReference Include="Xamarin.AndroidX.Activity.Ktx" Version="1.13.0.1" />
       <PackageReference Include="Xamarin.AndroidX.Credentials" Version="1.6.0.1" />
+	  <!-- OAHU step 3 (docs/oahu/03-vault.md): the vault screens load website icons with Coil, shipped as OAHU's
+	       hosting.md ("Android: third-party libraries") lists it for Coil 3.5.0. -->
+	  <AndroidMavenLibrary Include="io.coil-kt.coil3:coil-core-android" Version="3.5.0" Bind="false" />
+	  <AndroidMavenLibrary Include="io.coil-kt.coil3:coil-compose-core-android" Version="3.5.0" Bind="false" />
+	  <AndroidMavenLibrary Include="io.coil-kt.coil3:coil-network-core-android" Version="3.5.0" Bind="false" />
+	  <AndroidMavenLibrary Include="io.coil-kt.coil3:coil-network-okhttp-android" Version="3.5.0" Bind="false" />
+	  <PackageReference Include="Square.OkHttp3" Version="4.12.0.10" />
+	  <PackageReference Include="Square.OkIO.JVM" Version="3.17.0.1" />
+	  <PackageReference Include="Xamarin.Google.Accompanist.DrawablePainter" Version="0.37.3.4" />
+	  <PackageReference Include="Xamarin.AndroidX.ExifInterface" Version="1.4.2.3" />
+	  <PackageReference Include="Xamarin.AndroidX.AppCompat.AppCompatResources" Version="1.7.1.4" />
+	  <AndroidIgnoredJavaDependency Include="org.jetbrains.compose.foundation:foundation:1.11.1" />
 	</ItemGroup>
 	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android' AND !$(DefineConstants.Contains(FDROID))">
 	  <PackageReference Include="Xamarin.GooglePlayServices.SafetyNet" Version="118.0.1.5" />

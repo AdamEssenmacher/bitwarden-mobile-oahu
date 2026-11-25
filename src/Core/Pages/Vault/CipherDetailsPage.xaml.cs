@@ -25,6 +25,7 @@ namespace Bit.App.Pages
             _vm.Page = this;
             _vm.CipherId = cipherId;
             SetActivityIndicator(_mainContent);
+            _vm.PasswordHistoryRequested += () => PasswordHistory_Tapped(this, EventArgs.Empty);
 
             // TODO Xamarin.Forms.Device.RuntimePlatform is no longer supported. Use Microsoft.Maui.Devices.DeviceInfo.Platform instead. For more details see https://learn.microsoft.com/en-us/dotnet/maui/migration/forms-projects#device-changes
             if (Device.RuntimePlatform == Device.iOS)
@@ -36,7 +37,7 @@ namespace Bit.App.Pages
             }
             else
             {
-                _mainLayout.Padding = new Thickness(0, 0, 0, 75);
+                // OAHU: the Compose screen leaves room for the floating edit button itself (was _mainLayout.Padding).
                 ToolbarItems.Add(_attachmentsItem);
                 ToolbarItems.Add(_deleteItem);
             }

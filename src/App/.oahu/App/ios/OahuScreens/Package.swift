@@ -8,5 +8,8 @@ let package = Package(
     dependencies: [.package(path: "../../../../../../../oahu-feed/swift/0.1.0-preview.g104c58c2/OahuRuntime")],
     targets: [.target(name: "OahuScreens", dependencies: [
         .product(name: "OahuRuntime", package: "OahuRuntime"),
+    ], resources: [
+        // Bitwarden's icon font (a copy of src/Core/Resources/Fonts/bwi-font.ttf), registered by BitwardenIcons.swift.
+        .process("Resources"),
     ])]
 )

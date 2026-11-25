@@ -20,7 +20,7 @@ using Microsoft.Maui;
 
 namespace Bit.App.Pages
 {
-    public class CipherDetailsPageViewModel : BaseCipherViewModel, IPasswordPromptable
+    public partial class CipherDetailsPageViewModel : BaseCipherViewModel, IPasswordPromptable
     {
         private readonly ICipherService _cipherService;
         private readonly IStateService _stateService;

@@ -12,7 +12,7 @@ using Bit.Core.Utilities;
 
 namespace Bit.App.Pages
 {
-    public class GroupingsPageViewModel : VaultFilterViewModel
+    public partial class GroupingsPageViewModel : VaultFilterViewModel
     {
         private const int NoFolderListSize = 100;
 

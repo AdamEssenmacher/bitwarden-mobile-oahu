@@ -52,6 +52,10 @@ namespace Bit.App.Pages
             _vm.Deleted = deleted;
             _vm.ShowTotp = showTotp;
             _previousPage = previousPage;
+            // OAHU: the native screen sends row taps and the empty state's add button to the view model, which hands
+            // them back here so the page navigates as RowSelected and AddButton_Clicked did.
+            _vm.ItemSelected += SelectItemAsync;
+            _vm.AddRequested += () => AddButton_Clicked(this, EventArgs.Empty);
             if (pageTitle != null)
             {
                 _vm.PageTitle = pageTitle;
@@ -222,17 +226,14 @@ namespace Bit.App.Pages
             }
         }
 
-        private async void RowSelected(object sender, SelectionChangedEventArgs e)
+        private async Task SelectItemAsync(IGroupingsPageListItem selection)
         {
             try
             {
-                ((ExtendedCollectionView)sender).SelectedItem = null;
                 if (!DoOnce())
                 {
                     return;
                 }
-
-                var selection = e.CurrentSelection?.FirstOrDefault();
 
                 if (selection is GroupingsPageTOTPListItem totpItem)
                 {
