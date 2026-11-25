@@ -4,6 +4,23 @@
 <dict>
 	<key>MinimumOSVersion</key>
 	<string>17.0</string>
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+		<key>UISceneConfigurations</key>
+		<dict>
+			<key>UIWindowSceneSessionRoleApplication</key>
+			<array>
+				<dict>
+					<key>UISceneConfigurationName</key>
+					<string>__MAUI_DEFAULT_SCENE_CONFIGURATION__</string>
+					<key>UISceneDelegateClassName</key>
+					<string>SceneDelegate</string>
+				</dict>
+			</array>
+		</dict>
+	</dict>
 	<key>CFBundleDisplayName</key>
 	<string>Bitwarden</string>
 	<key>CFBundleName</key>
