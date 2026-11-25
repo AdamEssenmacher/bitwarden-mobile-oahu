@@ -106,7 +106,7 @@ generate password and username, check password, scan, copy TOTP, re-prompt help)
 
 | | Lines |
 |---|---|
-| XAML removed (`CipherAddEditPage.xaml`) | 771 changed, 815 → 64 |
+| XAML removed (`CipherAddEditPage.xaml`) | 815 → 62 |
 | App C# changed in existing files (page, view model) | +59 / -853 across XAML and C# (`git diff --stat`) |
 | New C#: contract (`CipherAddEdit.cs`) | 227 |
 | New C#: view-model half | 501 |
