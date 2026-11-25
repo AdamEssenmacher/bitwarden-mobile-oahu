@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Saved-state view IDs for OAHU screens (OahuView.AndroidSavedStateViewId), one per logical screen instance under the
+     activity (OAHU native-screens.md, "Saved state is the host's"). The pages live in src/Core, which has no Android
+     resources, so they look these up by name (Bit.App.Utilities.OahuAndroidIds; docs/oahu/gaps.md, G20). -->
+<resources>
+    <item type="id" name="oahu_generator_tab" />
+    <item type="id" name="oahu_generator_modal" />
+    <item type="id" name="oahu_lock" />
+</resources>

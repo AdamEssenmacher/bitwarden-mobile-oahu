@@ -13,7 +13,7 @@ using Bit.Core.Utilities;
 
 namespace Bit.App.Pages
 {
-    public class GeneratorPageViewModel : BaseViewModel
+    public partial class GeneratorPageViewModel : BaseViewModel
     {
         private readonly IPasswordGenerationService _passwordGenerationService;
         private readonly IPlatformUtilsService _platformUtilsService;

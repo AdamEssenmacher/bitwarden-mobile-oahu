@@ -35,6 +35,8 @@ internal object BwIcons {
     const val LINK = ""
     const val SQUARE = ""
     const val CHECK_SQUARE = ""
+    const val GENERATE = "\ue90e"
+    const val QUESTION_CIRCLE = "\ue923"
 }
 
 internal fun argb(value: Long): Color = Color(value.toInt())

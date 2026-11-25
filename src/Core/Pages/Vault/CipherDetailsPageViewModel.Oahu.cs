@@ -257,31 +257,7 @@ namespace Bit.App.Pages
 
         /// <summary>A value with its mask; the value itself only while <paramref name="shown"/>.</summary>
         private static SecretValue Secret(string? masked, string value, bool shown, bool canReveal, bool canCopy) =>
-            new(masked ?? string.Empty, shown && canReveal ? Runs(value) : null, canReveal, canCopy);
-
-        /// <summary>The runs GeneratedValueFormatter colors: letters, digits, everything else.</summary>
-        private static IReadOnlyList<TextRun> Runs(string value)
-        {
-            var runs = new List<TextRun>();
-            var start = 0;
-            TextRunKind? current = null;
-            for (var i = 0; i < value.Length; i++)
-            {
-                var kind = char.IsLetter(value[i]) ? TextRunKind.Letters
-                    : char.IsDigit(value[i]) ? TextRunKind.Digits : TextRunKind.Symbols;
-                if (current != null && kind != current)
-                {
-                    runs.Add(new TextRun(value[start..i], current.Value));
-                    start = i;
-                }
-                current = kind;
-            }
-            if (current != null)
-            {
-                runs.Add(new TextRun(value[start..], current.Value));
-            }
-            return runs;
-        }
+            new(masked ?? string.Empty, shown && canReveal ? OahuText.Runs(value) : null, canReveal, canCopy);
 
         private string DateText(DateTime date) => string.Format("{0} {1}",
             _localizeService.GetLocaleShortDate(date.ToLocalTime()), _localizeService.GetLocaleShortTime(date.ToLocalTime()));

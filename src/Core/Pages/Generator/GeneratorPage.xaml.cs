@@ -54,12 +54,11 @@ namespace Bit.App.Pages
                 ToolbarItems.Add(_historyItem);
 #endif
             }
-            _typePicker.On<Microsoft.Maui.Controls.PlatformConfiguration.iOS>().SetUpdateMode(UpdateMode.WhenFinished);
-            _passwordTypePicker.On<Microsoft.Maui.Controls.PlatformConfiguration.iOS>().SetUpdateMode(UpdateMode.WhenFinished);
-            _usernameTypePicker.On<Microsoft.Maui.Controls.PlatformConfiguration.iOS>().SetUpdateMode(UpdateMode.WhenFinished);
-            _serviceTypePicker.On<Microsoft.Maui.Controls.PlatformConfiguration.iOS>().SetUpdateMode(UpdateMode.WhenFinished);
-            _plusAddressedEmailTypePicker.On<Microsoft.Maui.Controls.PlatformConfiguration.iOS>().SetUpdateMode(UpdateMode.WhenFinished);
-            _catchallEmailTypePicker.On<Microsoft.Maui.Controls.PlatformConfiguration.iOS>().SetUpdateMode(UpdateMode.WhenFinished);
+#if ANDROID
+            // One logical screen per page instance: the tab and each modal (docs/oahu/gaps.md, G20).
+            _generatorView.AndroidSavedStateViewId = fromTabPage
+                ? OahuAndroidIds.Get("oahu_generator_tab") : OahuAndroidIds.Get("oahu_generator_modal");
+#endif
         }
 
         public async Task InitAsync()
@@ -72,8 +71,6 @@ namespace Bit.App.Pages
             try
             {
                 base.OnAppearing();
-
-                lblPassword.IsVisible = true;
 
                 if (!_fromTabPage)
                 {
@@ -98,8 +95,6 @@ namespace Bit.App.Pages
         protected override void OnDisappearing()
         {
             base.OnDisappearing();
-
-            lblPassword.IsVisible = false;
 
             _broadcasterService.Unsubscribe(nameof(GeneratorPage));
         }
@@ -147,11 +142,6 @@ namespace Bit.App.Pages
         {
             var page = new GeneratorHistoryPage();
             await Navigation.PushModalAsync(new Microsoft.Maui.Controls.NavigationPage(page));
-        }
-
-        private async void LengthSlider_DragCompleted(object sender, EventArgs e)
-        {
-            await _vm.SliderChangedAsync();
         }
 
         public override async Task UpdateOnThemeChanged()
