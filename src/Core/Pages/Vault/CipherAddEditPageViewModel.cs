@@ -547,7 +547,10 @@ namespace Bit.App.Pages
             // OAHU G12/G26: what Save read (fake data only; secrets as lengths).
             Console.WriteLine($"OAHUDEBUG save type={Cipher.Type} name='{Cipher.Name}' username='{Cipher.Login?.Username}' " +
                 $"password.len={Cipher.Login?.Password?.Length ?? 0} notes='{Cipher.Notes?.Replace("\n", "\\n")}' " +
-                $"uris=[{string.Join(" ", Uris.Select(u => u.Uri))}] fields=[{string.Join(" ", Fields.Select(f => $"{f.Field.Name}:{f.Field.Type}"))}] " +
+                $"uris=[{string.Join(" ", Uris.Select(u => u.Uri))}] fields=[{string.Join(" | ", Fields.Select(f => $"{f.Field.Name}:{f.Field.Type}={(f.Field.Type == FieldType.Hidden ? $"len {f.Field.Value?.Length ?? 0}" : f.Field.Type == FieldType.Linked ? f.Field.LinkedId?.ToString() : f.Field.Value)}"))}] " +
+                $"match=[{string.Join(" ", Uris.Select(u => u.Match?.ToString() ?? "-"))}] folder={Cipher.FolderId} org={Cipher.OrganizationId} " +
+                $"cols=[{string.Join(" ", Collections.Where(c => c.Checked).Select(c => c.Collection.Id))}] fav={Cipher.Favorite} reprompt={Cipher.Reprompt} " +
+                $"totp='{Cipher.Login?.Totp}' card.brand={Cipher.Card?.Brand} card.month={Cipher.Card?.ExpMonth} identity.title={Cipher.Identity?.Title} identity.email='{Cipher.Identity?.Email}' " +
                 $"identity.first='{Cipher.Identity?.FirstName}' card.len={Cipher.Card?.Number?.Length ?? 0} edits: {OahuDebugEditSummary()}");
 #endif
             var cipher = await _cipherService.EncryptAsync(Cipher);

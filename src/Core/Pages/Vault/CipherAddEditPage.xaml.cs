@@ -124,7 +124,13 @@ namespace Bit.App.Pages
                 await ShowAlertsAsync();
                 if (!_vm.EditMode && string.IsNullOrWhiteSpace(_vm.Cipher?.Name))
                 {
-                    _vm.RequestFocus(Bit.App.Contracts.FormField.Name);
+                    // As RequestFocus(_nameEntry) did: wait for the modal animation. A focus request delivered while the
+                    // modal is still presenting is dropped by SwiftUI (docs/oahu/gaps.md, step 5).
+                    Task.Run(async () =>
+                    {
+                        await Task.Delay(ShowModalAnimationDelay);
+                        MainThread.BeginInvokeOnMainThread(() => _vm.RequestFocus(Bit.App.Contracts.FormField.Name));
+                    });
                 }
 #if DEBUG
                 Bit.App.Pages.OahuDebug.OahuDebugEdit.Attached(this, _vm);

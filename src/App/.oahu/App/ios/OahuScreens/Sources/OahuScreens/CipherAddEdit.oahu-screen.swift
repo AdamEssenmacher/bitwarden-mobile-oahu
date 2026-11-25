@@ -10,6 +10,12 @@ public struct CipherAddEditScreen: View {
     // One row-text state per keyed list (OAHU "Text fields in rows").
     @State private var uriTexts = OahuRowTexts<EditUriRow>(\.uri)
     @State private var fieldTexts = OahuRowTexts<EditFieldRow>(\.editText)
+    @State private var localNotes: String?
+    static let notesLocal = ProcessInfo.processInfo.environment["BW_OAHU_NOTES_LOCAL"] == "1"
+
+    private var localNotesBinding: Binding<String> {
+        Binding(get: { localNotes ?? model.notes }, set: { localNotes = $0; model.notes = $0 })
+    }
 
     enum Focus: Hashable {
         case name, username, password, totp, cardholder, cardNumber, expYear, code, notes
@@ -83,8 +89,9 @@ public struct CipherAddEditScreen: View {
                 Text(copy.miscellaneous)
             }
             Section {
-                // MAUI's Editor with AutoSize: grows with its text.
-                TextField(copy.notes, text: $model.notes, axis: .vertical)
+                // MAUI's Editor with AutoSize: grows with its text. DEBUG A/B (BW_OAHU_NOTES_LOCAL=1): bind a local
+                // @State and copy it to the model, to tell SwiftUI's behavior from OAHU's binding (gaps.md, step 5).
+                TextField(copy.notes, text: Self.notesLocal ? localNotesBinding : $model.notes, axis: .vertical)
                     .lineLimit(3...)
                     .focused($focus, equals: .notes)
                     .accessibilityIdentifier("ItemNotesEntry")
