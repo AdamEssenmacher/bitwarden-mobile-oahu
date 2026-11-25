@@ -44,19 +44,9 @@ namespace Bit.App.Pages
             ToolbarItems.Add(_moreItem);
 #else
             ToolbarItems.Add(_logOut);
+            // Each LockPage is one logical screen; a new one replaces the last (docs/oahu/gaps.md, G20).
+            _mainLayout.AndroidSavedStateViewId = OahuAndroidIds.Get("oahu_lock");
 #endif
-        }
-
-        public Entry SecretEntry
-        {
-            get
-            {
-                if (_vm?.PinEnabled ?? false)
-                {
-                    return _pin;
-                }
-                return _masterPassword;
-            }
         }
 
         public async Task PromptBiometricAfterResumeAsync()
@@ -101,19 +91,14 @@ namespace Bit.App.Pages
 
                 await _vm.InitAsync();
 
-                _vm.FocusSecretEntry += PerformFocusSecretEntry;
-
+                // The view model's FocusSecretEntry reaches the screen through the contract's FocusSecret event; the
+                // biometric-only layout (no field, no Unlock) is part of ILockViewModel.Layout.
                 if (!_vm.BiometricEnabled)
                 {
-                    RequestFocus(SecretEntry);
+                    _vm.RequestSecretFocus();
                 }
                 else
                 {
-                    if (!_vm.HasMasterPassword && !_vm.PinEnabled)
-                    {
-                        _passwordGrid.IsVisible = false;
-                        _unlockButton.IsVisible = false;
-                    }
                     if (_autoPromptBiometric)
                     {
                         var tasks = Task.Run(async () =>
@@ -129,18 +114,6 @@ namespace Bit.App.Pages
                 LoggerHelper.LogEvenIfCantBeResolved(ex);
                 throw;
             }
-        }
-
-        private void PerformFocusSecretEntry(int? cursorPosition)
-        {
-            MainThread.BeginInvokeOnMainThread(() =>
-            {
-                SecretEntry.Focus();
-                if (cursorPosition.HasValue)
-                {
-                    SecretEntry.CursorPosition = cursorPosition.Value;
-                }
-            });
         }
 
         protected override bool OnBackButtonPressed()
@@ -161,41 +134,12 @@ namespace Bit.App.Pages
             _broadcasterService.Unsubscribe(nameof(LockPage));
         }
 
-        private void Unlock_Clicked(object sender, EventArgs e)
-        {
-            if (DoOnce())
-            {
-                var tasks = Task.Run(async () =>
-                {
-                    await Task.Delay(50);
-                    _vm.SubmitCommand.Execute(null);
-                });
-            }
-        }
-
         private async void LogOut_Clicked(object sender, EventArgs e)
         {
             await _accountListOverlay.HideAsync();
             if (DoOnce())
             {
                 await _vm.LogOutAsync();
-            }
-        }
-
-        private async void Biometric_Clicked(object sender, EventArgs e)
-        {
-            try
-            {
-                if (DoOnce())
-                {
-                    await _vm.PromptBiometricAsync();
-                }
-
-            }
-            catch (Exception ex)
-            {
-                LoggerHelper.LogEvenIfCantBeResolved(ex);
-                throw;
             }
         }
 

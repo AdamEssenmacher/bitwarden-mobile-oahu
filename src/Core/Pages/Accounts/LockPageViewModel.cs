@@ -20,7 +20,7 @@ using AsyncAwaitBestPractices;
 
 namespace Bit.App.Pages
 {
-    public class LockPageViewModel : BaseViewModel
+    public partial class LockPageViewModel : BaseViewModel
     {
         private readonly IApiService _apiService;
         private readonly IPlatformUtilsService _platformUtilsService;
