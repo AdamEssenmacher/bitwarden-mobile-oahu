@@ -17,6 +17,8 @@ enum BitwardenIcons {
     static let checkSquare = "\u{e93b}"
     static let generate = "\u{e90e}"
     static let questionCircle = "\u{e923}"
+    static let camera = "\u{e968}"
+    static let cog = "\u{e910}"
 
     /// Registers the font with the process once (fonts in a Swift package aren't in the app's UIAppFonts).
     static let registered: Bool = {

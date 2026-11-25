@@ -37,6 +37,8 @@ internal object BwIcons {
     const val CHECK_SQUARE = ""
     const val GENERATE = "\ue90e"
     const val QUESTION_CIRCLE = "\ue923"
+    const val CAMERA = "\ue968"
+    const val COG = "\ue910"
 }
 
 internal fun argb(value: Long): Color = Color(value.toInt())
