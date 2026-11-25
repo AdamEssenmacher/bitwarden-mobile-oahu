@@ -5,7 +5,7 @@
           xmlns:controls="clr-namespace:Bit.App.Controls"
           xmlns:u="clr-namespace:Bit.App.Utilities"
           xmlns:core="clr-namespace:Bit.Core" 
-          xmlns:behaviors="clr-namespace:CommunityToolkit.Maui.Behaviors"
+          xmlns:behaviors="clr-namespace:Bit.App.Behaviors.MCTTouch"
           x:Name="_accountView"
           x:DataType="controls:AccountViewCellViewModel">
     <Grid RowSpacing="0"

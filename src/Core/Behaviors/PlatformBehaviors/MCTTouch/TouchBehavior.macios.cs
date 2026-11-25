@@ -2,11 +2,10 @@
 using AsyncAwaitBestPractices;
 using CoreGraphics;
 using Foundation;
-using Microsoft.Maui.Controls.Compatibility.Platform.iOS;
 using Microsoft.Maui.Platform;
 using UIKit;
 
-namespace CommunityToolkit.Maui.Behaviors;
+namespace Bit.App.Behaviors.MCTTouch;
 
 public partial class TouchBehavior
 {
@@ -24,7 +23,7 @@ public partial class TouchBehavior
 
 		touchGesture = new TouchUITapGestureRecognizer(this);
 
-		if (((platformView as IVisualNativeElementRenderer)?.Control ?? platformView) is UIButton button)
+		if (platformView is UIButton button)
 		{
 			button.AllTouchEvents += PreventButtonHighlight;
 			((TouchUITapGestureRecognizer) touchGesture).IsButton = true;
@@ -48,7 +47,7 @@ public partial class TouchBehavior
 	/// <param name="platformView">Native View</param>
 	protected override void OnDetachedFrom(VisualElement bindable, UIView platformView)
 	{
-		if (((platformView as IVisualNativeElementRenderer)?.Control ?? platformView) is UIButton button)
+		if (platformView is UIButton button)
 		{
 			button.AllTouchEvents -= PreventButtonHighlight;
 		}

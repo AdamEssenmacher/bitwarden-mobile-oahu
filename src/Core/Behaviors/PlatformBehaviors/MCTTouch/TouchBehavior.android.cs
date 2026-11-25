@@ -15,7 +15,7 @@ using MView = Microsoft.Maui.Controls.View;
 using PlatformView = Android.Views.View;
 using ParentView = Android.Views.IViewParent;
 
-namespace CommunityToolkit.Maui.Behaviors;
+namespace Bit.App.Behaviors.MCTTouch;
 
 public partial class TouchBehavior
 {

@@ -1,6 +1,6 @@
 ﻿using System.Windows.Input;
 
-namespace CommunityToolkit.Maui.Behaviors;
+namespace Bit.App.Behaviors.MCTTouch;
 
 /// <summary>
 /// 
@@ -307,7 +307,7 @@ public partial class TouchBehavior : PlatformBehavior<VisualElement>
 	/// Bindable property for <see cref="HoverStatus"/>
 	/// </summary>
 	public static readonly BindableProperty HoverStatusProperty = BindableProperty.Create(
-		nameof(Behaviors.HoverStatus),
+		nameof(HoverStatus),
 		typeof(HoverStatus),
 		typeof(TouchBehavior),
 		HoverStatus.Exited,
@@ -326,7 +326,7 @@ public partial class TouchBehavior : PlatformBehavior<VisualElement>
 	/// Bindable property for <see cref="HoverState"/>
 	/// </summary>
 	public static readonly BindableProperty HoverStateProperty = BindableProperty.Create(
-		nameof(Behaviors.HoverState),
+		nameof(HoverState),
 		typeof(HoverState),
 		typeof(TouchBehavior),
 		HoverState.Normal,

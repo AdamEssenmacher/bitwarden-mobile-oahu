@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Maui.Behaviors;
+﻿using Bit.App.Behaviors.MCTTouch;
 
 namespace Bit.App.Controls
 {

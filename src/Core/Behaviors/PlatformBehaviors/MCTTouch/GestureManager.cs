@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CommunityToolkit.Maui.Extensions;
 using static System.Math;
 
-namespace CommunityToolkit.Maui.Behaviors;
+namespace Bit.App.Behaviors.MCTTouch;
 
 sealed class GestureManager : IDisposable
 {

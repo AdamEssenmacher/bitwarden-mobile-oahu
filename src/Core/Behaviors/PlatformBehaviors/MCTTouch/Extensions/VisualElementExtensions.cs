@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ViewExtensions = Microsoft.Maui.Controls.ViewExtensions;
 
-namespace CommunityToolkit.Maui.Extensions;
+namespace Bit.App.Behaviors.MCTTouch;
 static class VisualElementExtensions
 {
 	internal static bool TryFindParentElementWithParentOfType<T>(this VisualElement? element, out VisualElement? result, out T? parent) where T : VisualElement

@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CommunityToolkit.Maui.Behaviors;
+namespace Bit.App.Behaviors.MCTTouch;
 public partial class TouchBehavior : IDisposable
 {
 	readonly NullReferenceException nre = new(nameof(Element));

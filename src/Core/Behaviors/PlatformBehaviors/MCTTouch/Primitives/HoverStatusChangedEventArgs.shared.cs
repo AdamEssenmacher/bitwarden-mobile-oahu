@@ -1,4 +1,4 @@
-﻿namespace CommunityToolkit.Maui.Behaviors;
+﻿namespace Bit.App.Behaviors.MCTTouch;
 
 /// <summary>
 /// Provides data for the <see cref="TouchBehavior.HoverStatusChanged"/> event.
