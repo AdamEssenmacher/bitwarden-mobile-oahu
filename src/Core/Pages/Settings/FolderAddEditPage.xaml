@@ -5,6 +5,8 @@
     x:Class="Bit.App.Pages.FolderAddEditPage"
     xmlns:pages="clr-namespace:Bit.App.Pages"
     xmlns:u="clr-namespace:Bit.App.Utilities"
+    xmlns:oahu="clr-namespace:Oahu.Maui;assembly=Oahu.Maui"
+    xmlns:contracts="clr-namespace:Bit.App.Contracts;assembly=Core.Contracts"
     x:DataType="pages:FolderAddEditPageViewModel"
     HideSoftInputOnTapped="True"
     x:Name="_page"
@@ -36,23 +38,10 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <ScrollView x:Name="_scrollView">
-        <StackLayout Spacing="20">
-            <StackLayout StyleClass="box">
-                <StackLayout StyleClass="box-row, box-row-input">
-                    <Label
-                        Text="{u:I18n Name}"
-                        StyleClass="box-label" />
-                    <Entry
-                        Text="{Binding Folder.Name}"
-                        StyleClass="box-value"
-                        x:Name="_nameEntry"
-                        ReturnType="Go"
-                        ReturnCommand="{Binding SubmitCommand}"
-                        AutomationId="FolderNameEntry" />
-                </StackLayout>
-            </StackLayout>
-        </StackLayout>
-    </ScrollView>
+    <!-- OAHU: the name field is a native screen (FolderAddEditScreen in SwiftUI and Compose). The toolbar items
+         (Cancel, Save, Delete or the iOS options menu) stay MAUI's. -->
+    <oahu:OahuView x:Name="_screen"
+                   x:TypeArguments="contracts:IFolderAddEditViewModel"
+                   ViewModel="{Binding .}" />
 
 </pages:BaseContentPage>

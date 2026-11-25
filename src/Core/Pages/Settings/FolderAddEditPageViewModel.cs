@@ -10,7 +10,7 @@ using Microsoft.Maui;
 
 namespace Bit.App.Pages
 {
-    public class FolderAddEditPageViewModel : BaseViewModel
+    public partial class FolderAddEditPageViewModel : BaseViewModel
     {
         private readonly IDeviceActionService _deviceActionService;
         private readonly IFolderService _folderService;

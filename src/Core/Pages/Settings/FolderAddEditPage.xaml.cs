@@ -38,13 +38,10 @@ namespace Bit.App.Pages
         protected override async void OnAppearing()
         {
             base.OnAppearing();
-            await LoadOnAppearedAsync(_scrollView, true, async () =>
+            // OAHU: the native screen focuses its name field itself when adding (FocusName).
+            await LoadOnAppearedAsync(_screen, true, async () =>
             {
                 await _vm.LoadAsync();
-                if (!_vm.EditMode)
-                {
-                    RequestFocus(_nameEntry);
-                }
             });
         }
 

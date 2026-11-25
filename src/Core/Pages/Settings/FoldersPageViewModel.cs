@@ -8,7 +8,7 @@ using Bit.Core.Utilities;
 
 namespace Bit.App.Pages
 {
-    public class FoldersPageViewModel : BaseViewModel
+    public partial class FoldersPageViewModel : BaseViewModel
     {
         private readonly IFolderService _folderService;
 

@@ -8,6 +8,8 @@
     xmlns:u="clr-namespace:Bit.App.Utilities"
     xmlns:views="clr-namespace:Bit.Core.Models.View"
     xmlns:effects="clr-namespace:Bit.App.Effects"
+    xmlns:oahu="clr-namespace:Oahu.Maui;assembly=Oahu.Maui"
+    xmlns:contracts="clr-namespace:Bit.App.Contracts;assembly=Core.Contracts"
     x:DataType="pages:FoldersPageViewModel"
     x:Name="_page"
     Title="{Binding PageTitle}">
@@ -18,43 +20,16 @@
 
     <ContentPage.Resources>
         <ResourceDictionary>
-            <u:InverseBoolConverter x:Key="inverseBool" />
             <ToolbarItem x:Name="_closeItem" x:Key="closeItem" Text="{u:I18n Close}"
                          Clicked="Close_Clicked" Order="Primary" Priority="-1" />
             <ToolbarItem x:Name="_addItem" x:Key="addItem" IconImageSource="plus.png"
                          Clicked="AddButton_Clicked" Order="Primary"
                          SemanticProperties.Description="{u:I18n AddItem}" />
-            <StackLayout x:Name="_mainLayout" x:Key="mainLayout">
-                <Label IsVisible="{Binding ShowNoData}"
-                       Text="{u:I18n NoFoldersToList}"
-                       Margin="20, 0"
-                       VerticalOptions="CenterAndExpand"
-                       HorizontalOptions="CenterAndExpand"
-                       HorizontalTextAlignment="Center"
-                       AutomationId="NoFoldersLabel"></Label>
-                <controls:ExtendedCollectionView
-                          IsVisible="{Binding ShowNoData, Converter={StaticResource inverseBool}}"
-                          ItemsSource="{Binding Folders}"
-                          VerticalOptions="FillAndExpand"
-                          SelectionMode="Single"
-                          SelectionChanged="RowSelected"
-                          StyleClass="list, list-platform"
-                          ExtraDataForLogging="Folders Page">
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="views:FolderView">
-                            <controls:ExtendedStackLayout
-                                StyleClass="list-row, list-row-platform"
-                                Padding="10"
-                                AutomationId="FolderCell">
-                                <Label LineBreakMode="TailTruncation"
-                                        StyleClass="list-title, list-title-platform"
-                                        Text="{Binding Name, Mode=OneWay}"
-                                        AutomationId="FolderName" />
-                            </controls:ExtendedStackLayout>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </controls:ExtendedCollectionView>
-            </StackLayout>
+            <!-- OAHU: the list and its empty state are a native screen (FoldersScreen in SwiftUI and Compose).
+                 The page keeps its title, toolbar items and navigation. -->
+            <oahu:OahuView x:Name="_mainLayout" x:Key="mainLayout"
+                           x:TypeArguments="contracts:IFoldersViewModel"
+                           ViewModel="{Binding .}" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -67,14 +42,6 @@
             AbsoluteLayout.LayoutFlags="All"
             AbsoluteLayout.LayoutBounds="0, 0, 1, 1">
         </ContentView>
-        <Button
-            x:Name="_fab"
-            ImageSource="plus.png"
-            Clicked="AddButton_Clicked"
-            Style="{StaticResource btn-fab}"
-            AbsoluteLayout.LayoutFlags="PositionProportional"
-            AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"
-            SemanticProperties.Description="{u:I18n AddFolder}"/>
     </AbsoluteLayout>
 
 </pages:BaseContentPage>

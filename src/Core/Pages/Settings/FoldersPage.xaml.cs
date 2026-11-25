@@ -2,6 +2,7 @@
 using System.Linq;
 using Bit.App.Controls;
 using Bit.Core.Models.View;
+using Bit.Core.Utilities;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui;
 
@@ -17,11 +18,14 @@ namespace Bit.App.Pages
             SetActivityIndicator(_mainContent);
             _vm = BindingContext as FoldersPageViewModel;
             _vm.Page = this;
+            // OAHU: the native screen sends row taps and its own add button (Android) to the view model, which
+            // hands them back here so the page navigates as before.
+            _vm.FolderSelected += folder => OpenFolderAsync(folder).FireAndForget();
+            _vm.AddRequested += () => AddButton_Clicked(this, EventArgs.Empty);
 
             // TODO Xamarin.Forms.Device.RuntimePlatform is no longer supported. Use Microsoft.Maui.Devices.DeviceInfo.Platform instead. For more details see https://learn.microsoft.com/en-us/dotnet/maui/migration/forms-projects#device-changes
             if (Device.RuntimePlatform == Device.iOS)
             {
-                _absLayout.Children.Remove(_fab);
                 ToolbarItems.Add(_closeItem);
                 ToolbarItems.Add(_addItem);
             }
@@ -36,14 +40,9 @@ namespace Bit.App.Pages
             }, _mainContent);
         }
 
-        private async void RowSelected(object sender, SelectionChangedEventArgs e)
+        private async Task OpenFolderAsync(FolderView folder)
         {
-            ((ExtendedCollectionView)sender).SelectedItem = null;
             if (!DoOnce())
-            {
-                return;
-            }
-            if (!(e.CurrentSelection?.FirstOrDefault() is FolderView folder))
             {
                 return;
             }
