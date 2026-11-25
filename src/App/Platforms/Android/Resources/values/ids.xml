@@ -6,4 +6,5 @@
     <item type="id" name="oahu_generator_tab" />
     <item type="id" name="oahu_generator_modal" />
     <item type="id" name="oahu_lock" />
+    <item type="id" name="oahu_cipher_edit" />
 </resources>
