@@ -205,8 +205,11 @@ namespace Bit.App.Pages.OahuDebug
             Task.FromResult(true);
         public Tuple<ResetPasswordPolicyOptions, bool> GetResetPasswordPolicyOptions(IEnumerable<Policy> policies, string orgId) =>
             new(new ResetPasswordPolicyOptions(), false);
+        /// <summary>The generator-policy route (step 4) sets an organization's password generator policy here.</summary>
+        public PasswordGeneratorPolicyOptions GeneratorPolicy { get; set; }
+
         public Task<PasswordGeneratorPolicyOptions> GetPasswordGeneratorPolicyOptionsAsync() =>
-            Task.FromResult(new PasswordGeneratorPolicyOptions());
+            Task.FromResult(GeneratorPolicy ?? new PasswordGeneratorPolicyOptions());
     }
 
     /// <summary>
@@ -256,19 +259,35 @@ namespace Bit.App.Pages.OahuDebug
     public sealed class FakeVaultTimeoutService : IVaultTimeoutService
     {
         public long? DelayLockAndLogoutMs { get; set; }
-        public Task<bool> IsLockedAsync(string userId = null) => Task.FromResult(false);
+        /// <summary>The lock routes (step 4): lock settings and state come from OahuDebugLock.</summary>
+        public bool LockEnabled { get; set; }
+
+        public Task<bool> IsLockedAsync(string userId = null) => Task.FromResult(LockEnabled && OahuDebugLock.Locked);
         public Task CheckVaultTimeoutAsync() => Task.CompletedTask;
         public Task<bool> ShouldTimeoutAsync(string userId = null) => Task.FromResult(false);
         public Task ExecuteTimeoutActionAsync(string userId = null) => Task.CompletedTask;
         public Task ClearAsync(string userId = null) => Task.CompletedTask;
-        public Task<bool> ShouldLockAsync(string userId = null) => Task.FromResult(false);
+        public Task<bool> ShouldLockAsync(string userId = null) => Task.FromResult(LockEnabled && OahuDebugLock.Locked);
         public Task<bool> IsLoggedOutByTimeoutAsync(string userId = null) => Task.FromResult(false);
         public Task<bool> ShouldLogOutByTimeoutAsync(string userId = null) => Task.FromResult(false);
-        public Task<PinLockType> GetPinLockTypeAsync(string userId = null) => Task.FromResult(PinLockType.Disabled);
-        public Task<bool> IsBiometricLockSetAsync(string userId = null) => Task.FromResult(false);
+        public Task<PinLockType> GetPinLockTypeAsync(string userId = null) =>
+            Task.FromResult(LockEnabled && OahuDebugLock.Pin ? PinLockType.Persistent : PinLockType.Disabled);
+        public Task<bool> IsBiometricLockSetAsync(string userId = null) => Task.FromResult(LockEnabled && OahuDebugLock.Biometric);
 
         public Task LockAsync(bool allowSoftLock = false, bool userInitiated = false, string userId = null)
         {
+            if (LockEnabled)
+            {
+                // As VaultTimeoutService.LockAsync and AccountsManager.LockedAsync do: drop the key, then navigate to
+                // LockPage through the app (App.Navigate replaces MainPage). The "locked" message itself can't be used:
+                // AccountsManager holds the real state service, which doesn't know the fake account.
+                OahuDebugLock.Locked = true;
+                Console.WriteLine($"OAHUDEBUG locking (user initiated: {userInitiated})");
+                MainThread.BeginInvokeOnMainThread(() => ((Bit.App.App)Application.Current).Navigate(
+                    Bit.Core.Enums.NavigationTarget.Lock,
+                    new Bit.App.Utilities.AccountManagement.LockNavigationParams(autoPromptBiometric: !userInitiated)));
+                return Task.CompletedTask;
+            }
             ServiceContainer.Resolve<IPlatformUtilsService>("platformUtilsService")
                 .ShowToast("info", null, "OAHU debug: Lock is not available with the fake vault.");
             return Task.CompletedTask;
