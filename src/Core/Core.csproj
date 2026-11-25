@@ -1,20 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <!--When running Unit tests we'll have the custom constant "UT" added, so in this manner we can add the net8.0 target we need for UT -->
-    <TargetFrameworks Condition="$(CustomConstants.Contains(UT))">net8.0;net8.0-android;net8.0-ios</TargetFrameworks>
-    <TargetFrameworks Condition="!$(CustomConstants.Contains(UT))">net8.0-android;net8.0-ios</TargetFrameworks>
+    <!--When running Unit tests we'll have the custom constant "UT" added, so in this manner we can add the net11.0 target we need for UT -->
+    <TargetFrameworks Condition="$(CustomConstants.Contains(UT))">net11.0;net11.0-android;net11.0-ios</TargetFrameworks>
+    <TargetFrameworks Condition="!$(CustomConstants.Contains(UT))">net11.0-android;net11.0-ios</TargetFrameworks>
     <RootNamespace>Bit.Core</RootNamespace>
 
     <UseMaui>true</UseMaui>
 		<ImplicitUsings>enable</ImplicitUsings>
     
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">11.0</SupportedOSPlatformVersion>
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">17.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">28.0</SupportedOSPlatformVersion>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-ios|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net11.0-ios|AnyCPU'">
 	  <CreatePackage>false</CreatePackage>
 	</PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-ios|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net11.0-ios|AnyCPU'">
     <CreatePackage>false</CreatePackage>
   </PropertyGroup>
 	<PropertyGroup>
@@ -47,7 +47,7 @@
 		<PackageReference Include="AsyncAwaitBestPractices.MVVM" Version="6.0.6" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
 		<PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
-		<!-- HACK: When running Unit Tests we cannot load FFImageLoading because it doesn't support "raw" net8.0 -->
+		<!-- HACK: When running Unit Tests we cannot load FFImageLoading because it doesn't support "raw" net11.0 -->
 		<PackageReference Condition="!$(CustomConstants.Contains(UT))" Include="FFImageLoadingCompat.Maui" Version="0.1.1" />
 	</ItemGroup>
 	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">

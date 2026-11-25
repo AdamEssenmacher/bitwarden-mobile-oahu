@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net8.0-ios;net8.0-android</TargetFrameworks>
+    <TargetFrameworks>net11.0-ios;net11.0-android</TargetFrameworks>
     <Nullable>enable</Nullable>
     <UseMaui>true</UseMaui>
     <ImplicitUsings>true</ImplicitUsings>
@@ -16,7 +16,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <CreatePackage>false</CreatePackage>
   </PropertyGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0-android'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net11.0-android'">
     <Content Remove="**" />
     <Compile Remove="**" />
     <EmbeddedResource Remove="**" />

@@ -1,6 +1,6 @@
 <Project>
  <PropertyGroup>
-   <MauiVersion>8.0.7</MauiVersion>
+   <MauiVersion>11.0.0</MauiVersion>
    <ReleaseCodesignProvision>Automatic:AppStore</ReleaseCodesignProvision>
    <ReleaseCodesignKey>iPhone Distribution</ReleaseCodesignKey>
    <IncludeBitwardeniOSExtensions>True</IncludeBitwardeniOSExtensions>

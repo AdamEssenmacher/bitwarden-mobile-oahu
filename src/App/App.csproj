@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net8.0-android;net8.0-ios</TargetFrameworks>
+		<TargetFrameworks>net11.0-android;net11.0-ios</TargetFrameworks>
 
     <!-- Uncomment to also build for Windows platform.-->
-    <!--<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.19041.0</TargetFrameworks>-->
+    <!--<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net11.0-windows10.0.19041.0</TargetFrameworks>-->
 
     <!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
-    <!-- <TargetFrameworks>$(TargetFrameworks);net8.0-tizen</TargetFrameworks> -->
+    <!-- <TargetFrameworks>$(TargetFrameworks);net11.0-tizen</TargetFrameworks> -->
 
 		<OutputType>Exe</OutputType>
 		<RootNamespace>Bit.App</RootNamespace>
@@ -27,20 +27,20 @@
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
 		<ApplicationVersion>1</ApplicationVersion>
 
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">11.0</SupportedOSPlatformVersion>
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">17.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">28.0</SupportedOSPlatformVersion>
 
 		<ForceSimulatorX64ArchitectureInIDE>true</ForceSimulatorX64ArchitectureInIDE>
 	</PropertyGroup>
 	<PropertyGroup>
     <DefineConstants Condition=" '$(CustomConstants)' != '' ">$(DefineConstants);$(CustomConstants)</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-android|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net11.0-android|AnyCPU'">
     <AndroidEnableMultiDex>True</AndroidEnableMultiDex>
     <UseInterpreter>False</UseInterpreter>
     <DebugSymbols>True</DebugSymbols>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-android|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net11.0-android|AnyCPU'">
     <AndroidEnableMultiDex>True</AndroidEnableMultiDex>
     <UseInterpreter>False</UseInterpreter>
     <DebugSymbols>False</DebugSymbols>
@@ -50,20 +50,20 @@
     <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
     <AndroidEnableProfiledAot>true</AndroidEnableProfiledAot>
   </PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-ios|AnyCPU'">
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net11.0-ios|AnyCPU'">
 	  <CreatePackage>false</CreatePackage>
 	  <CodesignProvision>Automatic</CodesignProvision>
 	  <CodesignKey>iPhone Developer</CodesignKey>
 	  <CodesignEntitlements>Platforms\iOS\Entitlements.plist</CodesignEntitlements>
 	  <UseInterpreter>true</UseInterpreter>
 	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(RuntimeIdentifier)'=='Debug|net8.0-ios|iossimulator-x64'">
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(RuntimeIdentifier)'=='Debug|net11.0-ios|iossimulator-x64'">
 		<MtouchExtraArgs>$(Argon2IdLoadMtouchExtraArgs)</MtouchExtraArgs>
 	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(RuntimeIdentifier)'=='Debug|net8.0-ios|ios-arm64'">
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(RuntimeIdentifier)'=='Debug|net11.0-ios|ios-arm64'">
 		<MtouchExtraArgs>$(Argon2IdLoadMtouchExtraArgs)</MtouchExtraArgs>
 	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-ios|AnyCPU'">
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net11.0-ios|AnyCPU'">
 	  <CreatePackage>false</CreatePackage>
       <CodesignProvision>$(ReleaseCodesignProvision)</CodesignProvision>
       <CodesignKey>$(ReleaseCodesignKey)</CodesignKey>
@@ -227,7 +227,7 @@
 			<IsWatchApp>false</IsWatchApp>
 		</ProjectReference>
 	</ItemGroup>
-	<PropertyGroup Condition="'$(TargetFramework)'=='net8.0-ios' AND '$(IncludeBitwardenWatchOSApp)' == 'True'">
+	<PropertyGroup Condition="'$(TargetFramework)'=='net11.0-ios' AND '$(IncludeBitwardenWatchOSApp)' == 'True'">
 		<WatchAppBuildPath Condition=" '$(Configuration)' == 'Debug' ">$(Home)/Library/Developer/Xcode/DerivedData/bitwarden-acgkbpwvmebfiofokotvoerzkqcl/Build/Products</WatchAppBuildPath>
 		<WatchAppBuildPath Condition=" '$(Configuration)' != 'Debug' ">$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..'))/watchOS/bitwarden.xcarchive/Products/Applications/bitwarden.app/Watch</WatchAppBuildPath>
 		<WatchAppBundle>Bitwarden.app</WatchAppBundle>
@@ -236,10 +236,10 @@
 		<WatchAppBundleFullPath Condition=" '$(Configuration)' == 'Debug' ">$(WatchAppBuildPath)/$(Configuration)-$(WatchAppConfiguration)/$(WatchAppBundle)</WatchAppBundleFullPath>
 		<WatchAppBundleFullPath Condition=" '$(Configuration)' != 'Debug' ">$(WatchAppBuildPath)/$(WatchAppBundle)</WatchAppBundleFullPath>
 	</PropertyGroup>
-	<ItemGroup Condition="'$(TargetFramework)'=='net8.0-ios' AND Exists('$(WatchAppBundleFullPath)') ">
+	<ItemGroup Condition="'$(TargetFramework)'=='net11.0-ios' AND Exists('$(WatchAppBundleFullPath)') ">
 		<_ResolvedWatchAppReferences Include="$(WatchAppBundleFullPath)" />
 	</ItemGroup>
-	<PropertyGroup Condition="'$(TargetFramework)'=='net8.0-ios' AND Exists('$(WatchAppBundleFullPath)') ">
+	<PropertyGroup Condition="'$(TargetFramework)'=='net11.0-ios' AND Exists('$(WatchAppBundleFullPath)') ">
 		<CreateAppBundleDependsOn>
 			_CopyWatchOS2AppsToBundle;
 			$(CreateAppBundleDependsOn);
