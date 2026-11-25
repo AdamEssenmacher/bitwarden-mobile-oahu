@@ -64,6 +64,18 @@ namespace Bit.App.Pages.OahuDebug
                 {
                     SeedLarge(2000);
                 }
+                if (variant == "vault-manypick")
+                {
+                    // Step 5: long picker and checklist lists (300 folders, 2,000 collections in Example Org).
+                    for (var i = 0; i < 300; i++)
+                    {
+                        Folders.Add(($"folder-bulk-{i:000}", $"Bulk folder {i:000}"));
+                    }
+                    for (var i = 0; i < 2000; i++)
+                    {
+                        Collections.Add(new() { Id = $"col-bulk-{i:0000}", OrganizationId = OrgId, Name = $"Team {i:0000}" });
+                    }
+                }
             }
         }
 
@@ -174,6 +186,32 @@ namespace Bit.App.Pages.OahuDebug
             };
             _ciphers.Add(github);
 
+            // Step 5: a login with many URIs (each match type) and custom fields of every kind.
+            var many = Login("login-many", "Many fields", "many@example.com", "M4ny-Fields!",
+                new[] { "https://one.example.com", "https://two.example.com/path", "two.example.com", "^https://re\\.example",
+                    "https://exact.example.com/a", "https://never.example.com", "androidapp://com.example.many",
+                    "iosapp://com.example.many" }, folderId: "folder-personal");
+            UriMatchType?[] matches = { null, UriMatchType.Domain, UriMatchType.Host, UriMatchType.RegularExpression,
+                UriMatchType.Exact, UriMatchType.Never, UriMatchType.StartsWith, null };
+            for (var i = 0; i < many.Login.Uris.Count; i++)
+            {
+                many.Login.Uris[i].Match = matches[i];
+            }
+            many.Fields = new List<Field>
+            {
+                new() { Type = FieldType.Text, Name = Enc("Customer number"), Value = Enc("C-000123") },
+                new() { Type = FieldType.Hidden, Name = Enc("Security answer"), Value = Enc("fake-answer-blue") },
+                new() { Type = FieldType.Boolean, Name = Enc("Newsletter"), Value = Enc("false") },
+                new() { Type = FieldType.Linked, Name = Enc("Login password"), LinkedId = LinkedIdType.Login_Password },
+                new() { Type = FieldType.Text, Name = Enc("Branch"), Value = Enc("North") },
+                new() { Type = FieldType.Hidden, Name = Enc("Backup PIN"), Value = Enc("0000") },
+                new() { Type = FieldType.Boolean, Name = Enc("Paperless"), Value = Enc("true") },
+                new() { Type = FieldType.Text, Name = Enc("Account manager"), Value = Enc("Bob Example") },
+                new() { Type = FieldType.Linked, Name = Enc("Login name"), LinkedId = LinkedIdType.Login_Username },
+                new() { Type = FieldType.Text, Name = Enc("Notes 2"), Value = Enc(null) },
+            };
+            _ciphers.Add(many);
+
             _ciphers.Add(Login("login-gmail", "Gmail", "bob@example.com", "Gm@il-2026-pass",
                 new[] { "https://accounts.google.com" },
                 totp: "otpauth://totp/Google:bob@example.com?secret=GEZDGNBVGY3TQOJQ&period=60", favorite: true));
@@ -244,6 +282,64 @@ namespace Bit.App.Pages.OahuDebug
                     totp: i % 25 == 0 ? "JBSWY3DPEHPK3PXP" : null, folderId: folders[i % folders.Length],
                     favorite: i % 100 == 0));
             }
+        }
+
+        /// <summary>A "saved" Cipher with every value the add/edit page can change, from the page's CipherView.</summary>
+        public static Cipher FromView(CipherView v, Cipher original)
+        {
+            var c = Base(v.Id, v.Type, v.Name);
+            c.OrganizationId = v.OrganizationId;
+            c.FolderId = v.FolderId;
+            c.Notes = Enc(v.Notes);
+            c.Favorite = v.Favorite;
+            c.Reprompt = v.Reprompt;
+            c.Edit = original?.Edit ?? true;
+            c.ViewPassword = original?.ViewPassword ?? true;
+            c.OrganizationUseTotp = original?.OrganizationUseTotp ?? true;
+            c.CreationDate = original?.CreationDate ?? DateTime.UtcNow;
+            c.RevisionDate = DateTime.UtcNow;
+            c.CollectionIds = v.CollectionIds ?? original?.CollectionIds;
+            c.Attachments = original?.Attachments;
+            c.PasswordHistory = original?.PasswordHistory;
+            c.Fields = v.Fields?.Select(f => new Field { Type = f.Type, Name = Enc(f.Name), Value = Enc(f.Value), LinkedId = f.LinkedId })
+                .ToList();
+            switch (v.Type)
+            {
+                case CipherType.Login:
+                    c.Login = new Login
+                    {
+                        Username = Enc(v.Login?.Username),
+                        Password = Enc(v.Login?.Password),
+                        Totp = Enc(v.Login?.Totp),
+                        Uris = v.Login?.Uris?.Select(u => new LoginUri { Uri = Enc(u.Uri), Match = u.Match }).ToList(),
+                        PasswordRevisionDate = original?.Login?.PasswordRevisionDate,
+                        Fido2Credentials = v.Login?.Fido2Credentials == null ? null : original?.Login?.Fido2Credentials,
+                    };
+                    break;
+                case CipherType.Card:
+                    c.Card = new Card
+                    {
+                        CardholderName = Enc(v.Card?.CardholderName), Number = Enc(v.Card?.Number), Code = Enc(v.Card?.Code),
+                        ExpMonth = Enc(v.Card?.ExpMonth), ExpYear = Enc(v.Card?.ExpYear), Brand = Enc(v.Card?.Brand),
+                    };
+                    break;
+                case CipherType.Identity:
+                    var i = v.Identity;
+                    c.Identity = new Identity
+                    {
+                        Title = Enc(i?.Title), FirstName = Enc(i?.FirstName), MiddleName = Enc(i?.MiddleName),
+                        LastName = Enc(i?.LastName), Username = Enc(i?.Username), Company = Enc(i?.Company),
+                        SSN = Enc(i?.SSN), PassportNumber = Enc(i?.PassportNumber), LicenseNumber = Enc(i?.LicenseNumber),
+                        Email = Enc(i?.Email), Phone = Enc(i?.Phone), Address1 = Enc(i?.Address1), Address2 = Enc(i?.Address2),
+                        Address3 = Enc(i?.Address3), City = Enc(i?.City), State = Enc(i?.State),
+                        PostalCode = Enc(i?.PostalCode), Country = Enc(i?.Country),
+                    };
+                    break;
+                default:
+                    c.SecureNote = new SecureNote { Type = SecureNoteType.Generic };
+                    break;
+            }
+            return c;
         }
 
         private static Cipher Base(string id, CipherType type, string name)

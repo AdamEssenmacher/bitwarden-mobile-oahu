@@ -18,6 +18,8 @@
 //   BW_OAHU_SECURE / bwOahuSecure    1: screen capture not allowed (Android FLAG_SECURE, as the app's setting does).
 //   BW_OAHU_DRILL / bwOahuDrill      1: push Types > Login, then a folder, then a collection, one after the other.
 //
+// Step 5 (docs/oahu/05-cipher-edit.md): edit, with BW_OAHU_EDIT and the options listed in OahuDebugEdit.cs.
+//
 // Step 4 (docs/oahu/04-generator-lock.md):
 //   generator, generator-policy  The vault routes, opened on the Generator tab; -policy adds an organization password
 //                               generator policy (minimum length 20, at least 3 numbers and 2 special characters, all
@@ -120,6 +122,20 @@ namespace Bit.App.Pages.OahuDebug
                     // Posted, not BeginInvokeOnMainThread (which runs at once on the main thread): ShowLock must run
                     // after App.Bootstrap has finished with the real platform utilities.
                     Application.Current.Dispatcher.Dispatch(ShowLock);
+                    return true;
+                case "edit":
+                    if (!_shown)
+                    {
+                        _shown = true;
+                        InstallVault(Option("BW_OAHU_VAULT", "bwOahuVault") ?? "vault");
+                        // The page asks whether the account has a master password (the re-prompt toggle).
+                        ServiceContainer.RegisteredServices["userVerificationService"] = new FakeUserVerificationService();
+                    }
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        ShowVault();
+                        OahuDebugEdit.Show();
+                    });
                     return true;
                 default:
                     return false;

@@ -76,22 +76,9 @@ namespace Bit.App.Pages.OahuDebug
 
         public Task<Cipher> EncryptAsync(CipherView model, SymmetricCryptoKey key = null, Cipher originalCipher = null)
         {
-            // Only what the add/edit page needs to save a login, card, note or identity name in the debug vault.
-            var c = model.Type == CipherType.Login
-                ? FakeVault.Login(model.Id, model.Name, model.Login?.Username, model.Login?.Password,
-                    model.Login?.Uris?.Select(u => u.Uri).ToArray(), model.Login?.Totp, model.FolderId, model.Favorite,
-                    model.OrganizationId, model.CollectionIds?.ToArray())
-                : originalCipher ?? new Cipher { Type = model.Type };
-            c.Id = model.Id;
-            c.Name = FakeVault.Enc(model.Name);
-            c.Notes = FakeVault.Enc(model.Notes);
-            c.FolderId = model.FolderId;
-            c.Favorite = model.Favorite;
-            c.Edit = true;
-            c.ViewPassword = true;
-            c.RevisionDate = DateTime.UtcNow;
-            c.CreationDate = originalCipher?.CreationDate ?? DateTime.UtcNow;
-            return Task.FromResult(c);
+            // Step 5: everything the add/edit page can change round-trips (FakeVault.FromView), so an edit, an add and
+            // a clone can be opened again and checked.
+            return Task.FromResult(FakeVault.FromView(model, originalCipher ?? _vault.Get(model.Id)));
         }
 
         public async Task SaveWithServerAsync(Cipher cipher)
