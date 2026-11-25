@@ -141,6 +141,7 @@ dependencies {
         implementation('com.github.bumptech.glide:disklrucache:5.0.7') { because 'Xamarin.Android.Glide.DiskLruCache 5.0.7.1 in the .NET host' }
         implementation('com.github.bumptech.glide:gifdecoder:5.0.7') { because 'Xamarin.Android.Glide.GifDecoder 5.0.7.1 in the .NET host' }
         implementation('com.github.bumptech.glide:glide:5.0.7') { because 'Xamarin.Android.Glide 5.0.7.1 in the .NET host' }
+        implementation('com.google.accompanist:accompanist-drawablepainter:0.37.3') { because 'Xamarin.Google.Accompanist.DrawablePainter 0.37.3.4 in the .NET host' }
         implementation('com.google.android.datatransport:transport-api:3.0.0') { because 'Xamarin.Google.Android.DataTransport.TransportApi 3.0.0.8 in the .NET host' }
         implementation('com.google.android.datatransport:transport-backend-cct:3.1.9') { because 'Xamarin.Google.Android.DataTransport.TransportBackendCct 3.1.9.2 in the .NET host' }
         implementation('com.google.android.datatransport:transport-runtime:3.1.9') { because 'Xamarin.Google.Android.DataTransport.TransportRuntime 3.1.9.2 in the .NET host' }
@@ -169,8 +170,8 @@ dependencies {
         implementation('com.google.guava:listenablefuture:1.0') { because 'Xamarin.Google.Guava.ListenableFuture 1.0.0.32 in the .NET host' }
         implementation('javax.inject:javax.inject:1') { because 'Xamarin.JavaX.Inject 1.0.0.9 in the .NET host' }
         implementation('org.jetbrains.kotlin:kotlin-stdlib:2.4.0') { because 'Xamarin.Kotlin.StdLib 2.4.0.1 in the .NET host' }
-        implementation('org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.0') { because 'Xamarin.Kotlin.StdLib.Jdk7 1.9.0 in the .NET host' }
-        implementation('org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0') { because 'Xamarin.Kotlin.StdLib.Jdk8 1.9.0 in the .NET host' }
+        implementation('org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.4.0') { because 'Xamarin.Kotlin.StdLib.Jdk7 2.4.0.1 in the .NET host' }
+        implementation('org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.4.0') { because 'Xamarin.Kotlin.StdLib.Jdk8 2.4.0.1 in the .NET host' }
         implementation('org.jetbrains.kotlinx:atomicfu:0.33.0') { because 'Xamarin.KotlinX.AtomicFU 0.33.0.1 in the .NET host' }
         implementation('org.jetbrains.kotlinx:atomicfu-jvm:0.33.0') { because 'Xamarin.KotlinX.AtomicFU.Jvm 0.33.0.1 in the .NET host' }
         implementation('org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0') { because 'Xamarin.KotlinX.Coroutines.Android 1.11.0.1 in the .NET host' }

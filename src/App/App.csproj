@@ -132,6 +132,10 @@
 	  <AndroidMavenLibrary Include="io.coil-kt.coil3:coil-compose-core-android" Version="3.5.0" Bind="false" />
 	  <AndroidMavenLibrary Include="io.coil-kt.coil3:coil-network-core-android" Version="3.5.0" Bind="false" />
 	  <AndroidMavenLibrary Include="io.coil-kt.coil3:coil-network-okhttp-android" Version="3.5.0" Bind="false" />
+	  <!-- Not in hosting.md's list: the screens use coil-compose (AsyncImage with the app-wide image loader), whose
+	       Android AARs are coil-compose-android and coil-android (XA4241 without them). -->
+	  <AndroidMavenLibrary Include="io.coil-kt.coil3:coil-compose-android" Version="3.5.0" Bind="false" />
+	  <AndroidMavenLibrary Include="io.coil-kt.coil3:coil-android" Version="3.5.0" Bind="false" />
 	  <PackageReference Include="Square.OkHttp3" Version="4.12.0.10" />
 	  <PackageReference Include="Square.OkIO.JVM" Version="3.17.0.1" />
 	  <PackageReference Include="Xamarin.Google.Accompanist.DrawablePainter" Version="0.37.3.4" />

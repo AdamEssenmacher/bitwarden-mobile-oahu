@@ -52,6 +52,9 @@ public static class MauiProgram
                 {
                     handlers.Remove(sd);
                     handlers.AddHandler(typeof(IPicker), typeof(Controls.Picker.PickerHandler));
+                    // MAUI 11 looks the handler up by the view's own type: without this, any page with a Picker
+                    // (the Generator tab) fails with HandlerNotFoundException (found in OAHU step 3).
+                    handlers.AddHandler(typeof(Picker), typeof(Controls.Picker.PickerHandler));
                 }
 #endif
                 customHandlers?.Invoke(handlers);

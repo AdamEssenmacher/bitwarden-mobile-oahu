@@ -164,6 +164,9 @@ namespace Bit.App.Pages
 
         private void Rebuild()
         {
+#if DEBUG
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+#endif
             foreach (var totp in _totpKeys.Keys)
             {
                 totp.PropertyChanged -= OnTotpChanged;
@@ -202,7 +205,14 @@ namespace Bit.App.Pages
                 }
                 rows.Add(Map(key, item));
             }
+#if DEBUG
+            var mapped = watch.Elapsed.TotalMilliseconds;
+#endif
             _rows.Reconcile(rows);
+#if DEBUG
+            Console.WriteLine($"OAHUDEBUG rows: {rows.Count} mapped in {mapped:F0} ms, reconciled in " +
+                $"{watch.Elapsed.TotalMilliseconds - mapped:F0} ms");
+#endif
         }
 
         private void OnTotpChanged(object? sender, PropertyChangedEventArgs e)

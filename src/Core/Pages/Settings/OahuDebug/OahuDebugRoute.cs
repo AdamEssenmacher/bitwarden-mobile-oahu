@@ -22,6 +22,7 @@
 // event, audit and password re-prompt services with fakes, and wrap the state service so it reports a signed-in,
 // unlocked account. They must never run on a device with a real account; they are never compiled into Release, and
 // without the variable or extra nothing changes.
+using Bit.App.Abstractions;
 using Bit.Core.Abstractions;
 using Bit.App.Utilities;
 using Bit.Core.Utilities;
@@ -81,8 +82,18 @@ namespace Bit.App.Pages.OahuDebug
             var platformUtils = ServiceContainer.Resolve<IPlatformUtilsService>("platformUtilsService");
             var realState = ServiceContainer.Resolve<IStateService>("stateService");
 
-            services["stateService"] = new OahuDebugStateService(realState, vault,
+            var debugState = new OahuDebugStateService(realState, vault,
                 Option("BW_OAHU_THEME", "bwOahuTheme"), screenCaptureAllowed: Option("BW_OAHU_SECURE", "bwOahuSecure") != "1");
+            services["stateService"] = debugState;
+            // The device action service resolved the real state service at start; it decides FLAG_SECURE on Android
+            // (SetScreenCaptureAllowedAsync, called by every vault load), so point it at the debug one.
+            var deviceActions = ServiceContainer.Resolve<IDeviceActionService>("deviceActionService");
+            var stateField = deviceActions.GetType().GetField("_stateService",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            if (stateField?.FieldType == typeof(IStateService))
+            {
+                stateField.SetValue(deviceActions, debugState);
+            }
             services["cipherService"] = new FakeCipherService(vault);
             services["folderService"] = new FakeFolderService(vault.Folders);
             services["collectionService"] = new FakeCollectionService(vault);
