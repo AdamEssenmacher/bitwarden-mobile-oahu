@@ -27,8 +27,7 @@
   <ItemGroup>
 		<PackageReference Include="Camera.MAUI" Version="1.4.4" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
-		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="11.0.0" />
 	  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	  <PackageReference Include="MessagePack" Version="2.5.124" />
 	  <PackageReference Include="CsvHelper" Version="30.0.1" />
@@ -40,10 +39,9 @@
 	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	    <PrivateAssets>all</PrivateAssets>
 	  </PackageReference>		
-		<PackageReference Include="CommunityToolkit.Maui" Version="5.2.0" />
+		<PackageReference Include="CommunityToolkit.Maui" Version="17.0.0" />
 		<PackageReference Include="Plugin.Fingerprint" Version="3.0.0-beta.1" />
-		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="2.88.4-preview.84" />
-		<PackageReference Include="SkiaSharp.Views.Maui.Controls.Compatibility" Version="2.88.4-preview.84" />
+		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="3.119.4" />
 		<PackageReference Include="AsyncAwaitBestPractices.MVVM" Version="6.0.6" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
 		<PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
@@ -52,8 +50,8 @@
 	</ItemGroup>
 	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
 	  <PackageReference Include="Xamarin.AndroidX.AutoFill" Version="1.1.0.18" />
-	  <PackageReference Include="Xamarin.AndroidX.Activity.Ktx" Version="1.7.2.1" />
-      <PackageReference Include="Xamarin.AndroidX.Credentials" Version="1.0.0" />
+	  <PackageReference Include="Xamarin.AndroidX.Activity.Ktx" Version="1.13.0.1" />
+      <PackageReference Include="Xamarin.AndroidX.Credentials" Version="1.6.0.1" />
 	</ItemGroup>
 	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android' AND !$(DefineConstants.Contains(FDROID))">
 	  <PackageReference Include="Xamarin.GooglePlayServices.SafetyNet" Version="118.0.1.5" />
