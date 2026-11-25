@@ -748,6 +748,13 @@ namespace Bit.App
             switch (navTarget)
             {
                 case NavigationTarget.HomeLogin:
+#if DEBUG
+                    // OAHU step 2: a debug-only route to the folder pages with a fake folder service.
+                    if (Bit.App.Pages.OahuDebug.OahuDebugRoute.TryShow())
+                    {
+                        break;
+                    }
+#endif
                     App.MainPage = new NavigationPage(new HomePage(Options));
                     break;
                 case NavigationTarget.Login:
