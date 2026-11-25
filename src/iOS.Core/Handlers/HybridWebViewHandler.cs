@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Bit.App.Controls;
+using HybridWebView = Bit.App.Controls.HybridWebView;
 using CoreGraphics;
 using Foundation;
 using Microsoft.Maui.Handlers;

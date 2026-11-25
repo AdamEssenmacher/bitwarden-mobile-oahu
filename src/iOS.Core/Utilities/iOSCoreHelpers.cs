@@ -1,5 +1,6 @@
 ﻿using Bit.App.Abstractions;
 using Bit.App.Controls;
+using HybridWebView = Bit.App.Controls.HybridWebView;
 using Bit.App.Models;
 using Bit.App.Pages;
 using Bit.App.Services;
@@ -13,7 +14,7 @@ using Bit.Core.Utilities;
 using Bit.iOS.Core.Services;
 using CoreNFC;
 using Foundation;
-using Microsoft.Maui.Embedding;
+using Microsoft.Maui.Controls.Embedding;
 using UIKit;
 
 namespace Bit.iOS.Core.Utilities
@@ -28,11 +29,14 @@ namespace Bit.iOS.Core.Utilities
 
         public static void SetupMaui()
         {
+            // MCT001 wants UseMauiCommunityToolkit() chained to UseMauiApp<T>(); the app is registered here by UseMauiEmbeddedApp, after ConfigureMauiAppBuilder.
+#pragma warning disable MCT001
             var builder = Bit.Core.MauiProgram.ConfigureMauiAppBuilder(ConfigureMAUIEffects, handlers =>
                 {
                     ConfigureMAUIHandlers(handlers);
                 })
-                .UseMauiEmbedding<Application>();
+                .UseMauiEmbeddedApp<Application>();
+#pragma warning restore MCT001
             // Register the Window
             builder.Services.Add(new ServiceDescriptor(typeof(UIWindow), _ => UIApplication.SharedApplication.KeyWindow, ServiceLifetime.Singleton));
             var mauiApp = builder.Build();

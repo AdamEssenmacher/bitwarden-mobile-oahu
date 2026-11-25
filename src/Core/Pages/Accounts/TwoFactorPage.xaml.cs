@@ -51,7 +51,7 @@ namespace Bit.App.Pages
 #endif
         }
 
-        public HybridWebView DuoWebView { get; set; }
+        public Bit.App.Controls.HybridWebView DuoWebView { get; set; }
 
         protected override bool ShouldCheckToPreventOnNavigatedToCalledTwice => true;
 
