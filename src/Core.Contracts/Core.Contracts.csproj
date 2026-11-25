@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    OAHU contracts for the pages converted to native screens (docs/oahu/02-folders.md). Plain net11.0, as OAHU's
+    docs ask: oahu-gen reads this assembly to write the Swift and Kotlin halves. The view models that implement these
+    contracts stay in src/Core (Bit.App.Pages), which references this project.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Bit.App.Contracts</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Oahu" Version="0.1.0-preview.g104c58c2" />
+  </ItemGroup>
+</Project>

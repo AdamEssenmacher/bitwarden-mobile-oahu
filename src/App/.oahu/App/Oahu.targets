@@ -1,0 +1,28 @@
+<Project>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net11.0-ios'">
+    <SupportedOSPlatformVersion Condition="'$(SupportedOSPlatformVersion)' == ''">17.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::VersionLessThan('$(SupportedOSPlatformVersion)', '16.0'))">16.0</SupportedOSPlatformVersion>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net11.0-ios'">
+    <PackageReference Include="Oahu.Maui" Version="0.1.0-preview.g104c58c2" />
+    <PackageReference Include="Oahu.CodeGen.Build" Version="0.1.0-preview.g104c58c2" />
+    <ProjectReference Include="../Core.Contracts/Core.Contracts.csproj" />
+    <OahuGen Include="../Core.Contracts/Core.Contracts.csproj" SwiftOut=".oahu/App/ios/OahuScreens/Sources/OahuScreens" />
+    <OahuSwiftPackage Include=".oahu/App/ios/OahuScreens" />
+  </ItemGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net11.0-android'">
+    <SupportedOSPlatformVersion Condition="'$(SupportedOSPlatformVersion)' == ''">28</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::VersionLessThan('$(SupportedOSPlatformVersion)', '28'))">28</SupportedOSPlatformVersion>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net11.0-android'">
+    <PackageReference Include="Oahu.Maui" Version="0.1.0-preview.g104c58c2" />
+    <PackageReference Include="Oahu.CodeGen.Build" Version="0.1.0-preview.g104c58c2" />
+    <PackageReference Include="Xamarin.AndroidX.Compose.Runtime" Version="1.11.3.1" />
+    <PackageReference Include="Xamarin.AndroidX.Compose.UI" Version="1.11.3.1" />
+    <PackageReference Include="Xamarin.AndroidX.Compose.Foundation" Version="1.11.3.1" />
+    <PackageReference Include="Xamarin.AndroidX.Compose.Material3" Version="1.4.0.3" />
+    <ProjectReference Include="../Core.Contracts/Core.Contracts.csproj" />
+    <OahuGen Include="../Core.Contracts/Core.Contracts.csproj" KotlinOut=".oahu/App/android/oahu-screens/src/main/kotlin" KotlinPackage="com.oahu.appapp" />
+    <OahuGradleProject Include=".oahu/App/android/build.gradle.kts" ModuleName="oahu-screens" />
+  </ItemGroup>
+</Project>

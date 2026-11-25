@@ -119,7 +119,11 @@
 	  <Folder Include="Resources\Raw\" />
 	</ItemGroup>
 	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
-	  <PackageReference Include="Xamarin.AndroidX.AutoFill" Version="1.1.0.18" />
+	  <PackageReference Include="Xamarin.AndroidX.AutoFill" Version="1.3.0.4" />
+	  <!-- OAHU (docs/oahu/gaps.md): Firebase's bindings pull Kotlin's jdk7/jdk8 stdlib at 1.9.0; OAHU's version check
+	       (OAHUVER001) wants them at its Kotlin version. -->
+	  <PackageReference Include="Xamarin.Kotlin.StdLib.Jdk7" Version="2.4.0.1" />
+	  <PackageReference Include="Xamarin.Kotlin.StdLib.Jdk8" Version="2.4.0.1" />
 	  <PackageReference Include="Xamarin.AndroidX.Activity.Ktx" Version="1.13.0.1" />
       <PackageReference Include="Xamarin.AndroidX.Credentials" Version="1.6.0.1" />
 	</ItemGroup>
@@ -266,4 +270,5 @@
 	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
 	  <MauiAsset Include="Resources\Raw\fido2_privileged_allow_list.json" LogicalName="fido2_privileged_allow_list.json" />
 	</ItemGroup>
+  <Import Project=".oahu/App/Oahu.targets" />
 </Project>

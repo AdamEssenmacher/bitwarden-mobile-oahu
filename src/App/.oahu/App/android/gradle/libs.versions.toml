@@ -1,0 +1,51 @@
+# Generated from oahu.versions.json, do not edit. Change the manifest, then build src/platforms/android/Oahu.Android (its
+# OahuVersions.targets runs oahu-gen) or run `oahu-gen versions --manifest oahu.versions.json --catalog <this file>`.
+# tests/managed/Oahu.Tests fails when this file is stale. The .NET host supplies Kotlin, coroutines and Compose at run time
+# through the NuGet packages named below, and OahuVersions.targets fails a host build whose packages don't match.
+[versions]
+minSdk = "28"
+compileSdk = "37"
+agp = "9.5.2"
+# The .NET host: NuGet 2.4.0.R (any binding revision), e.g. 2.4.0.1 of Xamarin.Kotlin.StdLib,
+# Xamarin.Kotlin.StdLib.Jdk7, Xamarin.Kotlin.StdLib.Jdk8, Xamarin.Kotlin.Reflect, Xamarin.Kotlin.Parcelize.Runtime
+kotlin = "2.4.0"
+# The .NET host: NuGet 1.11.0.R (any binding revision), e.g. 1.11.0.1 of Xamarin.KotlinX.Coroutines.*
+coroutines = "1.11.0"
+# The .NET host: NuGet 1.11.3.R (any binding revision), e.g. 1.11.3.1 of Xamarin.AndroidX.Compose.Runtime*,
+# Xamarin.AndroidX.Compose.UI*, Xamarin.AndroidX.Compose.Foundation*, Xamarin.AndroidX.Compose.Animation*,
+# Xamarin.AndroidX.Compose.Material.Ripple*, Xamarin.AndroidX.Compose.Material,
+# Xamarin.AndroidX.Compose.Material.Android
+compose = "1.11.3"
+# The .NET host: NuGet 1.4.0.R (any binding revision), e.g. 1.4.0.1 of Xamarin.AndroidX.Compose.Material3,
+# Xamarin.AndroidX.Compose.Material3Android, Xamarin.AndroidX.Compose.Material3.WindowSizeClass*,
+# Xamarin.AndroidX.Compose.Material3.Adaptive.NavigationSuite*
+material3 = "1.4.0"
+activity = "1.13.0"
+junit = "4.13.2"
+gson = "2.11.0"
+robolectric = "4.17"
+espresso = "3.7.0"
+
+[libraries]
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "compose" }
+compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
+compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
+compose-material-ripple = { module = "androidx.compose.material:material-ripple", version.ref = "compose" }
+compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
+compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
+compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
+compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "compose" }
+compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "compose" }
+activity-core = { module = "androidx.activity:activity", version.ref = "activity" }
+junit = { module = "junit:junit", version.ref = "junit" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
+espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

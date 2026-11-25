@@ -1,10 +1,12 @@
-﻿namespace Bit.App
+﻿using Oahu.Maui;
+
+namespace Bit.App
 {
     public class MauiProgram
     {
         public static MauiApp CreateMauiApp()
         {
-            return Core.MauiProgram.ConfigureMauiAppBuilder(
+            var builder = Core.MauiProgram.ConfigureMauiAppBuilder(
                 effects =>
                 {
 #if IOS
@@ -35,7 +37,16 @@
 #endif
                 },
                initUseMauiApp: true
-            ).Build();
+            ).UseOahu();
+            // OAHU: a contract method that throws, or a defect OAHU detects, is reported only here.
+#if IOS
+            Oahu.iOS.IosPortHost.Shared.MethodFailed += ex => Console.WriteLine($"OAHU METHOD FAILED {ex}");
+            Oahu.iOS.IosPortHost.Shared.Faulted += ex => Console.WriteLine($"OAHU FAULT {ex}");
+#elif ANDROID
+            Oahu.Android.AndroidPortHost.Main.MethodFailed += ex => Android.Util.Log.Error("OAHU", $"METHOD FAILED {ex}");
+            Oahu.Android.AndroidPortHost.Main.Faulted += ex => Android.Util.Log.Error("OAHU", $"FAULT {ex}");
+#endif
+            return builder.Build();
         }
     }
 }

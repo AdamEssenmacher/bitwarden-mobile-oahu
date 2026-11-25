@@ -6,13 +6,22 @@
       "version": "5.1.250801",
       "commands": [
         "dotnet-format"
-      ]
+      ],
+      "rollForward": false
     },
     "cake.tool": {
       "version": "2.2.0",
       "commands": [
         "dotnet-cake"
-      ]
+      ],
+      "rollForward": false
+    },
+    "oahu.cli": {
+      "version": "0.1.0-preview.g104c58c2",
+      "commands": [
+        "oahu"
+      ],
+      "rollForward": false
     }
   }
 }

@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Test", "test\Core.Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "test\Common\Common.csproj", "{1AC5ED7F-301E-4B3C-ACDE-C0EADFA5AE44}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Contracts", "src\Core.Contracts\Core.Contracts.csproj", "{DFEC8D48-D495-498B-AE1F-B3CFDCCF32A5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +40,10 @@ Global
 		FDroid|Any CPU = FDroid|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DFEC8D48-D495-498B-AE1F-B3CFDCCF32A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DFEC8D48-D495-498B-AE1F-B3CFDCCF32A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DFEC8D48-D495-498B-AE1F-B3CFDCCF32A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DFEC8D48-D495-498B-AE1F-B3CFDCCF32A5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{971FDF07-E288-4239-B47A-E9E7E912193B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{971FDF07-E288-4239-B47A-E9E7E912193B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{971FDF07-E288-4239-B47A-E9E7E912193B}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
