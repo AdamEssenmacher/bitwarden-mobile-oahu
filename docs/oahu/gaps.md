@@ -25,6 +25,10 @@ the local feed `~/RiderProjects/oahu-feed`.
   `PackageReference` to `Oahu.Maui`. The preview version string is now written in three places (`Oahu.targets`,
   `Core.Contracts.csproj`, `Core.csproj`); `init` defines no MSBuild property such as `$(OahuVersion)` to reuse, so a
   feed update means finding them all by hand.
+- Seen again in step 4: the pages in `src/Core` can't name the app's Android resources, so the saved-state view IDs
+  `native-screens.md` asks for (`Resource.Id.…`) are declared in `src/App/Platforms/Android/Resources/values/ids.xml`
+  and looked up by name at run time with the discouraged `Resources.GetIdentifier`
+  (`src/Core/Utilities/OahuAndroidIds.cs`). The contracts project can't reference `Bit.Core` either (G24).
 
 ### G2. `init`'s Compose packages collide with the app's pinned AndroidX packages (friction)
 - Trying to: run `oahu init` on an app that pins older AndroidX bindings.
@@ -129,12 +133,23 @@ the local feed `~/RiderProjects/oahu-feed`.
   (context menus, pull-to-refresh) follow. The step 2 folder screens still use the system appearance. A theme change
   while a screen is open was not exercised (the debug state service pins the theme). See G16 for the cost.
 
-### G12. A MAUI toolbar action cannot flush a Compose text field's pending edit (friction, inferred)
+### G12. A MAUI toolbar action cannot flush a Compose text field's pending edit (friction, inferred; not reproduced)
 - Save is a MAUI toolbar item; the name field is a Compose `TextFieldState`. `native-screens.md` says text during an
   IME composition is not proposed until the composition ends, and `rememberTextFieldBinding().commit()` sends pending
   text, but only native code can call `commit()`. Tapping MAUI's Save while Gboard is still composing a word could save
   the previous text. Not reproduced: `adb shell input text` commits immediately, and the save in the run had the full
   text. The keyboard's Go key does call `commit()` before `submit()`.
+- Step 4, tried for real and **not reproduced on Android**: folder edit page (step 2), emulator `OAHU_Pixel_API36` with
+  Gboard. Tapped the field, tapped Gboard's space key, then typed `p`, `l`, `a`, `n` by tapping the on-screen keys
+  (Gboard showed "plan / plans / planner" as suggestions for the word being composed), and tapped MAUI's **Save**
+  without ending the word. The list then showed **"Work plan"**: the composing word was saved. Whether the binding
+  proposed it while composing or the toolbar tap finished the composition first was not instrumented (the folders
+  route has no diagnostics). The generator and lock screens have no MAUI action that reads a text field (Select reads
+  the generated value; Unlock and Go are native and call `commit()`).
+- **iOS not tried with marked text**: the simulator's typing goes in through the hardware keyboard and no Japanese
+  keyboard was installed on "BW OAHU iPhone". The screens use SwiftUI `TextField`/`SecureField`, which propose each
+  keystroke; OAHU's own `OahuTextField` (which keeps marked text local, so would be the risky one) is not used. Still
+  open on iOS.
 
 ### G13. A whole-page iOS screen stops at the bottom safe area (papercut)
 - The SwiftUI `List` background ends above the home indicator, leaving a strip of the MAUI page's white background
@@ -259,6 +274,16 @@ Same OAHU preview as step 2. Details of what was built are in [03-vault.md](03-v
   fixed set of declared IDs doesn't fit, and `View.generateViewId()` is what the doc warns against. Each Compose screen
   here uses `rememberLazyListState()` (saveable), so the scroll position of covered levels is what would be mixed up
   after a recreation; MAUI drops that bundle anyway (`maui.md`), so nothing visible happened. Not set.
+- Step 4, checked for real on Android: the new screens set `OahuView.AndroidSavedStateViewId` (generator tab, generator
+  modal, lock page: declared IDs looked up by name, G1); the vault drill-down stays ID-less. With four ID-less
+  `GroupingsScreen`s open (vault-large, three levels deep) plus the generator, sending the app to the background and
+  killing the process (`am kill`), then reopening: no fault, no `Wrong state class`, nothing restored. The app starts
+  from scratch (the debug route re-runs from the intent, every level reloads at the top), so neither a leak between
+  instances nor a lost state is observable; MAUI drops the bundle anyway (`maui.md`). Recreating only the activity was
+  not achieved: "Don't keep activities" (`always_finish_activities 1`) did not take effect on the running emulator,
+  so that case is still inferred. Each new LockPage reuses the one `oahu_lock` ID; the previous lock screen had always
+  closed first (diagnostics show `ScreenCloseFinished Lock` before the next `ScreenOpening Lock`), as `maui.md`
+  requires.
 
 ### G21. The icon font and its glyphs are copied into each native library (papercut)
 - `bwi-font.ttf` now exists three times (`src/Core/Resources/Fonts`, the Swift package's `Resources`, the Gradle
@@ -282,6 +307,13 @@ Same OAHU preview as step 2. Details of what was built are in [03-vault.md](03-v
   would commit (not tried here); and that a fault message might include a value (not observed). A short "sensitive
   values" section in `contracts.md` or `debugging.md` would have saved the reading.
 - Also seen: the TOTP code is shown on the item view before re-prompt, exactly as MAUI shows it.
+- Seen again in step 4, sharper: the master password and PIN are editables, so every keystroke crosses as an edit
+  (as the MAUI `Entry` binding did) and a session recording (`docs/session-replay.md`, §1: `execute` entries hold the
+  argument bytes; "OAHU never starts a recording ... and redacts nothing") would hold the typed master password,
+  the PIN and the forwarding-service API key. There is no per-member opt-out, so an app that records sessions in
+  Debug must not record on the lock page at all. See G27. `OahuDiagnostics` stayed metadata-only (verified: with
+  `BW_OAHU_DIAG=1` the logs show `MasterPassword Succeeded 0.2ms` per keystroke, no values; the iOS console logs of all
+  runs contain none of the typed secrets).
 
 ### G23. A view model's nested item view models don't reach `FromProperty` (papercut)
 - `CipherDetailsPageViewModel.Fields` holds `HiddenCustomFieldItemViewModel`s, which raise `ShowHiddenValue` on
@@ -332,3 +364,144 @@ Same OAHU preview as step 2. Details of what was built are in [03-vault.md](03-v
   at start, so the debug route can't fake them by replacing the registration (the route repoints the device action
   service's state by reflection, DEBUG only).
 - iOS shows the account avatar toolbar item as a blank white circle for the fake account (Android draws "AE").
+
+## Step 4 (generator, lock)
+
+Pages: the generator (`GeneratorPage`, as the Generator tab and as the modal add/edit opens with Select) and the lock
+page (`LockPage`). Same OAHU preview. Details in [04-generator-lock.md](04-generator-lock.md). Host load during the
+runs: load average 7–38 from other sessions; timings below are indicative only.
+
+### G24. A contract can't use the app's own enums, so each picker's enum is mirrored and mapped (papercut)
+- Trying to: bind the generator's pickers (`GeneratorType`, `UsernameType`, `UsernameEmailType`,
+  `ForwardedEmailServiceType`, all in `Bit.Core.Enums`) as `IOahuEditable<TEnum>`.
+- What happened: the contracts project must be a plain library oahu-gen can read (`docs/consumer/contracts.md`,
+  `oahu-gen.md`); the enums live in `src/Core`, a MAUI library that references the contracts, so the contracts can't
+  reference it back. Nothing in the docs says what to do with domain types that live with the view models.
+- Workaround: five mirror enums in `src/Core.Contracts/Generator.cs` (`ForwardedService` also mirrors the app's
+  `None = -1`, which crosses fine because enums cross by position) and a by-name `Map<T>` in
+  `GeneratorPageViewModel.Oahu.cs`. A renamed member in either enum fails at run time (`Enum.Parse`), not compile time.
+
+### G25. Picker options with localized labels need one record type per enum (papercut)
+- Trying to: send each picker's options with their localized names (the XAML used `LocalizableEnumConverter`) and
+  only the options the page offers (the service list leaves out `None`).
+- What happened: records can't be generic (`contracts.md`, "Records may not be generic"), so there is no
+  `Option<T>(T Value, string Label)`. Five records (`GeneratorKindOption`, `PasswordKindOption`, …) carry the same two
+  fields. Swift and Kotlin then need one `Picker` call per enum anyway; a generic native helper over them works
+  (Kotlin `Picker<T>` takes `List<Pair<T, String>>`), but every option list is converted by hand.
+- Workaround: the five records in `Generator.cs`, built from the view model's existing `*Options` lists in
+  `GeneratorPageViewModel.Oahu.cs`.
+
+### G26. Every control change crosses, including values equal to the current one (papercut, verified)
+- Trying to: count round trips for the length slider (which regenerates the password as it moves) and for secure text.
+- What happened (diagnostics plus a DEBUG counter in the setter):
+  - iOS SwiftUI `Slider` over `Binding(get: Double(model.length), set: { model.length = Int($0.rounded()) })`: one
+    edit per touch sample (11 edits for a drag from 14 to 82 in ~1 s; the first and last proposed the value it already
+    had). Each `Edit` took 0.5–2 ms in C#, generation included.
+  - Android Compose `Slider` with `collectAsMutableState()`: one edit per `onValueChange`, 75 for a 2-second drag
+    across 70 values (`82.49 -> 82` was sent although 82 was current). With the policy clamp applied during the drag
+    (`BW_OAHU_CLAMP_LIVE=1`), a 4-second drag below the minimum sent **201** edits, all answered 20.
+  - iOS `SecureField`/`TextField` on the lock page: 12 `MasterPassword` edits for the 5 characters of "wrong" (about two
+    per keystroke), plus edits on focus changes and after `Submit` cleared the field. Android
+    `OutlinedSecureTextField`: one per character.
+- Nothing is wrong with the answers (see "Probed and fine"), but an editable whose setter does real work (here: save
+  options, normalize, regenerate a password, and in MAUI a history write on release) runs it for every sample. The
+  model setter doesn't skip a proposal equal to the current value, and neither `native-screens.md` nor `editable.md`
+  says how often a continuous control proposes or suggests coalescing. Not changed: the MAUI slider also set the bound
+  property on every move.
+
+### G27. A session recording would capture every keystroke of a secret editable, with no way to exclude a member (friction, security, inferred)
+- Trying to: decide whether the lock page can be recorded for a replay test (`docs/consumer/debugging.md`,
+  "Recording a session"; `docs/session-replay.md`).
+- What happened: by the docs, each edit is recorded as an `execute` entry with its argument bytes, and the recorder
+  "redacts nothing". The lock contract's `MasterPassword` and `Pin` editables, and the generator's `ApiSecret`, are
+  edits. `debugging.md` warns that recordings hold what the user typed, but there is no attribute or option to keep a
+  member's values out (a `[OahuSensitive]` that records the edit with empty bytes would do). Not run: recording was not
+  turned on in this app.
+- Workaround: none in code; the step log says never to record on the lock page. Seen with G22.
+
+### G28. Secure text on iOS: show/hide swaps fields and loses focus; OAHU's text field has no secure mode or focus (friction, verified)
+- Trying to: keep MAUI's `MonoEntry` behavior: one field whose `IsPassword` follows the eye button, keeping text,
+  focus and cursor; the view model then asks for focus with the cursor at the end (`TogglePassword` raises
+  `FocusSecretEntry(secret.Length)`).
+- What happened:
+  - iOS: SwiftUI has no secure toggle on one field, so the eye swaps a `SecureField` for a `TextField`. The text stayed
+    (it is the model's), focus did not. On the lock page the C# focus event put focus back (verified: keyboard stayed
+    up after the toggle), but SwiftUI has no API to place the cursor, so `SecretFocus.Cursor` is ignored. On the
+    generator's API key field, which has no focus event in MAUI either, the toggle dismissed the keyboard (verified).
+    `OahuTextField` (OAHU's UIKit-backed field) has `keyboard:` options but no `isSecureTextEntry` and, per
+    `native-screens.md`, isn't for "SwiftUI focus management", so it doesn't help. iOS also clears a secure field's text
+    when typing resumes after it lost focus (seen: "wrong" was replaced, not appended), as MAUI's `Entry` does.
+  - Android: one `OutlinedSecureTextField` whose `textObfuscationMode` follows the eye kept text, focus, keyboard and
+    cursor (verified), and the cursor request maps to `state.edit { selection = … }`.
+- Workaround: the focus event (see "Probed and fine") restores focus on iOS. Not an OAHU core-design issue: SwiftUI's
+  field model; but OAHU's own text field could carry a secure mode and a focus binding.
+
+### G29. A first tap on a native text field sometimes doesn't focus it on iOS (friction, inferred cause)
+- Seen three times on iOS (generator word separator on first use, the API key field after the eye toggle, the lock
+  page's field after a MAUI alert): the first tap showed no cursor and no keyboard; a second tap focused the field.
+  Both pages set `HideSoftInputOnTapped="True"`, whose page-level tap handling ends editing, and the inferred cause is
+  that it races the SwiftUI field becoming first responder. Not checked by turning the property off. `maui.md`'s
+  "Not measured" list includes keyboard handling for hosted screens. Android did not show it.
+
+### Probed and fine (step 4)
+- **Editables of non-string types**: `int` (slider, steppers), `bool` (toggles), five enums (pickers, iOS menu
+  `Picker`, Compose `ExposedDropdownMenuBox`), on both platforms.
+- **Clamping and refusals while dragging**: with the policy minimum applied during the drag, the native thumb stayed at
+  the answer (20) while the finger moved to 5–7; screenshots every 0.5–1 s during the drag on both platforms showed the
+  thumb at 20 every time, no jitter caught. Without it (the app's real behavior), the slider followed the finger to 5
+  and **snapped to 20 on release** when `LengthEditingEnded` ran `SaveOptionsAsync` and `LoadFromOptions` set
+  `Length` (a method's later change, delivered through `FromProperty`). The password generated during the drag already
+  had the policy length (as in MAUI).
+- **Clamp inside the edit**: Minimum numbers "−" from 3 with a policy minimum of 3: the stepper stayed at 3 (the setter's
+  save completed synchronously, so `LoadFromOptions` ran inside `Edit`). With `BW_OAHU_SLOWSAVE=1` (the save yields 30
+  ms) the answer arrived after the edit and the stepper ended at 3, with no fault (the late value comes in through the
+  property notification, as `inpc.md` describes for setters that write later). The app's own reentrancy (every
+  property `LoadFromOptions` sets saves again) made Minimum special jump 2 → 3 in the synchronous case and not in the
+  slow one; the same view-model code runs under MAUI, not compared there.
+- **Controls disabled by other state**: the six policy-locked toggles disabled from `Locks`; sections shown and hidden
+  by the type pickers, service and email type; the policy banner.
+- **Many small states changing together**: one regenerate or one picker change publishes several states (value,
+  layout, a dozen option editables via `LoadFromOptions`); no intermediate frame was seen in screenshots, though frames
+  were not instrumented.
+- **One-shot C# → native signals**: `IOahuEvents` worked for focus (`FocusSecret`: on appearing, after show/hide, after
+  the fake biometric prompt's "Master password" fallback; both platforms) and for "copied" (`Copied` → haptic). The
+  first focus request is published before the screen subscribes and was still delivered (the held-events rule).
+- **Keyboard Go / submit**: SwiftUI `.submitLabel(.go).onSubmit` and Compose `ImeAction.Go` + `onKeyboardAction` (with
+  `commit()`) ran the view model's `SubmitCommand`; wrong password → MAUI "Invalid master password" alert over the
+  native screen; `debug` unlocked; PIN 1234 unlocked (number pad on iOS has no Go key, as with MAUI).
+- **Keyboard avoidance**: on iOS the `Form` scrolled the focused field above the keyboard (word separator, API key);
+  Compose screens use `imePadding()`; both fine inside the MAUI page.
+- **Rich text**: the coloured value crosses as `TextRun`s (letters, digits, symbols) and is coloured natively
+  (`AttributedString`, `AnnotatedString`), replacing MAUI's HTML spans.
+- **Same contract two ways**: the generator as a long-lived tab screen (kept across tab switches on Android; its
+  options kept, value regenerated on return as MAUI's tab does) and as a per-modal screen with Cancel/Select (MAUI
+  toolbar), closed when the modal popped (`ScreenCloseFinished` 10–22 ms).
+- **Teardown when `MainPage` is replaced**: unlocking swaps `LockPage` for a new `TabsPage`, and relocking swaps back;
+  diagnostics show the lock screen closing on unlock and, on relock, the tab's Generator and Groupings screens closing
+  before the new lock screen opened, on both platforms, with no fault.
+- **Backgrounding**: relock on resume (debug route watching `Window.Stopped`/`Resumed`) showed the lock page with the
+  biometric auto-prompt (a MAUI action sheet standing in for the system prompt) over the native screen on Android and
+  iOS. The real Face ID/fingerprint prompt was not shown (simulator not enrolled).
+- **Android saved state of secrets**: oahu-compose's text helpers use `remember`, not `rememberSaveable` (read in
+  `EditableTextFieldState.kt`: "Not saved across process death"), so a typed master password is not written to the
+  saved-instance bundle. Only in KDoc; `native-screens.md` doesn't say it (doc).
+- **Autofill/password manager hints**: iOS showed the "Passwords" QuickType bar on the `SecureField`s (and the lock
+  field sets `.textContentType(.password)`); Android's password keyboard showed no suggestion strip. Autocorrect off on
+  both; iOS emoji key hidden on the separator field with `.asciiCapable`, still present on the shown-password
+  `TextField`.
+
+### Not OAHU (found while testing)
+- iOS: after a **PIN** unlock the app crashed twice with `SIGSEGV` in `UIBarButtonItem.get_Image()` called from
+  `Bit.iOS.Core.Handlers.CustomNavigationHandler` (`src/iOS.Core/Handlers/CustomNavigationHandler.cs`, the avatar
+  item's `IconImageSource` handler dispatched after the lock page's bar items were released). The master-password
+  unlock path did not crash. Inferred to be the app's handler racing the `MainPage` swap; not compared with the MAUI
+  page.
+- SwiftUI wrapped long generated values at "word" boundaries and drew a hyphen that isn't in the value
+  (`ex-ample.com`, `fragilexdepressxam-enity`). Fixed with a zero-width space after each character
+  (`Generator.oahu-screen.swift`); MAUI's HTML label used `word-break: break-all` for the same reason.
+- The XAML's `{u:I18n UsernamePromptHelpLink}` key doesn't exist in `AppResources` (MAUI showed the key); the screen uses
+  "Learn more".
+- DEBUG harness: `MainThread.BeginInvokeOnMainThread` runs inline on the main thread, so the lock route had to post
+  with `Dispatcher.Dispatch` (App.Bootstrap casts `platformUtilsService` to its concrete type right after the route
+  runs); `AccountsManager` holds the real state service, so the fake lock navigates with `App.Navigate` instead of the
+  "locked" message; the generation services hold the real state service, so the route registers new ones.
