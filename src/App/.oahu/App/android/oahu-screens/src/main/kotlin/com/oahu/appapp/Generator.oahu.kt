@@ -2,7 +2,7 @@
 // change the C# contract and rebuild (docs/codegen.md). The screen is yours to write, in this package:
 // @Composable fun GeneratorScreen(model: GeneratorModel).
 //
-// Contract hash 1282258391682217861, over its signature:
+// Contract hash -3406561538140632292, over its signature:
 //   oahu/1 contract Generator
 //   stream 0 state Copy: GeneratorCopy
 //   stream 1 state Palette: AppPalette
@@ -76,7 +76,7 @@
 //   type EmailKind = enum {Random, Website}
 //   type ForwardedServiceOption = record {Value: ForwardedService, Label: string}
 //   type ForwardedService = enum {None, AnonAddy, FirefoxRelay, SimpleLogin, DuckDuckGo, Fastmail, ForwardEmail}
-//   type AppPalette = record {Name: string, IsDark: bool, Background: long, ListHeaderBackground: long, ListHeaderText: long, Text: long, Muted: long, Primary: long, Danger: long, Separator: long, PasswordNumber: long, PasswordSpecial: long, BoxHeaderText: long}
+//   type AppPalette = record {Name: string, IsDark: bool, Background: color, ListHeaderBackground: color, ListHeaderText: color, Text: color, Muted: color, Primary: color, Danger: color, Separator: color, PasswordNumber: color, PasswordSpecial: color, BoxHeaderText: color}
 //   type GeneratorLayout = record {ShowKindPicker: bool, IsUsername: bool, PolicyInEffect: bool, UsernameTypeDescription: string, ShowEmailType: bool, EmailWebsite: string?, ApiSecretLabel: string?, ShowApiSecret: bool}
 //   type GeneratorPolicyLocks = record {Uppercase: bool, Lowercase: bool, Numbers: bool, Special: bool, Capitalize: bool, IncludeNumber: bool}
 //   type TextRun = record {Text: string, Kind: TextRunKind}
@@ -101,7 +101,7 @@ internal object GeneratorContract {
     const val NAME: String = "Generator"
 
     /** FNV-1a 64 of Generator's signature (above). The .NET host refuses the screen when its own hash differs. */
-    const val HASH: Long = 1282258391682217861L
+    const val HASH: Long = -3406561538140632292L
 
     const val STREAM_COPY: Int = 0
     const val STREAM_PALETTE: Int = 1

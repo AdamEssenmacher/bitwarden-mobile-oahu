@@ -2,7 +2,7 @@
 // change the C# contract and rebuild (docs/codegen.md). The screen is yours to write, in this package:
 // @Composable fun LockScreen(model: LockModel).
 //
-// Contract hash 1065598040508947186, over its signature:
+// Contract hash -3376576688497003, over its signature:
 //   oahu/1 contract Lock
 //   stream 0 state Copy: LockCopy
 //   stream 1 state Palette: AppPalette
@@ -16,7 +16,7 @@
 //   member 3 method ToggleShowSecret: unit
 //   member 4 method UseBiometrics: unit
 //   type LockCopy = record {MasterPassword: string, Pin: string, Unlock: string, ToggleVisibility: string, SecretShownHint: string, SecretHiddenHint: string, BiometricInvalidated: string}
-//   type AppPalette = record {Name: string, IsDark: bool, Background: long, ListHeaderBackground: long, ListHeaderText: long, Text: long, Muted: long, Primary: long, Danger: long, Separator: long, PasswordNumber: long, PasswordSpecial: long, BoxHeaderText: long}
+//   type AppPalette = record {Name: string, IsDark: bool, Background: color, ListHeaderBackground: color, ListHeaderText: color, Text: color, Muted: color, Primary: color, Danger: color, Separator: color, PasswordNumber: color, PasswordSpecial: color, BoxHeaderText: color}
 //   type LockLayout = record {PinEnabled: bool, ShowSecretEntry: bool, ShowSecret: bool, LockedVerifyText: string, LoggedInAsText: string, BiometricButton: string?, BiometricInvalidated: bool}
 //   type SecretFocus = record {Cursor: int?}
 
@@ -39,7 +39,7 @@ internal object LockContract {
     const val NAME: String = "Lock"
 
     /** FNV-1a 64 of Lock's signature (above). The .NET host refuses the screen when its own hash differs. */
-    const val HASH: Long = 1065598040508947186L
+    const val HASH: Long = -3376576688497003L
 
     const val STREAM_COPY: Int = 0
     const val STREAM_PALETTE: Int = 1

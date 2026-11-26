@@ -2,14 +2,16 @@
 // change the C# contract and rebuild (docs/codegen.md). The screen is yours to write, in this package:
 // @Composable fun FolderAddEditScreen(model: FolderAddEditModel).
 //
-// Contract hash -3975927858367467996, over its signature:
+// Contract hash 4441729020688071958, over its signature:
 //   oahu/1 contract FolderAddEdit
 //   stream 0 state Copy: FolderAddEditCopy
-//   stream 1 editable Name: string
-//   stream 2 state FocusName: bool
+//   stream 1 state Palette: AppPalette
+//   stream 2 editable Name: string
+//   stream 3 state FocusName: bool
 //   member 0 edit Name: string
 //   member 1 method Submit: unit
 //   type FolderAddEditCopy = record {NameLabel: string}
+//   type AppPalette = record {Name: string, IsDark: bool, Background: color, ListHeaderBackground: color, ListHeaderText: color, Text: color, Muted: color, Primary: color, Danger: color, Separator: color, PasswordNumber: color, PasswordSpecial: color, BoxHeaderText: color}
 
 package com.oahu.appapp
 
@@ -28,11 +30,12 @@ internal object FolderAddEditContract {
     const val NAME: String = "FolderAddEdit"
 
     /** FNV-1a 64 of FolderAddEdit's signature (above). The .NET host refuses the screen when its own hash differs. */
-    const val HASH: Long = -3975927858367467996L
+    const val HASH: Long = 4441729020688071958L
 
     const val STREAM_COPY: Int = 0
-    const val STREAM_NAME: Int = 1
-    const val STREAM_FOCUS_NAME: Int = 2
+    const val STREAM_PALETTE: Int = 1
+    const val STREAM_NAME: Int = 2
+    const val STREAM_FOCUS_NAME: Int = 3
 
     const val MEMBER_EDIT_NAME: Int = 0
     const val MEMBER_SUBMIT: Int = 1
@@ -46,6 +49,7 @@ internal object FolderAddEditContract {
 public class FolderAddEditModel private constructor(
     private val connection: OahuConnection,
     public val copy: StateFlow<FolderAddEditCopy>,
+    public val palette: StateFlow<AppPalette>,
     public val name: OahuEditable<String>,
     public val focusName: StateFlow<Boolean>,
 ) {
@@ -96,6 +100,11 @@ public class FolderAddEditModel private constructor(
             port.publish(FolderAddEditContract.STREAM_COPY) { FolderAddEditCopyOahuCodec.writeFolderAddEditCopy(it, value) }
         }
 
+        /** Publishes a new `Palette`: the screen gets it, and so does a model connected later. */
+        public fun setPalette(value: AppPalette) {
+            port.publish(FolderAddEditContract.STREAM_PALETTE) { AppPaletteOahuCodec.writeAppPalette(it, value) }
+        }
+
         /**
          * Publishes a new `Name`, as a change the view model makes itself: the screen gets it, and so does a
          * model connected later. Edits are answered by [onEditName].
@@ -125,6 +134,10 @@ public class FolderAddEditModel private constructor(
                     FolderAddEditContract.STREAM_COPY,
                     FolderAddEditCopyOahuCodec::readFolderAddEditCopy,
                 )
+                val palette = connection.subscribeState(
+                    FolderAddEditContract.STREAM_PALETTE,
+                    AppPaletteOahuCodec::readAppPalette,
+                )
                 val name = connection.subscribeEditable(
                     FolderAddEditContract.STREAM_NAME,
                     FolderAddEditContract.MEMBER_EDIT_NAME,
@@ -132,7 +145,7 @@ public class FolderAddEditModel private constructor(
                     OahuWriter::writeString,
                 )
                 val focusName = connection.subscribeState(FolderAddEditContract.STREAM_FOCUS_NAME, OahuReader::readBool)
-                return FolderAddEditModel(connection, copy, name, focusName)
+                return FolderAddEditModel(connection, copy, palette, name, focusName)
             } catch (failure: Throwable) {
                 connection.close()
                 throw failure
@@ -145,12 +158,14 @@ public class FolderAddEditModel private constructor(
          */
         public fun preview(
             copy: FolderAddEditCopy,
+            palette: AppPalette,
             name: String,
             focusName: Boolean,
             configure: Preview.() -> Unit = {},
         ): FolderAddEditModel {
             val port = OahuPreviewPort(FolderAddEditContract.NAME, FolderAddEditContract.HASH)
             port.setState(FolderAddEditContract.STREAM_COPY) { FolderAddEditCopyOahuCodec.writeFolderAddEditCopy(it, copy) }
+            port.setState(FolderAddEditContract.STREAM_PALETTE) { AppPaletteOahuCodec.writeAppPalette(it, palette) }
             port.setState(FolderAddEditContract.STREAM_NAME) { it.writeString(name) }
             port.setState(FolderAddEditContract.STREAM_FOCUS_NAME) { it.writeBool(focusName) }
             val preview = Preview(port)

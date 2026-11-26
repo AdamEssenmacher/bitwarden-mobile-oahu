@@ -2,7 +2,7 @@
 // change the C# contract and rebuild (docs/codegen.md). The screen is yours to write, in this package:
 // @Composable fun CipherAddEditScreen(model: CipherAddEditModel).
 //
-// Contract hash 5167115593965496683, over its signature:
+// Contract hash 3946269057232147140, over its signature:
 //   oahu/1 contract CipherAddEdit
 //   stream 0 state Copy: CipherAddEditCopy
 //   stream 1 state Palette: AppPalette
@@ -30,6 +30,7 @@
 //   stream 23 list Fields: EditFieldRow keyed by Key
 //   stream 24 list Collections: CollectionCheckRow keyed by Key
 //   stream 25 events Focus: FormFocus
+//   stream 26 state Sections: CipherAddEditSections
 //   member 0 edit Type: int
 //   member 1 edit Folder: int
 //   member 2 edit Owner: int
@@ -48,27 +49,28 @@
 //   member 15 edit Identity: IdentityFields
 //   member 16 edit Favorite: bool
 //   member 17 edit Reprompt: bool
-//   member 18 method AddUri: unit
-//   member 19 method SetUriText: RowText
-//   member 20 method UriOptions: string
-//   member 21 method AddField: unit
-//   member 22 method SetFieldText: RowText
-//   member 23 method SetFieldBool: RowBool
-//   member 24 method SetFieldLinked: RowIndex
-//   member 25 method ToggleFieldHidden: string
-//   member 26 method FieldOptions: string
-//   member 27 method ToggleCollection: string
-//   member 28 method TogglePassword: unit
-//   member 29 method ToggleCardNumber: unit
-//   member 30 method ToggleCardCode: unit
-//   member 31 method GeneratePassword: unit
-//   member 32 method GenerateUsername: unit
-//   member 33 method CheckPassword: unit
-//   member 34 method ScanTotp: unit
-//   member 35 method CopyTotp: unit
-//   member 36 method PasswordPromptHelp: unit
+//   member 18 method MoveFocus: FormFocus
+//   member 19 method AddUri: unit
+//   member 20 method SetUriText: RowText
+//   member 21 method UriOptions: string
+//   member 22 method AddField: unit
+//   member 23 method SetFieldText: RowText
+//   member 24 method SetFieldBool: RowBool
+//   member 25 method SetFieldLinked: RowIndex
+//   member 26 method ToggleFieldHidden: string
+//   member 27 method FieldOptions: string
+//   member 28 method ToggleCollection: string
+//   member 29 method TogglePassword: unit
+//   member 30 method ToggleCardNumber: unit
+//   member 31 method ToggleCardCode: unit
+//   member 32 method GeneratePassword: unit
+//   member 33 method GenerateUsername: unit
+//   member 34 method CheckPassword: unit
+//   member 35 method ScanTotp: unit
+//   member 36 method CopyTotp: unit
+//   member 37 method PasswordPromptHelp: unit
 //   type CipherAddEditCopy = record {ItemInformation: string, Type: string, Name: string, Username: string, Password: string, Passkey: string, AuthenticatorKey: string, SetupTotp: string, Uris: string, Uri: string, NewUri: string, Miscellaneous: string, Folder: string, Favorite: string, PasswordPrompt: string, Notes: string, CustomFields: string, NewCustomField: string, Ownership: string, WhoOwnsThisItem: string, Collections: string, NoCollectionsToList: string, PersonalOwnershipPolicyInEffect: string, CardholderName: string, Number: string, Brand: string, ExpirationMonth: string, ExpirationYear: string, SecurityCode: string, Title: string, FirstName: string, MiddleName: string, LastName: string, Company: string, Ssn: string, PassportNumber: string, LicenseNumber: string, Email: string, Phone: string, Address1: string, Address2: string, Address3: string, City: string, State: string, PostalCode: string, Country: string, Options: string, ToggleVisibility: string, GenerateUsername: string, GeneratePassword: string, CheckPassword: string, CopyTotp: string, ScanQr: string, PasswordPromptHelp: string, TypeOptions: list<string>, CardBrandOptions: list<string>, CardExpMonthOptions: list<string>, IdentityTitleOptions: list<string>}
-//   type AppPalette = record {Name: string, IsDark: bool, Background: long, ListHeaderBackground: long, ListHeaderText: long, Text: long, Muted: long, Primary: long, Danger: long, Separator: long, PasswordNumber: long, PasswordSpecial: long, BoxHeaderText: long}
+//   type AppPalette = record {Name: string, IsDark: bool, Background: color, ListHeaderBackground: color, ListHeaderText: color, Text: color, Muted: color, Primary: color, Danger: color, Separator: color, PasswordNumber: color, PasswordSpecial: color, BoxHeaderText: color}
 //   type CipherAddEditLayout = record {Kind: EditItemKind, ShowTypePicker: bool, ViewPassword: bool, ShowPassword: bool, ShowCardNumber: bool, ShowCardCode: bool, HasTotp: bool, AllowTotpCopy: bool, PasskeyCreated: string?, OwnershipPolicyInEffect: bool, ShowOwnership: bool, ShowCollections: bool, HasCollections: bool, ShowPasswordPrompt: bool, UrisLocked: bool, CanLinkFields: bool}
 //   type EditItemKind = enum {Login, Card, Identity, SecureNote}
 //   type CipherAddEditChoices = record {Folders: list<string>, Owners: list<string>}
@@ -78,6 +80,7 @@
 //   type CollectionCheckRow = record {Key: string, Name: string, Checked: bool}
 //   type FormFocus = record {Field: FormField, RowKey: string?}
 //   type FormField = enum {Name, Username, Password, Totp, CardholderName, IdentityFirstName, Notes, Uri, CustomField}
+//   type CipherAddEditSections = record {Identity: long, Uris: long}
 //   type RowText = record {Key: string, Text: string}
 //   type RowBool = record {Key: string, Value: bool}
 //   type RowIndex = record {Key: string, Index: int}
@@ -103,7 +106,7 @@ internal object CipherAddEditContract {
     const val NAME: String = "CipherAddEdit"
 
     /** FNV-1a 64 of CipherAddEdit's signature (above). The .NET host refuses the screen when its own hash differs. */
-    const val HASH: Long = 5167115593965496683L
+    const val HASH: Long = 3946269057232147140L
 
     const val STREAM_COPY: Int = 0
     const val STREAM_PALETTE: Int = 1
@@ -131,6 +134,7 @@ internal object CipherAddEditContract {
     const val STREAM_FIELDS: Int = 23
     const val STREAM_COLLECTIONS: Int = 24
     const val STREAM_FOCUS: Int = 25
+    const val STREAM_SECTIONS: Int = 26
 
     const val MEMBER_EDIT_TYPE: Int = 0
     const val MEMBER_EDIT_FOLDER: Int = 1
@@ -150,25 +154,26 @@ internal object CipherAddEditContract {
     const val MEMBER_EDIT_IDENTITY: Int = 15
     const val MEMBER_EDIT_FAVORITE: Int = 16
     const val MEMBER_EDIT_REPROMPT: Int = 17
-    const val MEMBER_ADD_URI: Int = 18
-    const val MEMBER_SET_URI_TEXT: Int = 19
-    const val MEMBER_URI_OPTIONS: Int = 20
-    const val MEMBER_ADD_FIELD: Int = 21
-    const val MEMBER_SET_FIELD_TEXT: Int = 22
-    const val MEMBER_SET_FIELD_BOOL: Int = 23
-    const val MEMBER_SET_FIELD_LINKED: Int = 24
-    const val MEMBER_TOGGLE_FIELD_HIDDEN: Int = 25
-    const val MEMBER_FIELD_OPTIONS: Int = 26
-    const val MEMBER_TOGGLE_COLLECTION: Int = 27
-    const val MEMBER_TOGGLE_PASSWORD: Int = 28
-    const val MEMBER_TOGGLE_CARD_NUMBER: Int = 29
-    const val MEMBER_TOGGLE_CARD_CODE: Int = 30
-    const val MEMBER_GENERATE_PASSWORD: Int = 31
-    const val MEMBER_GENERATE_USERNAME: Int = 32
-    const val MEMBER_CHECK_PASSWORD: Int = 33
-    const val MEMBER_SCAN_TOTP: Int = 34
-    const val MEMBER_COPY_TOTP: Int = 35
-    const val MEMBER_PASSWORD_PROMPT_HELP: Int = 36
+    const val MEMBER_MOVE_FOCUS: Int = 18
+    const val MEMBER_ADD_URI: Int = 19
+    const val MEMBER_SET_URI_TEXT: Int = 20
+    const val MEMBER_URI_OPTIONS: Int = 21
+    const val MEMBER_ADD_FIELD: Int = 22
+    const val MEMBER_SET_FIELD_TEXT: Int = 23
+    const val MEMBER_SET_FIELD_BOOL: Int = 24
+    const val MEMBER_SET_FIELD_LINKED: Int = 25
+    const val MEMBER_TOGGLE_FIELD_HIDDEN: Int = 26
+    const val MEMBER_FIELD_OPTIONS: Int = 27
+    const val MEMBER_TOGGLE_COLLECTION: Int = 28
+    const val MEMBER_TOGGLE_PASSWORD: Int = 29
+    const val MEMBER_TOGGLE_CARD_NUMBER: Int = 30
+    const val MEMBER_TOGGLE_CARD_CODE: Int = 31
+    const val MEMBER_GENERATE_PASSWORD: Int = 32
+    const val MEMBER_GENERATE_USERNAME: Int = 33
+    const val MEMBER_CHECK_PASSWORD: Int = 34
+    const val MEMBER_SCAN_TOTP: Int = 35
+    const val MEMBER_COPY_TOTP: Int = 36
+    const val MEMBER_PASSWORD_PROMPT_HELP: Int = 37
 }
 
 /**
@@ -204,6 +209,7 @@ public class CipherAddEditModel private constructor(
     private val _fields: KeyedList<EditFieldRow>,
     private val _collections: KeyedList<CollectionCheckRow>,
     private val _focus: OahuEvents<FormFocus>,
+    public val sections: StateFlow<CipherAddEditSections>,
 ) {
     /** The rows of `Uris`, keyed by `key`; one new list per batch. */
     public val uris: StateFlow<List<EditUriRow>> = _uris.items
@@ -219,6 +225,11 @@ public class CipherAddEditModel private constructor(
      * created) wait for the first collector; after that, nothing is replayed (P1-D7).
      */
     public val focus: Flow<FormFocus> = _focus
+
+    /** Sends the MoveFocus intent. Observe state and events for its effects. */
+    public fun moveFocus(input: FormFocus) {
+        connection.call(CipherAddEditContract.MEMBER_MOVE_FOCUS, { FormFocusOahuCodec.writeFormFocus(it, input) })
+    }
 
     /** Sends the AddUri intent. Observe state and events for its effects. */
     public fun addUri() {
@@ -622,6 +633,14 @@ public class CipherAddEditModel private constructor(
             )
         }
 
+        /** Handles the MoveFocus intent. Publish state or events to show its effects. */
+        public fun onMoveFocus(handler: (FormFocus) -> Unit) {
+            port.onMethod(CipherAddEditContract.MEMBER_MOVE_FOCUS) {
+                val input = FormFocusOahuCodec.readFormFocus(it)
+                return@onMethod { handler(input) }
+            }
+        }
+
         /** Handles the AddUri intent. Publish state or events to show its effects. */
         public fun onAddUri(handler: () -> Unit) {
             port.onMethod(CipherAddEditContract.MEMBER_ADD_URI) { handler }
@@ -927,6 +946,11 @@ public class CipherAddEditModel private constructor(
         public fun emitFocus(value: FormFocus) {
             port.publish(CipherAddEditContract.STREAM_FOCUS) { FormFocusOahuCodec.writeFormFocus(it, value) }
         }
+
+        /** Publishes a new `Sections`: the screen gets it, and so does a model connected later. */
+        public fun setSections(value: CipherAddEditSections) {
+            port.publish(CipherAddEditContract.STREAM_SECTIONS) { CipherAddEditSectionsOahuCodec.writeCipherAddEditSections(it, value) }
+        }
     }
 
     public companion object {
@@ -1084,6 +1108,10 @@ public class CipherAddEditModel private constructor(
                 )
                 val focus = OahuEvents<FormFocus>()
                 connection.subscribe(CipherAddEditContract.STREAM_FOCUS, FormFocusOahuCodec::readFormFocus, focus::emit)
+                val sections = connection.subscribeState(
+                    CipherAddEditContract.STREAM_SECTIONS,
+                    CipherAddEditSectionsOahuCodec::readCipherAddEditSections,
+                )
                 return CipherAddEditModel(
                     connection,
                     copy,
@@ -1112,6 +1140,7 @@ public class CipherAddEditModel private constructor(
                     fields,
                     collections,
                     focus,
+                    sections,
                 )
             } catch (failure: Throwable) {
                 connection.close()
@@ -1146,6 +1175,7 @@ public class CipherAddEditModel private constructor(
             identity: IdentityFields,
             favorite: Boolean,
             reprompt: Boolean,
+            sections: CipherAddEditSections,
             uris: List<EditUriRow> = emptyList(),
             fields: List<EditFieldRow> = emptyList(),
             collections: List<CollectionCheckRow> = emptyList(),
@@ -1177,6 +1207,7 @@ public class CipherAddEditModel private constructor(
             port.setList(CipherAddEditContract.STREAM_URIS, uris, EditUriRowOahuCodec::writeEditUriRow)
             port.setList(CipherAddEditContract.STREAM_FIELDS, fields, EditFieldRowOahuCodec::writeEditFieldRow)
             port.setList(CipherAddEditContract.STREAM_COLLECTIONS, collections, CollectionCheckRowOahuCodec::writeCollectionCheckRow)
+            port.setState(CipherAddEditContract.STREAM_SECTIONS) { CipherAddEditSectionsOahuCodec.writeCipherAddEditSections(it, sections) }
             val preview = Preview(port)
             // Edits are accepted as proposed until configure answers them (docs/editable.md §5).
             preview.onEditType { it }

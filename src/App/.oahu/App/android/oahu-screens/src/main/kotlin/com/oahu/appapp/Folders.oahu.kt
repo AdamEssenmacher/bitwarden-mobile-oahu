@@ -2,14 +2,16 @@
 // change the C# contract and rebuild (docs/codegen.md). The screen is yours to write, in this package:
 // @Composable fun FoldersScreen(model: FoldersModel).
 //
-// Contract hash 3028792575856197906, over its signature:
+// Contract hash -6035256203165860254, over its signature:
 //   oahu/1 contract Folders
 //   stream 0 state Copy: FoldersCopy
-//   stream 1 state ShowNoData: bool
-//   stream 2 list Folders: FolderRow keyed by Key
+//   stream 1 state Palette: AppPalette
+//   stream 2 state ShowNoData: bool
+//   stream 3 list Folders: FolderRow keyed by Key
 //   member 0 method Open: string
 //   member 1 method Add: unit
 //   type FoldersCopy = record {NoFolders: string, AddFolder: string}
+//   type AppPalette = record {Name: string, IsDark: bool, Background: color, ListHeaderBackground: color, ListHeaderText: color, Text: color, Muted: color, Primary: color, Danger: color, Separator: color, PasswordNumber: color, PasswordSpecial: color, BoxHeaderText: color}
 //   type FolderRow = record {Key: string, Name: string}
 
 package com.oahu.appapp
@@ -29,11 +31,12 @@ internal object FoldersContract {
     const val NAME: String = "Folders"
 
     /** FNV-1a 64 of Folders's signature (above). The .NET host refuses the screen when its own hash differs. */
-    const val HASH: Long = 3028792575856197906L
+    const val HASH: Long = -6035256203165860254L
 
     const val STREAM_COPY: Int = 0
-    const val STREAM_SHOW_NO_DATA: Int = 1
-    const val STREAM_FOLDERS: Int = 2
+    const val STREAM_PALETTE: Int = 1
+    const val STREAM_SHOW_NO_DATA: Int = 2
+    const val STREAM_FOLDERS: Int = 3
 
     const val MEMBER_OPEN: Int = 0
     const val MEMBER_ADD: Int = 1
@@ -47,6 +50,7 @@ internal object FoldersContract {
 public class FoldersModel private constructor(
     private val connection: OahuConnection,
     public val copy: StateFlow<FoldersCopy>,
+    public val palette: StateFlow<AppPalette>,
     public val showNoData: StateFlow<Boolean>,
     private val _folders: KeyedList<FolderRow>,
 ) {
@@ -97,6 +101,11 @@ public class FoldersModel private constructor(
             port.publish(FoldersContract.STREAM_COPY) { FoldersCopyOahuCodec.writeFoldersCopy(it, value) }
         }
 
+        /** Publishes a new `Palette`: the screen gets it, and so does a model connected later. */
+        public fun setPalette(value: AppPalette) {
+            port.publish(FoldersContract.STREAM_PALETTE) { AppPaletteOahuCodec.writeAppPalette(it, value) }
+        }
+
         /** Publishes a new `ShowNoData`: the screen gets it, and so does a model connected later. */
         public fun setShowNoData(value: Boolean) {
             port.publish(FoldersContract.STREAM_SHOW_NO_DATA) { it.writeBool(value) }
@@ -121,6 +130,10 @@ public class FoldersModel private constructor(
             val connection = OahuConnection(port)
             try {
                 val copy = connection.subscribeState(FoldersContract.STREAM_COPY, FoldersCopyOahuCodec::readFoldersCopy)
+                val palette = connection.subscribeState(
+                    FoldersContract.STREAM_PALETTE,
+                    AppPaletteOahuCodec::readAppPalette,
+                )
                 val showNoData = connection.subscribeState(FoldersContract.STREAM_SHOW_NO_DATA, OahuReader::readBool)
                 val folders = KeyedList(FolderRow::key)
                 connection.subscribe(
@@ -128,7 +141,7 @@ public class FoldersModel private constructor(
                     { it.readBatch(FolderRowOahuCodec::readFolderRow) },
                     folders::apply,
                 )
-                return FoldersModel(connection, copy, showNoData, folders)
+                return FoldersModel(connection, copy, palette, showNoData, folders)
             } catch (failure: Throwable) {
                 connection.close()
                 throw failure
@@ -141,12 +154,14 @@ public class FoldersModel private constructor(
          */
         public fun preview(
             copy: FoldersCopy,
+            palette: AppPalette,
             showNoData: Boolean,
             folders: List<FolderRow> = emptyList(),
             configure: Preview.() -> Unit = {},
         ): FoldersModel {
             val port = OahuPreviewPort(FoldersContract.NAME, FoldersContract.HASH)
             port.setState(FoldersContract.STREAM_COPY) { FoldersCopyOahuCodec.writeFoldersCopy(it, copy) }
+            port.setState(FoldersContract.STREAM_PALETTE) { AppPaletteOahuCodec.writeAppPalette(it, palette) }
             port.setState(FoldersContract.STREAM_SHOW_NO_DATA) { it.writeBool(showNoData) }
             port.setList(FoldersContract.STREAM_FOLDERS, folders, FolderRowOahuCodec::writeFolderRow)
             val preview = Preview(port)

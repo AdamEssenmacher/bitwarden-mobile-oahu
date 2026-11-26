@@ -2,7 +2,7 @@
 // change the C# contract and rebuild (docs/codegen.md). The screen is yours to write, in this package:
 // @Composable fun CipherDetailsScreen(model: CipherDetailsModel).
 //
-// Contract hash 5709382837785089209, over its signature:
+// Contract hash -3574526755337486478, over its signature:
 //   oahu/1 contract CipherDetails
 //   stream 0 state Copy: CipherDetailsCopy
 //   stream 1 state Palette: AppPalette
@@ -20,7 +20,7 @@
 //   member 9 method DownloadAttachment: string
 //   member 10 method OpenPasswordHistory: unit
 //   type CipherDetailsCopy = record {ItemInformation: string, Name: string, Username: string, Password: string, Passkey: string, VerificationCode: string, PremiumRequired: string, CardholderName: string, Number: string, Brand: string, Expiration: string, SecurityCode: string, IdentityName: string, Company: string, Ssn: string, PassportNumber: string, LicenseNumber: string, Email: string, Phone: string, Address: string, Uris: string, Uri: string, Website: string, Notes: string, CustomFields: string, Attachments: string, Copy: string, Launch: string, Download: string, CheckPassword: string, Show: string, Hide: string}
-//   type AppPalette = record {Name: string, IsDark: bool, Background: long, ListHeaderBackground: long, ListHeaderText: long, Text: long, Muted: long, Primary: long, Danger: long, Separator: long, PasswordNumber: long, PasswordSpecial: long, BoxHeaderText: long}
+//   type AppPalette = record {Name: string, IsDark: bool, Background: color, ListHeaderBackground: color, ListHeaderText: color, Text: color, Muted: color, Primary: color, Danger: color, Separator: color, PasswordNumber: color, PasswordSpecial: color, BoxHeaderText: color}
 //   type CipherDetails = record {Name: string, Login: LoginDetails?, Card: CardDetails?, Identity: IdentityDetails?, Uris: list<UriRow>, Notes: string?, Fields: list<FieldRow>, Attachments: list<AttachmentRow>, Footer: list<FooterLine>}
 //   type LoginDetails = record {Username: string?, Password: SecretValue?, CanCheckPassword: bool, PasskeyCreated: string?, HasTotp: bool}
 //   type SecretValue = record {Masked: string, Revealed: list<TextRun>?, CanReveal: bool, CanCopy: bool}
@@ -48,7 +48,7 @@ internal object CipherDetailsContract {
     const val NAME: String = "CipherDetails"
 
     /** FNV-1a 64 of CipherDetails's signature (above). The .NET host refuses the screen when its own hash differs. */
-    const val HASH: Long = 5709382837785089209L
+    const val HASH: Long = -3574526755337486478L
 
     const val STREAM_COPY: Int = 0
     const val STREAM_PALETTE: Int = 1

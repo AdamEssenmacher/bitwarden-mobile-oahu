@@ -2,7 +2,7 @@
 // change the C# contract and rebuild (docs/codegen.md). The screen is yours to write, in this package:
 // @Composable fun GroupingsScreen(model: GroupingsModel).
 //
-// Contract hash -1272480561603521802, over its signature:
+// Contract hash -3653786441250323639, over its signature:
 //   oahu/1 contract Groupings
 //   stream 0 state Copy: GroupingsCopy
 //   stream 1 state Palette: AppPalette
@@ -19,7 +19,7 @@
 //   member 5 method ChooseVaultFilter: unit
 //   member 6 method Add: unit
 //   type GroupingsCopy = record {AddAnItem: string, Filter: string, Options: string, Shared: string, Attachments: string, CopyTotp: string, View: string, Edit: string, Loading: string}
-//   type AppPalette = record {Name: string, IsDark: bool, Background: long, ListHeaderBackground: long, ListHeaderText: long, Text: long, Muted: long, Primary: long, Danger: long, Separator: long, PasswordNumber: long, PasswordSpecial: long, BoxHeaderText: long}
+//   type AppPalette = record {Name: string, IsDark: bool, Background: color, ListHeaderBackground: color, ListHeaderText: color, Text: color, Muted: color, Primary: color, Danger: color, Separator: color, PasswordNumber: color, PasswordSpecial: color, BoxHeaderText: color}
 //   type GroupingsEmpty = record {Text: string, ShowAddButton: bool}
 //   type GroupingsRow = union {SectionHeader {Key: string, Title: string, Count: string}, Grouping {Key: string, Glyph: string, Name: string, Count: string}, CipherItem {Key: string, Name: string, Subtitle: string?, Glyph: string, IconUrl: string?, Shared: bool, HasAttachments: bool, CanEdit: bool}, TotpItem {Key: string, Name: string, Subtitle: string?, Glyph: string, IconUrl: string?, Code: string?, Seconds: string, Progress: double}}
 
@@ -41,7 +41,7 @@ internal object GroupingsContract {
     const val NAME: String = "Groupings"
 
     /** FNV-1a 64 of Groupings's signature (above). The .NET host refuses the screen when its own hash differs. */
-    const val HASH: Long = -1272480561603521802L
+    const val HASH: Long = -3653786441250323639L
 
     const val STREAM_COPY: Int = 0
     const val STREAM_PALETTE: Int = 1
