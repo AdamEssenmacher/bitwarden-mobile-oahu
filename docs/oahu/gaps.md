@@ -739,6 +739,7 @@ contracts) on the add/edit form. Details in [07-retest.md](07-retest.md). Host l
 Android ran on a read-only `OAHU_Fold_API36` because another session held `OAHU_Pixel_API36` without `-read-only`.
 
 ### G37. `init` refuses a managed file that git's line-ending normalisation changed (friction, verified)
+- Issue: [AdamE.Oahu#1046](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/1046)
 - Trying to: rerun `dotnet tool run oahu init --project src/App/App.csproj --version 0.1.0-preview.gc63d0aba` from a
   fresh worktree of the app, after putting init's own Package.swift and build.gradle.kts back (G17).
 - What happened: `oahu: /Users/adam/RiderProjects/bw-retest-18315/src/App/.oahu/App/android/gradlew.bat already exists
@@ -753,6 +754,7 @@ Android ran on a read-only `OAHU_Fold_API36` because another session held `OAHU_
   rerun the same way for every text file init manages.
 
 ### G38. An upgrade leaves stale OAHU versions in projects `init` doesn't manage, and the checks don't notice (friction, verified)
+- Issue: [AdamE.Oahu#1047](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/1047)
 - Trying to: move the app to the new preview with `init --version`.
 - What happened: init updated `.oahu/App/Oahu.targets` (src/App), but the `Oahu.Maui` reference in `src/Core/Core.csproj`
   and the `Oahu` reference in `src/Core.Contracts/Core.Contracts.csproj` (both added by hand because of G1) stayed at
@@ -764,6 +766,7 @@ Android ran on a read-only `OAHU_Fold_API36` because another session held `OAHU_
   or a doctor check across the project's references, would have caught it.
 
 ### G39. Mounted sections need the platform's `Mount` and a teardown hook passed in from MAUI page code (papercut, verified)
+- Issue: [AdamE.Oahu#1048](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/1048)
 - Trying to: follow contracts.md "Splitting a large screen into sections" in a view model that lives in a MAUI class
   library and is hosted by `OahuView`.
 - What happened: it works (07-retest.md, "D25 trial"), but `OahuScreens.Mount<T>` lives in `Oahu.iOS` and
@@ -775,6 +778,7 @@ Android ran on a read-only `OAHU_Fold_API36` because another session held `OAHU_
 - Workaround: `MountSections(...)`/`DisposeSections()` on the view model, called from `CipherAddEditPage.xaml.cs`.
 
 ### G40. On iOS a parent screen can't move focus into a mounted section without a round trip through C# (friction, verified)
+- Issue: [AdamE.Oahu#1049](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/1049)
 - Trying to: keep Return on the name field moving to the identity section's first field, as the flat form did with one
   `@FocusState`.
 - What happened: the section is a separate SwiftUI view with its own `@FocusState`; the parent's focus enum can't
@@ -788,12 +792,14 @@ Android ran on a read-only `OAHU_Fold_API36` because another session held `OAHU_
   (focus order, "scroll to the invalid field") now needs either C# or hand-written environment plumbing.
 
 ### G41. `OahuTextField` takes SwiftUI focus but the docs say it doesn't, and it can't place the cursor (doc/papercut, verified)
+- Issue: [AdamE.Oahu#1050](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/1050)
 - native-screens.md says to "Use `TextField` … for multiline input or SwiftUI focus management", yet `.focused($state)`
   on an `OahuTextField` focused it on appearing and after the wrong-password alert (lock page, iOS). The view model's
   cursor request (`SecretFocus.Cursor`, MAUI's "cursor at the end") still has nowhere to go: `OahuTextField` has no
   selection binding. Cost here: none (UIKit kept the cursor itself across show/hide).
 
 ### G42. A held focus request has no moment to wait for (papercut, partly verified)
+- Issue: [AdamE.Oahu#1051](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/1051)
 - native-screens.md now says the screen should hold a request that arrives while it is being presented, and admits the
   earliest moment is unknown. Here a retry every 100 ms kept focus only on the 4th attempt; yet with the request sent at
   once and applied once, the name took focus in 4 of 4 runs. So the screen has to retry or sleep, and the timing it
