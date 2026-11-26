@@ -206,8 +206,9 @@ public class GroupingsModel private constructor(
             port.publish(GroupingsContract.STREAM_IS_REFRESHING) { it.writeBool(value) }
         }
 
-        /** Publishes a batch of edits to `Rows`, applied in order, all or nothing. */
+        /** Publishes a batch of edits to `Rows`, applied in order, all or nothing. No edits publish nothing. */
         public fun updateRows(ops: List<ListOp<GroupingsRow>>) {
+            if (ops.isEmpty()) return
             port.publish(GroupingsContract.STREAM_ROWS) { it.writeBatch(ops, GroupingsRowOahuCodec::writeGroupingsRow) }
         }
     }

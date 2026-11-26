@@ -148,8 +148,9 @@ extension FoldersModel {
             port.setState(stream: FoldersContract.Stream.showNoData) { $0.writeBool(value) }
         }
 
-        /// Publishes a batch of edits to the Folders list, applied all or nothing.
+        /// Publishes a batch of edits to the Folders list, applied all or nothing. No edits publish nothing.
         public func updateFolders(_ ops: [OahuListOp<FolderRow>]) {
+            guard !ops.isEmpty else { return }
             port.publish(stream: FoldersContract.Stream.folders) { $0.writeBatch(ops, FolderRow.write) }
         }
     }

@@ -905,18 +905,21 @@ public class CipherAddEditModel private constructor(
             port.publish(CipherAddEditContract.STREAM_REPROMPT) { it.writeBool(value) }
         }
 
-        /** Publishes a batch of edits to `Uris`, applied in order, all or nothing. */
+        /** Publishes a batch of edits to `Uris`, applied in order, all or nothing. No edits publish nothing. */
         public fun updateUris(ops: List<ListOp<EditUriRow>>) {
+            if (ops.isEmpty()) return
             port.publish(CipherAddEditContract.STREAM_URIS) { it.writeBatch(ops, EditUriRowOahuCodec::writeEditUriRow) }
         }
 
-        /** Publishes a batch of edits to `Fields`, applied in order, all or nothing. */
+        /** Publishes a batch of edits to `Fields`, applied in order, all or nothing. No edits publish nothing. */
         public fun updateFields(ops: List<ListOp<EditFieldRow>>) {
+            if (ops.isEmpty()) return
             port.publish(CipherAddEditContract.STREAM_FIELDS) { it.writeBatch(ops, EditFieldRowOahuCodec::writeEditFieldRow) }
         }
 
-        /** Publishes a batch of edits to `Collections`, applied in order, all or nothing. */
+        /** Publishes a batch of edits to `Collections`, applied in order, all or nothing. No edits publish nothing. */
         public fun updateCollections(ops: List<ListOp<CollectionCheckRow>>) {
+            if (ops.isEmpty()) return
             port.publish(CipherAddEditContract.STREAM_COLLECTIONS) { it.writeBatch(ops, CollectionCheckRowOahuCodec::writeCollectionCheckRow) }
         }
 

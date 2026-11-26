@@ -306,8 +306,9 @@ extension GroupingsModel {
             port.setState(stream: GroupingsContract.Stream.isRefreshing) { $0.writeBool(value) }
         }
 
-        /// Publishes a batch of edits to the Rows list, applied all or nothing.
+        /// Publishes a batch of edits to the Rows list, applied all or nothing. No edits publish nothing.
         public func updateRows(_ ops: [OahuListOp<GroupingsRow>]) {
+            guard !ops.isEmpty else { return }
             port.publish(stream: GroupingsContract.Stream.rows) { $0.writeBatch(ops, GroupingsRow.write) }
         }
     }

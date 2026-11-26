@@ -102,8 +102,9 @@ public class FoldersModel private constructor(
             port.publish(FoldersContract.STREAM_SHOW_NO_DATA) { it.writeBool(value) }
         }
 
-        /** Publishes a batch of edits to `Folders`, applied in order, all or nothing. */
+        /** Publishes a batch of edits to `Folders`, applied in order, all or nothing. No edits publish nothing. */
         public fun updateFolders(ops: List<ListOp<FolderRow>>) {
+            if (ops.isEmpty()) return
             port.publish(FoldersContract.STREAM_FOLDERS) { it.writeBatch(ops, FolderRowOahuCodec::writeFolderRow) }
         }
     }

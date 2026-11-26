@@ -1669,18 +1669,21 @@ extension CipherAddEditModel {
             port.setState(stream: CipherAddEditContract.Stream.reprompt) { $0.writeBool(value) }
         }
 
-        /// Publishes a batch of edits to the Uris list, applied all or nothing.
+        /// Publishes a batch of edits to the Uris list, applied all or nothing. No edits publish nothing.
         public func updateUris(_ ops: [OahuListOp<EditUriRow>]) {
+            guard !ops.isEmpty else { return }
             port.publish(stream: CipherAddEditContract.Stream.uris) { $0.writeBatch(ops, EditUriRow.write) }
         }
 
-        /// Publishes a batch of edits to the Fields list, applied all or nothing.
+        /// Publishes a batch of edits to the Fields list, applied all or nothing. No edits publish nothing.
         public func updateFields(_ ops: [OahuListOp<EditFieldRow>]) {
+            guard !ops.isEmpty else { return }
             port.publish(stream: CipherAddEditContract.Stream.fields) { $0.writeBatch(ops, EditFieldRow.write) }
         }
 
-        /// Publishes a batch of edits to the Collections list, applied all or nothing.
+        /// Publishes a batch of edits to the Collections list, applied all or nothing. No edits publish nothing.
         public func updateCollections(_ ops: [OahuListOp<CollectionCheckRow>]) {
+            guard !ops.isEmpty else { return }
             port.publish(stream: CipherAddEditContract.Stream.collections) { $0.writeBatch(ops, CollectionCheckRow.write) }
         }
 
