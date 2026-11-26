@@ -15,6 +15,21 @@ namespace Bit.App.Pages
         public FoldersPage()
         {
             InitializeComponent();
+#if DEBUG
+            // Step 7, #943 probe: BW_OAHU_PAGEBG=1 paints the MAUI page red, so any strip the native screen leaves shows;
+            // BW_OAHU_SAFEAREA=0 puts back the step 2 settings (layouts at Container, UseSafeArea on).
+            if (Bit.App.Pages.OahuDebug.OahuDebugRoute.Option("BW_OAHU_PAGEBG", "bwOahuPageBg") == "1")
+            {
+                BackgroundColor = Colors.Red;
+            }
+            if (Bit.App.Pages.OahuDebug.OahuDebugRoute.Option("BW_OAHU_SAFEAREA", "bwOahuSafeArea") == "0")
+            {
+                Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific.Page.SetUseSafeArea(this, true);
+                SafeAreaEdges = SafeAreaEdges.Container;
+                _absLayout.SafeAreaEdges = SafeAreaEdges.Container;
+                _mainContent.SafeAreaEdges = SafeAreaEdges.Container;
+            }
+#endif
             SetActivityIndicator(_mainContent);
             _vm = BindingContext as FoldersPageViewModel;
             _vm.Page = this;
