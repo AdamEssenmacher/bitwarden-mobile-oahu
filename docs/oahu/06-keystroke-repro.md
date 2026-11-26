@@ -4,6 +4,11 @@ A controlled reproduction of G34. In step 5, fast typing into the multi-line not
 bound to the generated `$model.notes`) lost one character in 3 of 4 runs. This step tried to reproduce that with
 scripted typing, several bindings, two hosts and logs at every layer. Nothing was fixed.
 
+Round 1 (software keyboard, `insertText`) did not reproduce it. [Round 2](#round-2-hardware-keyboard-path) typed
+through hardware-keyboard (HID) events, as step 5 did, and did reproduce it. The cause is in UIKit/SwiftUI, not OAHU:
+a hardware Return ends editing of the vertical field while an earlier key is still being inserted, and that key is
+dropped. The plain `@State` control loses characters as often.
+
 ## Result
 
 No characters were lost in 708 runs on two hosts: plain SwiftUI bindings, the generated OAHU binding (multi-line and
@@ -212,3 +217,191 @@ answer equals the edit:
 4. `UDID=… DD=… LAB=<worktree>/tests/native/apple/EditableLab OUT=<dir> bash run-editablelab.sh <tag> <rounds> A,O,B,C,D,S xcui0,xcui1,inject [yes-count]`
    (or `run-bitwarden.sh … state,model,local,single …`). Then run `tabulate.py <OUT>/results.txt` and
    `analyze.py <OUT>/results.txt <OUT>/logs --details`.
+
+## Round 2: hardware-keyboard path
+
+Round 2 typed through the path step 5 used: HID key events sent to the simulator. It reproduced the loss, and the
+plain `@State` control (no OAHU) loses characters too. The character is lost inside UIKit: the app receives the key,
+and it never reaches the field's text.
+
+### Result
+
+- The step 5 result came back: `Line ne\n` for `Line one\nLine two…`, the same string step 5's first run saved. The
+  multi-line field lost one character in 30 of the 78 runs that typed a Return in the same burst as the letters before
+  it.
+- **The no-OAHU control loses at least as often.** In the primary condition, the plain `@State` field lost a character
+  in 10 of 20 runs; the generated binding in 6 of 20; step 5's local binding in 4 of 10. The difference between
+  `state` and `model` is not significant (Fisher p = 0.33). The single-line field (Return submits) lost none in 20.
+- **Where:** every one of the 30 losses is "received by the app, never in the field". backboardd delivered the key to
+  the app's pid, and no UIKit text-change ever contained it. UIKit's own log shows why. The Return keypress ends editing
+  of the vertical field (`_teardownExistingDelegate:<SwiftUI.VerticalTextView>`) as soon as UIKit dispatches it. The
+  keyboard inserts typed text through an asynchronous pipeline that runs behind event dispatch. A key that is inside
+  that pipeline when editing ends is dropped. Keys already queued behind it are still inserted.
+- **Not OAHU.** The loss happens before any binding sees the text, and with a plain `@State` as well. The generated
+  setter got `Line ` for the dropped key (SwiftUI syncs the field's text when editing ends) and never `Line o`. The
+  view model echoed every edit unchanged, as in round 1. OAHU's runtime (`OahuConnection.edit`,
+  `OahuEditableText.Hold`) is not implicated.
+- **What it needs:** a hardware Return in the vertical field while earlier keys are still queued. The HID burst does
+  that: the control tool hands backboardd the whole string in 10–30 ms, and the app works through it at about 10 ms a
+  character. Without a Return (`fox`) nothing was lost (0 of 10). With the Return sent on its own after the letters
+  had landed (K2), no letter was lost (0 of 6); the Return ended editing without inserting a newline. With the Return
+  in the same call as `one` (K1), the `e` before it was lost in 5 of 6 runs. Waiting 2 s between the tap and the
+  typing (W) did not prevent it (2 of 10), nor did turning off autocorrection (A, 2 of 10).
+- Confidence: high that this mechanism produces the step 5 symptom, and that it does not need OAHU. Moderate that it
+  is the only cause of step 5's losses: step 5's second loss (`Lie one`, the `n` at index 2) was not seen here. The
+  same mechanism predicts it if the keyboard's pipeline was further behind; step 5 ran at load 64–146.
+
+### Method
+
+- **The original mechanism** (from step 5's transcript): the Claude desktop app's iOS Simulator control tool. `attach`,
+  then per run one `tap` on the notes field and one `text` call with the whole string, `\n` as a hardware Return.
+  Texts: `Line one\nLine two\nLine three\nLine four\nLine five teh` typed straight after the tap (first run saved
+  `Line ne\n`), `Line one\nLine two\nLine three` after a 2 s pause, and `Alpha beta gamma delta epsilon` (intact).
+- **This round:** the same tool on a new simulator, "BW OAHU Repro977 HID" (iPhone 16 Pro, iOS 18.6), with this
+  branch's Debug build (x86_64 under Rosetta) and the DEBUG `add-note` route. Per run: `run-hid.sh pre` (record the
+  load, relaunch with the variant, start the backboardd log), then `tap` (80, 497) and `text`, then `run-hid.sh post`
+  (wait, record the load, collect the logs, analyze). A one-time keyboard onboarding sheet ("slide to type") was
+  dismissed once before the runs.
+- **Conditions:**
+  - P (primary): `tap` and `text` sent together, with the 52-character `line5` text. The tap lands about 100 ms after
+    the keys reach backboardd; UIKit handles the touch first, so the field has focus before the first key is
+    inserted.
+  - W: `tap`, then `text` in the next call. Focus came 1.8–2.9 s before the keys.
+  - F: as P, with `The quick brown fox jumps over` (no Return).
+  - A: as P, with autocorrection off (`BW_OAHU_NOTES_AUTOCORRECT=0`).
+  - K1: `tap` with `Line `, then `one\n` in a second call. K2: `tap` with `Line one`, then `\n` alone. These were the
+    word-by-word runs, split to put the Return in or out of a burst.
+- **Variants:** as round 1. `state` (plain `@State`, the no-OAHU control), `model` (the generated binding, multi-line;
+  step 5's case), `single` (generated binding, single line), `local` (step 5's local binding). P rounds rotated the
+  variant order; the other conditions alternated `state` and `model`.
+- **Scoring** ([`analyze-hid.py`](06-keystroke-repro/analyze-hid.py)): a run is scored up to and including the first
+  Return. The text after it never reaches the field, because the Return ends editing (G34). For `single` the expected
+  text has no newline, because the field submits on Return. "Lost" means a typed letter is missing from the field or
+  the model. "Cut" means the field is the typed text without its final newline (all letters intact). For `state` the
+  field is scored: the `@State`'s `.onChange` log lagged once (F-r2) while the field was right, as in round 1.
+- **Layers:** backboardd (`log stream`, `KeyPresses`: each key with the receiving pid) → UIKit text (`uiChange`,
+  sampled `ui`) → setter (`csSet`) → model. In two diagnostic runs (D), UIKit's keyboard log was streamed as well.
+
+### Harness changes
+
+- The prepared HID probe was blind. The probe's GameController handler logged nothing: `GCKeyboard.coalesced` is nil
+  in the simulator and `GCKeyboardDidConnect` never fires, even though the keys are real HID events. So `hidDown` is
+  empty in every run, and the analyzer would have called every loss "never received by the app". The HID layer is now
+  backboardd's own log, which names every key it delivers and the pid it delivers to. `run-hid.sh pre` starts it and
+  `post` stops it. The clocks are aligned by reading the wall clock and `CLOCK_UPTIME_RAW` (the probes' clock)
+  together.
+- The software keyboard stays on screen. The arbiter switches the event source to `KBHW` on the first key, but the
+  simulator never reports a hardware keyboard (`hwKeyboard none`).
+- Checks before counting: two slow runs (dbg1, dbg2) where the screenshot, the probe and the analyzer agreed
+  (`The quick brown fox jumps over`; `Line one` with the keyboard dismissed by the Return). Three edited copies of
+  dbg2's logs (a key removed from backboardd's log, an `o` removed from the field and setter, an overwritten model)
+  were each classified as expected. In every counted run, backboardd's log has every typed key for the app's pid.
+- Each run's focus was checked from the log, not a screenshot. Every counted run's field received text, and the add
+  form's initial focus on Name never took a key. Screenshots were taken for the first launches. The notes field sat
+  at y = 493–500 points; the tap at y = 497 focused it every time.
+
+### Counts
+
+"Runs/lost". Lost = a letter before the first Return is missing. All results are in
+[`06-keystroke-repro/results`](06-keystroke-repro/results): `hid-results.txt`, `hid-analysis.txt` (per run), and the
+logs in `hid-logs.tar.gz`.
+
+| Condition | `state` (no OAHU) | `model` (generated, multi-line) | `local` | `single` |
+|---|---|---|---|---|
+| P: tap + text together, `line5` | **20/10** | **20/6** | 10/4 | 20/0 |
+| W: text in the next call (focus 1.8–2.9 s earlier) | 5/2 | 5/0 | – | – |
+| A: as P, autocorrection off | 5/1 | 5/1 | – | – |
+| F: as P, single-line phrase, no Return | 5/0 | 5/0 | – | – |
+| K1: `Line ` then `one\n` | 3/3 | 3/2 | – | – |
+| K2: `Line one` then `\n` alone | 3/0 | 3/0 | – | – |
+| D: diagnostic (UIKit log on) | 1/1 | 1/0 | – | – |
+
+- The lost character, across all 30 losses: `o` at index 5 (`Line ne\n`) 22 times, `n` at index 6 (`Line oe\n`) 3
+  times, and in K1 the `e` before the Return (`Line on\n`) 5 times. In K2 all 6 runs and in K1 one `model` run, the
+  Return ended editing without inserting a newline, with every letter intact ("cut" in the analysis).
+- P by load bucket (the mean of the 1-minute load average before and after the run):
+
+  | Variant | <20 | 20–40 | 40–80 | ≥80 |
+  |---|---|---|---|---|
+  | state | 12/5 | 5/3 | 2/2 | 1/0 |
+  | model | 15/3 | 2/2 | 1/0 | 2/1 |
+  | local | 4/2 | 5/2 | – | 1/0 |
+  | single | 14/0 | 5/0 | 1/0 | – |
+
+  The loads came from other sessions; the per-run means ranged from 4.8 to 139, median 15. Losses happen at every
+  load, including below 10. No synthetic-load set was run: the machine was not quiet, and its own load already
+  covered the range. No `yes` process was running during any run.
+- The rates: `state` 10/20 against `model` 6/20 (p = 0.33). `state` against `single` p < 0.001; `model` against
+  `single` p = 0.02. Across P, W and A, `state` lost 13 of 30 and `model` 7 of 30 (p = 0.17). The data do not show
+  the generated binding losing more often than plain SwiftUI. If anything it loses less often, which fits the
+  mechanism: its setter makes each insert slower, so the pipeline is less likely to be mid-key when the Return lands.
+  That is not established.
+
+### Log excerpts
+
+**`model`, P-r12 (load 25): received, never in the field.** backboardd delivered all of `Line one\n` (and the rest)
+to the app in 2 ms. The field went from `Line ` to `Line n`. The setter's two calls with `Line ` and no text change
+are SwiftUI syncing the field when editing ended. `o` never reached UIKit's text, so it never reached C#.
+
+```
+231932.6312 BB ' '  231932.6316 BB 'o'  231932.6320 BB 'n'  231932.6324 BB 'e'  231932.6331 BB '\n'   (pid 76685, the app)
+231932.7184 notesFocused true
+231932.8387 csSet 'Line '  231932.8389 uiChange 'Line '
+231932.8466 csSet 'Line '                               <- editing ends; no text change, no 'Line o'
+231932.8538 csSet 'Line n' 231932.8540 uiChange 'Line n'
+231932.8645 csSet 'Line ne\n' 231932.8653 uiChange 'Line ne\n'
+231932.8789 kbHide
+```
+
+**`state`, D-r01 (load 26), UIKit's log: the Return ends editing while `o` is in the keyboard's pipeline.** Each key
+goes "adds a string" → "sends inputEvent to kbd" → "receives output" → "inserts text". All 20 press events of
+`Line one\n` (shift, letters, space, Return; down and up) had been dispatched to the window by 13.268. The teardown
+started at 13.270, with 6 keys added and 5 inserted:
+
+```
+13.238 Keyboard adds a string            (' ')
+13.259 Keyboard inserts text             ('Line ')
+13.268 Keyboard adds a string            ('o')
+13.270 -_teardownExistingDelegate:<SwiftUI.VerticalTextView ...> forSetDelegate:(nil)   <- Return ends editing
+13.274 Keyboard adds a string  13.279 Keyboard inserts text   ('n')
+13.283 Keyboard adds a string  13.287 Keyboard inserts text   ('e')
+13.289 Keyboard adds a string  13.294 Keyboard inserts text   ('\n')
+13.297 -_setDelegate:(nil) existingDelegate:<SwiftUI.VerticalTextView ...>
+```
+
+**`model`, D-r02 (load 15), no loss, for contrast.** The same teardown came at the same point, between keys: 6 keys
+added and 6 inserted. Nothing was in flight, so nothing was lost.
+
+```
+43.259 Keyboard adds a string   43.266 Keyboard inserts text   ('o')
+43.271 -_teardownExistingDelegate:<SwiftUI.VerticalTextView ...>
+43.275 Keyboard adds a string   43.280 Keyboard inserts text   ('n')
+```
+
+### Conclusion
+
+- The hardware-keyboard path reproduces G34's dropped character. In step 5's case, `line5` typed straight after the
+  tap, the generated binding lost one in 6 of 20 runs and plain `@State` in 10 of 20.
+- The cause is in UIKit/SwiftUI, not OAHU. A hardware Return in a SwiftUI `TextField(axis: .vertical)` ends editing
+  when UIKit dispatches the key. Text insertion runs asynchronously behind dispatch, so a key still in the keyboard's
+  pipeline at that moment is dropped. The app received the key; it never entered the field's text, so no binding
+  could see it. OAHU's runtime is not on the path. The 2.3 edits per keystroke, the setter and the hold play no part.
+- It needs a Return typed into the vertical field while earlier keys are still being inserted. A person typing at
+  human speed on a hardware keyboard would rarely hit it. A tool or agent that sends a whole string with `\n` in one
+  call hits it often. Typing the Return in a separate call avoids it (0 of 6), as does a text without a Return (0 of
+  10). It is the same SwiftUI behaviour step 5 recorded: a hardware Return ends editing instead of inserting a
+  newline. Here it also drops the key in flight.
+- Confidence: high for the mechanism and that OAHU is not needed for it (30 of 30 losses at the same layer, the
+  no-OAHU control losing as often, and the UIKit log showing the teardown mid-key). Moderate that it explains every
+  step 5 loss: `Lie one` was not reproduced.
+
+### Not tested (round 2)
+
+- A physical device or a Mac's real keyboard through Simulator.app (here the keys came from the control tool's HID
+  injection; no Simulator window was in front). Whether a person typing fast on a real keyboard can hit it.
+- iOS versions other than 18.6, an arm64 build, a Release build.
+- EditableLab: not run, since the no-OAHU control in this host lost characters too.
+- A synthetic-load set (`run-hid.sh burn` was not used).
+- Why the generated binding's rate is lower than `@State`'s (6/20 against 10/20; not significant).
+- What SwiftUI does on the Return in detail (the vertical field's key handling is not public). The log shows the end
+  of editing starting right after the Return is dispatched, but not the call that starts it.

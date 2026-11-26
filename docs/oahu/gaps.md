@@ -626,7 +626,7 @@ the shared ones (see "Not OAHU").
   Then the name field focused on open on both platforms. Focus after the "Name is required" alert worked without a
   delay (the alert is dismissed by then).
 
-### G34. iOS multi-line field: a fast keystroke was sometimes dropped (friction, partly verified, cause not isolated)
+### G34. iOS multi-line field: a fast keystroke was sometimes dropped (friction, verified; cause in SwiftUI/UIKit, not OAHU)
 - Trying to: type a multi-line note quickly (`TextField(axis: .vertical)` bound to `$model.notes`), typing through the
   simulator's hardware keyboard.
 - What happened: three of four runs with the generated binding lost one character of the first word ("Line ne",
@@ -646,6 +646,19 @@ the shared ones (see "Not OAHU").
   hold never started. Not tried: the Simulator app's hardware keyboard (the step 5 path) and a device. Severity
   unchanged until the hardware-keyboard path is tried; the cause is still unknown, and OAHU is not implicated by the
   evidence.
+- Step 6 round 2 ([06-keystroke-repro.md](06-keystroke-repro.md#round-2-hardware-keyboard-path)): reproduced, and not
+  OAHU. It used the step 5 path: the simulator control tool's `tap` and `text` (HID key events), on iOS 18.6. Typed
+  straight after the tap, `Line one\nLine two…` lost one character in 6 of 20 runs with `$model.notes` and in 10 of 20
+  with a plain `@State` (no OAHU). Step 5's local binding lost 4 of 10 and the single-line field none of 20. All 30
+  losses were keys the app received (backboardd's log) that never entered the field's text, mostly `Line ne\n`, step
+  5's string. UIKit's log shows the mechanism. The hardware Return ends editing of the vertical field
+  (`_teardownExistingDelegate:<SwiftUI.VerticalTextView>`) as soon as it is dispatched, while text insertion runs
+  asynchronously behind dispatch, so the key still in the keyboard's pipeline is dropped. No Return, no loss (0 of
+  10); a Return sent on its own after the letters, no loss (0 of 6); autocorrection off or a 2 s wait after focus does
+  not prevent it. It needs keys queued ahead of a Return, which a tool that types whole strings produces and human
+  typing rarely would. Workaround for agents: send the Return in its own `text` call, or use the on-screen Return.
+  Severity: friction for scripted typing; OAHU's runtime is not involved. Step 5's `Lie one` was not reproduced; a
+  device and a real keyboard through Simulator.app were not tried.
 
 ### G35. Android: the window pans for the keyboard, hiding MAUI's toolbar (and Save) while a low field has focus (friction, verified)
 - Trying to: keep the form usable with the keyboard up (the Compose screen uses `imePadding()`, as in step 4).
