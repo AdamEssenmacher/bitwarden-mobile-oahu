@@ -8,12 +8,13 @@ Severity: **blocker** (no app-side way past it), **friction** (cost real time or
 annoying), **doc** (the docs were wrong, missing or misleading). "Verified" means seen on a simulator, emulator or in
 build output; "inferred" means read from code or docs and not exercised.
 
-OAHU used so far: preview `0.1.0-preview.g104c58c2` (AdamE.Oahu commit `104c58c2`, origin/main on 2026-11-25), from
-the local feed `~/RiderProjects/oahu-feed`.
+OAHU used in steps 2–5: preview `0.1.0-preview.g104c58c2` (AdamE.Oahu commit `104c58c2`, origin/main on 2026-11-25),
+from the local feed `~/RiderProjects/oahu-feed`. Step 7 moved to `0.1.0-preview.gc63d0aba` (commit `c63d0aba`,
+2026-11-26) and retested the gaps ([07-retest.md](07-retest.md)); each gap's title links its AdamE.Oahu issue.
 
 ## Step 2 (folders)
 
-### G1. `oahu init` and the MAUI guide assume pages and view models live in the app project (friction)
+### G1. `oahu init` and the MAUI guide assume pages and view models live in the app project (friction) [#931](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/931)
 - Trying to: host native screens from pages that live in a MAUI class library (`src/Core`, `UseMaui`, targets
   `net11.0-ios;net11.0-android`), next to their view models, with `src/App` only the thin executable.
 - What happened: `oahu init --project src/App/App.csproj` adds `Oahu.Maui`, the contract `ProjectReference` and the
@@ -29,8 +30,9 @@ the local feed `~/RiderProjects/oahu-feed`.
   `native-screens.md` asks for (`Resource.Id.…`) are declared in `src/App/Platforms/Android/Resources/values/ids.xml`
   and looked up by name at run time with the discouraged `Resources.GetIdentifier`
   (`src/Core/Utilities/OahuAndroidIds.cs`). The contracts project can't reference `Bit.Core` either (G24).
+- **Retested on 0.1.0-preview.gc63d0aba** (step 7): init still adds OAHU to `src/App` only, and on the upgrade it left `Oahu.Maui` 104c58c2 in `src/Core/Core.csproj` and `Oahu` 104c58c2 in `src/Core.Contracts/Core.Contracts.csproj`; `doctor` and `versions --check` reported the new version everywhere and said nothing (G38). Two lines by hand.
 
-### G2. `init`'s Compose packages collide with the app's pinned AndroidX packages (friction)
+### G2. `init`'s Compose packages collide with the app's pinned AndroidX packages (friction) [#932](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/932)
 - Trying to: run `oahu init` on an app that pins older AndroidX bindings.
 - What happened: the Android restore inside `init` failed: `error NU1605: Warning As Error: Detected package
   downgrade: Xamarin.AndroidX.AutoFill from 1.3.0.4 to 1.1.0.18 ... App -> Xamarin.AndroidX.Compose.UI 1.11.3.1 ->
@@ -39,7 +41,7 @@ the local feed `~/RiderProjects/oahu-feed`.
 - Workaround: raised `Xamarin.AndroidX.AutoFill` to 1.3.0.4 in `src/App/App.csproj` and `src/Core/Core.csproj`, then
   reran `init`. Behavior change of that bump is untested (autofill service).
 
-### G3. First Android build fails OAHUVER001 after `init` said it was aligned (friction)
+### G3. First Android build fails OAHUVER001 after `init` said it was aligned (friction) [#933](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/933)
 - Trying to: build the Android target right after `init` reported "Aligned oahu-screens with the restored NuGet
   bindings: 170 Maven constraint(s)".
 - What happened: `error OAHUVER001: Xamarin.Kotlin.StdLib.Jdk7 resolves to 1.9.0 through another package's
@@ -55,8 +57,9 @@ the local feed `~/RiderProjects/oahu-feed`.
   1.9.0 in the .NET host"): it was aligned before the app pinned Jdk7/Jdk8 to 2.4.0.1, and nothing said it was stale
   until a Gradle dependency used it. `dotnet tool run oahu versions --align-android`, as the `OAHUAPK007` warning said,
   fixed it (3 changed constraints).
+- **Retested on 0.1.0-preview.gc63d0aba** (step 7): the upgrade's init aligned (171 constraints) and the first Android build had no OAHUVER error; the app already pins Jdk7/Jdk8, so the original case was not re-run.
 
-### G4. `oahu generate` silently generates nothing until a screen file exists (friction)
+### G4. `oahu generate` silently generates nothing until a screen file exists (friction) [#934](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/934)
 - Trying to: generate the Swift and Kotlin models after writing the contracts, to see their API before writing screens.
 - What happened: `dotnet tool run oahu generate --project src/App/App.csproj --framework net11.0-ios` printed
   `oahu-gen: : 0 file(s) written or removed.`; `--json` reported `"current": true, "files": []`, no diagnostics.
@@ -67,12 +70,13 @@ the local feed `~/RiderProjects/oahu-feed`.
   consequence.
 - Workaround: wrote the screen files blind from the docs' member mapping, then generated, then corrected them.
 
-### G5. A keyed-list row without `IOahuKeyed` gives a plain compiler error, not an OAHU one (papercut)
+### G5. A keyed-list row without `IOahuKeyed` gives a plain compiler error, not an OAHU one (papercut) [#935](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/935)
 - `public sealed record FolderRow(string Key, string Name);` used in `IOahuKeyedList<FolderRow>` fails with
   `CS0311 ... There is no implicit reference conversion from 'FolderRow' to 'Oahu.IOahuKeyed'`. `contracts.md` does
   say rows implement `IOahuKeyed`, so this is only a discoverability point. Fixed by adding `: IOahuKeyed`.
+- **Retested on 0.1.0-preview.gc63d0aba** (step 7): unchanged: removing `IOahuKeyed` gives the same bare `CS0311`. contracts.md now names CS0311 beside the row rule (#935 closed as documentation). Verified.
 
-### G6. Native intents land on the view model, but this app navigates from page code-behind (friction)
+### G6. Native intents land on the view model, but this app navigates from page code-behind (friction) [#936](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/936)
 - Trying to: keep the MAUI page's navigation (row tap pushes `FolderAddEditPage` modally; Android's add button) while
   the tap happens in the native screen.
 - What happened: contract methods are called on the bound view model. In this app (as in many Xamarin.Forms-era apps)
@@ -89,7 +93,7 @@ the local feed `~/RiderProjects/oahu-feed`.
   `CipherDetailsPageViewModel.Oahu.cs` raises `PasswordHistoryRequested` for the pages to handle. `RowSelected` became
   `SelectItemAsync(IGroupingsPageListItem)` so the old body is reused (`src/Core/Pages/Vault/GroupingsPage/GroupingsPage.xaml.cs`).
 
-### G7. Static labels need a "copy" record per screen (papercut)
+### G7. Static labels need a "copy" record per screen (papercut) [#937](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/937)
 - The native screens cannot read the app's `AppResources` resx, so "There are no folders to list.", "Add Folder" and
   "Name" go through `IOahuState<FoldersCopy>`/`IOahuState<FolderAddEditCopy>` (made with `new StateSource<T>(...)`).
   This is exactly what `docs/consumer/localization.md` prescribes, and it worked; it is boilerplate per screen, and the
@@ -101,12 +105,13 @@ the local feed `~/RiderProjects/oahu-feed`.
   record needed a C# property (`FilterByVault` used instead; an app bug, not OAHU).
 - Seen again in step 5: `CipherAddEditCopy` has 54 strings and the four fixed option lists.
 
-### G8. `init` derives an odd Kotlin package and generic names (papercut)
+### G8. `init` derives an odd Kotlin package and generic names (papercut) [#938](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/938)
 - For `src/App/App.csproj`, `init` chose Kotlin package `com.oahu.appapp`, Gradle root `oahu-native`, module
   `oahu-screens` and Swift package `OahuScreens`. The doubled `appapp` looks like a bug in name derivation. There is no
   init option to choose them. Kept as generated.
+- **Retested on 0.1.0-preview.gc63d0aba** (step 7): unchanged (`com.oahu.appapp`).
 
-### G9. `init` writes machine-relative feed paths; the guide uses environment variables (doc)
+### G9. `init` writes machine-relative feed paths; the guide uses environment variables (doc) [#939](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/939)
 - `maui-migration.md` ("Set up the feed and folders") tells you to export `OAHU_FEED`/`OAHU_VERSION` and use
   `%OAHU_FEED%/nuget`, `System.getenv("OAHU_FEED")` and an absolute path in `Package.swift`. `init` instead wrote
   relative paths into committed files: `nuget.config` (`../oahu-feed/nuget`), `Package.swift`
@@ -114,8 +119,9 @@ the local feed `~/RiderProjects/oahu-feed`.
   (`../../../../../../oahu-feed/maven`). These work only when the feed sits beside the repository. The guide says "If you
   use the CLI, use its generated MSBuild and native build files", so both are "right", but the two setups differ more
   than the guide suggests. `init` also wrote the `nuget.config` line with different indentation from its neighbours.
+- **Retested on 0.1.0-preview.gc63d0aba** (step 7): init still writes file-relative paths; maui-migration.md now says so and how to move the feed (#939). Matches.
 
-### G10. `Oahu.Maui` in a library shared with iOS app extensions links the extensions against OahuRuntime (friction, inferred)
+### G10. `Oahu.Maui` in a library shared with iOS app extensions links the extensions against OahuRuntime (friction, inferred) [#940](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/940)
 - `src/Core` is also referenced by the three iOS extensions (autofill, action, share). Because `Core` now references
   `Oahu.Maui` (G1), each `.appex` binary links `@rpath/OahuRuntime.framework/OahuRuntime` (seen with `otool -L`); it
   resolves through `@executable_path/../../Frameworks` to the host app's copy. The extensions were not launched, so it
@@ -123,7 +129,7 @@ the local feed `~/RiderProjects/oahu-feed`.
   covers app extensions. A cleaner split would keep OAHU out of the library the extensions use, which this app's
   layout (pages in `Core`) does not allow without moving pages.
 
-### G11. The app's own theme does not reach native screens (friction)
+### G11. The app's own theme does not reach native screens (friction) [#941](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/941)
 - Bitwarden has an in-app theme setting (Light, Dark, Black, Nord, Solarized) applied through MAUI resources. Native
   screens follow only the system appearance; `maui.md` "Known limits" says no environment values reach a hosted screen.
 - Workaround: the Compose screens use a small `BitwardenTheme` with Bitwarden's primary colors
@@ -136,8 +142,9 @@ the local feed `~/RiderProjects/oahu-feed`.
   (verified, screenshots), and `.environment(\.colorScheme, ...)`/a Material `darkColorScheme` made system controls
   (context menus, pull-to-refresh) follow. The step 2 folder screens still use the system appearance. A theme change
   while a screen is open was not exercised (the debug state service pins the theme). See G16 for the cost.
+- **Retested on 0.1.0-preview.gc63d0aba** (step 7): the palette is now `OahuColor` (Styling, #1021/#1022) and a live theme change while the folders screen was open re-themed it on iOS and Android (verified, screenshots). Each root contract still declares it (G16).
 
-### G12. A MAUI toolbar action cannot flush a Compose text field's pending edit (friction, inferred; not reproduced)
+### G12. A MAUI toolbar action cannot flush a Compose text field's pending edit (friction, inferred; not reproduced) [#942](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/942)
 - Save is a MAUI toolbar item; the name field is a Compose `TextFieldState`. `native-screens.md` says text during an
   IME composition is not proposed until the composition ends, and `rememberTextFieldBinding().commit()` sends pending
   text, but only native code can call `commit()`. Tapping MAUI's Save while Gboard is still composing a word could save
@@ -170,16 +177,18 @@ the local feed `~/RiderProjects/oahu-feed`.
   - A new limit found instead (G35): on Android the window pans to keep a low field above the keyboard, which pushes
     MAUI's toolbar, and so Save, off screen until the keyboard closes.
 
-### G13. A whole-page iOS screen stops at the bottom safe area (papercut)
+### G13. A whole-page iOS screen stops at the bottom safe area (papercut) [#943](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/943)
 - The SwiftUI `List` background ends above the home indicator, leaving a strip of the MAUI page's white background
   below it (visible in the grouped-list screenshots). MAUI lays the `OahuView` out inside the safe area; the screen
   cannot extend under it. Not fixed.
 - Not seen in step 3: the vault list sits above the tab bar and the item view's background fills to the bottom on
   both themes tried.
+- **Retested on 0.1.0-preview.gc63d0aba** (step 7): fixed by following maui.md "Whole-page safe areas" (page `UseSafeArea` off, `SafeAreaEdges="None"` on the page, the `AbsoluteLayout` and the `ContentView`). With the MAUI page painted red, the old settings leave a red strip under the list and the recipe leaves none (iOS, verified). Android inconclusive (the Compose folder screen draws no background).
 
-### G14. `oahu doctor` text output is mostly Gradle resolution lines (papercut)
+### G14. `oahu doctor` text output is mostly Gradle resolution lines (papercut) [#944](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/944)
 - Without `--json`, `doctor` printed over a hundred `Gradle resolved androidx.compose...` lines before the one warning
   that mattered (`OAHUCLI011`, no emulator running). `--json` is clean.
+- **Retested on 0.1.0-preview.gc63d0aba** (step 7): fixed: `doctor` prints `warning OAHUCLI005: …` with a `Try:` line first, then summary counts (verified).
 
 ### Worked, worth recording
 - **x86_64 simulator**: supported. `OahuRuntime.xcframework` in `Oahu.iOS` has an `ios-arm64_x86_64-simulator` slice,
@@ -212,7 +221,7 @@ the local feed `~/RiderProjects/oahu-feed`.
 Pages: the vault list (`GroupingsPage`, "My Vault" and every drill-down) and the item view (`CipherDetailsPage`).
 Same OAHU preview as step 2. Details of what was built are in [03-vault.md](03-vault.md).
 
-### G15. Keyed lists have no sections, and `FromCollection` can't key a row by its section (friction)
+### G15. Keyed lists have no sections, and `FromCollection` can't key a row by its section (friction) [#947](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/947)
 - Trying to: show GroupingsPage's grouped list (Favorites, Types, Folders, Collections, Items, No Folder, Trash, each
   with a header and a count) from its existing `ObservableRangeCollection<IGroupingsPageListItem> GroupedItems`
   (header items followed by their rows, rebuilt with new objects on every load).
@@ -233,7 +242,7 @@ Same OAHU preview as step 2. Details of what was built are in [03-vault.md](03-v
 - Measured (DEBUG timing log in the projection, Android emulator, Debug): 2,014 rows mapped in 28 ms and reconciled
   in 2 ms on first load; 43–85 rows in under 10 ms.
 
-### G16. No value is shared by every screen: each contract re-declares theme and glyphs (friction)
+### G16. No value is shared by every screen: each contract re-declares theme and glyphs (friction) [#948](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/948)
 - Trying to: draw both new screens (and, later, every converted page) in the app's own theme.
 - What happened: OAHU has no ambient or app-wide state reaching screens (`maui.md`, "Known limits": no environment
   values), and a contract can't extend a base interface (OAHU001), so "every screen gets the palette" is one
@@ -243,8 +252,9 @@ Same OAHU preview as step 2. Details of what was built are in [03-vault.md](03-v
   use, G21; a font scale; a "screen capture allowed" flag).
 - Workaround: one shared `StateSource<AppPalette>` (`src/Core/Utilities/OahuPalette.cs`) returned by every contract.
   It works (G11), but nothing makes a new contract include it.
+- **Retested on 0.1.0-preview.gc63d0aba** (step 7): all 7 root contracts now carry `IOahuState<AppPalette> Palette` (the two folder contracts added in this step), typed with `OahuColor`. Mounted sections (D25) read it from the parent's environment with no member. D26's revisit condition ("most screens of the Bitwarden conversion carry the palette") is met.
 
-### G17. Adding a resource or a library means editing files `init` manages, and `init` then refuses to run (friction)
+### G17. Adding a resource or a library means editing files `init` manages, and `init` then refuses to run (friction) [#949](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/949)
 - Trying to: bundle Bitwarden's icon font in the Swift package and use Coil in the Gradle module, as `hosting.md`
   describes ("declare them on the target (`resources: [.process("Resources")]` ...)"; "Android: third-party libraries").
 - What happened: both live in files `init` wrote and records by hash in `.oahu/App/setup.json`
@@ -255,8 +265,9 @@ Same OAHU preview as step 2. Details of what was built are in [03-vault.md](03-v
   add a font or an image loader leaves an app that can't take the next `init` (a version upgrade, a deployment-target
   change) without hand-merging.
 - Workaround: edited both files anyway (comments mark the lines). Not resolved: the next `init` rerun.
+- **Retested on 0.1.0-preview.gc63d0aba** (step 7): unchanged, and a second cause (G37): the upgrade's init refused Package.swift and build.gradle.kts (`OAHUCLI001` only in `--json`), then gradlew.bat, which the app never edited.
 
-### G18. The Coil recipe in `hosting.md` doesn't cover Coil's Compose `AsyncImage` (doc)
+### G18. The Coil recipe in `hosting.md` doesn't cover Coil's Compose `AsyncImage` (doc) [#950](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/950)
 - Trying to: load website icons (`https://icons.bitwarden.net/<host>/icon.png`) in Compose, following
   `hosting.md` "Android: third-party libraries" (four `AndroidMavenLibrary` items for Coil 3.5.0 and five packages).
 - What happened: the doc lists the AARs but not the Gradle dependency they correspond to. With
@@ -268,7 +279,7 @@ Same OAHU preview as step 2. Details of what was built are in [03-vault.md](03-v
 - Workaround: two more `AndroidMavenLibrary` items in `src/App/App.csproj`. On iOS, SwiftUI's `AsyncImage` needed
   nothing.
 
-### G19. A value that changes every second in each row re-sends whole rows, one turn per row (friction)
+### G19. A value that changes every second in each row re-sends whole rows, one turn per row (friction) [#951](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/951)
 - Trying to: keep the verification-code drill-down's per-row countdown and code (GroupingsPageTOTPListItem ticks every
   second through `TotpTickAsync`, which posts one `BeginInvokeOnMainThread` per row and sets three properties).
 - What happened: the only per-row channel is the row itself, so every tick replaces every TOTP row (`Update` per row,
@@ -284,7 +295,7 @@ Same OAHU preview as step 2. Details of what was built are in [03-vault.md](03-v
   left per period" shared by all rows; both change what the existing view model does. The item view does it the cheap
   way already: the code is its own `IOahuState<TotpDisplay?>`, so a tick re-sends 6 fields, not the whole item.
 
-### G20. Several pushed instances of one contract under one Android activity share a saved-state key (friction, inferred)
+### G20. Several pushed instances of one contract under one Android activity share a saved-state key (friction, inferred) [#952](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/952)
 - Trying to: push GroupingsPage three deep (Types > Login, a folder, a nested collection), each with its own view
   model and `OahuView<IGroupingsViewModel>`.
 - What happened: it worked on both platforms (each level loaded its own rows; Back restored the one below). But
@@ -305,7 +316,7 @@ Same OAHU preview as step 2. Details of what was built are in [03-vault.md](03-v
   requires.
 - Step 5: add/edit sets a declared `oahu_cipher_edit` ID; it is modal and only one is open at a time.
 
-### G21. The icon font and its glyphs are copied into each native library (papercut)
+### G21. The icon font and its glyphs are copied into each native library (papercut) [#953](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/953)
 - `bwi-font.ttf` now exists three times (`src/Core/Resources/Fonts`, the Swift package's `Resources`, the Gradle
   module's `res/font/bwi_font.ttf`), and the screens' own buttons (copy, eye, launch, download, paperclip, collection)
   repeat `BitwardenIcons` code points in `BitwardenTheme.swift` and `BitwardenPalette.kt`. Row glyphs come from C#
@@ -313,7 +324,7 @@ Same OAHU preview as step 2. Details of what was built are in [03-vault.md](03-v
   as `hosting.md` says); it rendered on both platforms. A font from the MAUI app (`MauiFont`) can't be reused, and there
   is no OAHU place to put assets both native libraries share.
 
-### G22. Nothing in OAHU marks a value as sensitive; keeping secrets off the native side is contract design (doc)
+### G22. Nothing in OAHU marks a value as sensitive; keeping secrets off the native side is contract design (doc) [#954](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/954)
 - Trying to: decide whether passwords, card numbers, security codes and hidden custom fields must cross before the
   user reveals them, and whether OAHU logs or records them.
 - What happened: they need not cross. `SecretValue(Masked, Revealed, ...)` carries the mask only, and the value (as
@@ -334,8 +345,9 @@ Same OAHU preview as step 2. Details of what was built are in [03-vault.md](03-v
   Debug must not record on the lock page at all. See G27. `OahuDiagnostics` stayed metadata-only (verified: with
   `BW_OAHU_DIAG=1` the logs show `MasterPassword Succeeded 0.2ms` per keystroke, no values; the iOS console logs of all
   runs contain none of the typed secrets).
+- **Retested on 0.1.0-preview.gc63d0aba** (step 7): contracts.md "Sensitive values" now says what this entry had to work out (#954, documentation). The cost is unchanged.
 
-### G23. A view model's nested item view models don't reach `FromProperty` (papercut)
+### G23. A view model's nested item view models don't reach `FromProperty` (papercut) [#955](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/955)
 - `CipherDetailsPageViewModel.Fields` holds `HiddenCustomFieldItemViewModel`s, which raise `ShowHiddenValue` on
   themselves. The details state is `OahuState.FromProperty(this, [...])` over the page view model, so a toggle would not
   re-publish. `ToggleField` awaits the field's toggle and then raises `PropertyChanged(nameof(Fields))` on the page view
@@ -399,7 +411,7 @@ Pages: the generator (`GeneratorPage`, as the Generator tab and as the modal add
 page (`LockPage`). Same OAHU preview. Details in [04-generator-lock.md](04-generator-lock.md). Host load during the
 runs: load average 7–38 from other sessions; timings below are indicative only.
 
-### G24. A contract can't use the app's own enums, so each picker's enum is mirrored and mapped (papercut)
+### G24. A contract can't use the app's own enums, so each picker's enum is mirrored and mapped (papercut) [#956](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/956)
 - Trying to: bind the generator's pickers (`GeneratorType`, `UsernameType`, `UsernameEmailType`,
   `ForwardedEmailServiceType`, all in `Bit.Core.Enums`) as `IOahuEditable<TEnum>`.
 - What happened: the contracts project must be a plain library oahu-gen can read (`docs/consumer/contracts.md`,
@@ -412,8 +424,9 @@ runs: load average 7–38 from other sessions; timings below are indicative only
   the contract has `IOahuEditable<int>` per picker plus the labels as `IReadOnlyList<string>`; no enum crosses
   (`CipherType`, `FieldType`, `UriMatchType`, `LinkedIdType` stay in C#). The one enum the screen switches on
   (`EditItemKind`) is mirrored.
+- **Retested on 0.1.0-preview.gc63d0aba** (step 7): contracts.md "Types declared with the view models" covers it and warns against `Enum.Parse` (#956, documentation). The app's five mirrors are unchanged.
 
-### G25. Picker options with localized labels need one record type per enum (papercut)
+### G25. Picker options with localized labels need one record type per enum (papercut) [#957](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/957)
 - Trying to: send each picker's options with their localized names (the XAML used `LocalizableEnumConverter`) and
   only the options the page offers (the service list leaves out `None`).
 - What happened: records can't be generic (`contracts.md`, "Records may not be generic"), so there is no
@@ -422,8 +435,9 @@ runs: load average 7–38 from other sessions; timings below are indicative only
   (Kotlin `Picker<T>` takes `List<Pair<T, String>>`), but every option list is converted by hand.
 - Workaround: the five records in `Generator.cs`, built from the view model's existing `*Options` lists in
   `GeneratorPageViewModel.Oahu.cs`.
+- **Retested on 0.1.0-preview.gc63d0aba** (step 7): contracts.md "Options with labels" shows the per-enum record (#957, ruled: records stay non-generic). Unchanged cost.
 
-### G26. Every control change crosses, including values equal to the current one (papercut, verified)
+### G26. Every control change crosses, including values equal to the current one (papercut, verified) [#958](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/958)
 - Trying to: count round trips for the length slider (which regenerates the password as it moves) and for secure text.
 - What happened (diagnostics plus a DEBUG counter in the setter):
   - iOS SwiftUI `Slider` over `Binding(get: Double(model.length), set: { model.length = Int($0.rounded()) })`: one
@@ -454,8 +468,9 @@ runs: load average 7–38 from other sessions; timings below are indicative only
     0.7–3 s late at load average 70–100, on all pages alike. On Android, opening the organization form with 2,000
     collection rows took about 20 s to draw (my non-lazy `Column` of 2,000 switches; `ScreenOpenFinished` was 481 ms),
     after which typing and toggling a row (3.2 ms in C#) were immediate.
+- **Retested on 0.1.0-preview.gc63d0aba** (step 7): native-screens.md now says every write is a proposal (#958, documentation). New count: `OahuTextField` with `isSecure:` sends one edit per keystroke and none on focus on iOS (lock page), against about two plus two on focus for SwiftUI fields.
 
-### G27. A session recording would capture every keystroke of a secret editable, with no way to exclude a member (friction, security, inferred)
+### G27. A session recording would capture every keystroke of a secret editable, with no way to exclude a member (friction, security, inferred) [#959](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/959)
 - Trying to: decide whether the lock page can be recorded for a replay test (`docs/consumer/debugging.md`,
   "Recording a session"; `docs/session-replay.md`).
 - What happened: by the docs, each edit is recorded as an `execute` entry with its argument bytes, and the recorder
@@ -468,7 +483,7 @@ runs: load average 7–38 from other sessions; timings below are indicative only
   identity section all cross per keystroke. Because the identity section is one record editable (G31), typing one
   letter of the city sends all 17 identity strings, SSN and passport number included. Not recorded.
 
-### G28. Secure text on iOS: show/hide swaps fields and loses focus; OAHU's text field has no secure mode or focus (friction, verified)
+### G28. Secure text on iOS: show/hide swaps fields and loses focus; OAHU's text field has no secure mode or focus (friction, verified) [#960](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/960)
 - Trying to: keep MAUI's `MonoEntry` behavior: one field whose `IsPassword` follows the eye button, keeping text,
   focus and cursor; the view model then asks for focus with the cursor at the end (`TogglePassword` raises
   `FocusSecretEntry(secret.Length)`).
@@ -488,8 +503,9 @@ runs: load average 7–38 from other sessions; timings below are indicative only
   `@FocusState` in the same button action does not bring focus back (the new field doesn't exist yet), so the keyboard
   closes. iOS also cleared a hidden row's 16-character value when typing resumed after a refocus (typed "Z" replaced
   it), as a secure `UITextField` does. Android kept focus and appended.
+- **Retested on 0.1.0-preview.gc63d0aba** (step 7): `OahuTextField(…, isSecure:)` (#982) on the lock page and the add/edit secrets keeps focus, keyboard and cursor across show/hide (cursor moved, hidden, typed, shown: the character landed at the cursor), and a hidden custom field row kept focus and appended. SwiftUI `.focused()` on an `OahuTextField` worked for the C# focus requests. Still missing: placing the cursor from the view model (G41). Verified on iOS.
 
-### G29. A first tap on a native text field sometimes doesn't focus it on iOS (friction, inferred cause)
+### G29. A first tap on a native text field sometimes doesn't focus it on iOS (friction, inferred cause) [#961](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/961)
 - Seen three times on iOS (generator word separator on first use, the API key field after the eye toggle, the lock
   page's field after a MAUI alert): the first tap showed no cursor and no keyboard; a second tap focused the field.
   Both pages set `HideSoftInputOnTapped="True"`, whose page-level tap handling ends editing, and the inferred cause is
@@ -580,7 +596,7 @@ indicative only. iOS runs on a simulator created for this step ("BW OAHU Step5 i
 x86_64), Android on a second read-only instance of `OAHU_Pixel_API36` (port 5640), because other agents were using
 the shared ones (see "Not OAHU").
 
-### G30. A large form is one flat contract; there is no way to split it into sections or nest view models (friction)
+### G30. A large form is one flat contract; there is no way to split it into sections or nest view models (friction) [#973](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/973)
 - Trying to: map the add/edit view model, which nests `CipherView` → `LoginView`/`CardView`/`IdentityView` and lists
   of `LoginUriView` and custom field item view models, to a contract, ideally one per section.
 - What happened: contract members are only the four stream types and methods, declared on the contract itself; "Base
@@ -595,8 +611,9 @@ the shared ones (see "Not OAHU").
   generated model is not needed.
 - Workaround: the flat contract; sections are grouped by comments. Not a core-design problem, but a form-heavy app will
   want either composable contracts or a documented "section record" pattern.
+- **Retested on 0.1.0-preview.gc63d0aba** (step 7): D25 works under `OahuView`: the identity section and the URI list as mounted child contracts, drawn inside the parent's Form/Column on iOS and Android (verified; 07-retest.md, "D25 trial").
 
-### G31. Compose has no text-field helper for a string inside a record editable (friction, verified)
+### G31. Compose has no text-field helper for a string inside a record editable (friction, verified) [#974](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/974)
 - Trying to: edit the identity section (17 strings) as one `IOahuEditable<IdentityFields>`.
 - What happened: Swift binds a field directly (`$model.identity[dynamicMember: \.city]`, which `native-screens.md`
   documents: "Binding a field of a record proposes the whole record", and "doesn't hold"). oahu-compose has
@@ -608,15 +625,17 @@ the shared ones (see "Not OAHU").
   composition and pending-typing protection the state-based helpers exist for.
 - Workaround: value-based fields in `IdentitySection` (`CipherAddEdit.oahu-screen.kt`). The alternative is 17 string
   editables. Every keystroke also sends all 17 strings (G27).
+- **Retested on 0.1.0-preview.gc63d0aba** (step 7): sidestepped by D25: the identity section is 17 string editables, so Compose uses `rememberTextFieldState()` and each keystroke sends one string (verified, Android).
 
-### G32. A union case named like a Kotlin type passes the analyzer and iOS, then fails only the Android generation (papercut)
+### G32. A union case named like a Kotlin type passes the analyzer and iOS, then fails only the Android generation (papercut) [#975](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/975)
 - `EditFieldRow.Boolean` (a custom field row case) built, generated Swift, then `oahu generate --framework
   net11.0-android` failed: `error OAHUGEN004: oahu-gen: CipherAddEdit: Bit.App.Contracts.EditFieldRow.Boolean: inside
   the sealed interface EditFieldRow, a case named Boolean would hide the type of that name. Rename the case.` The
   message is clear; the C# analyzer could report it as you type, before one platform's output is already written.
   Renamed to `Toggle`. `Text` as a case name was fine on both.
+- **Retested on 0.1.0-preview.gc63d0aba** (step 7): fixed: `EditFieldRow.Boolean` now fails the C# build with `error OAHU027: … whose name Boolean is reserved in Kotlin …` for both targets, before oahu-gen runs (verified).
 
-### G33. A one-shot event published before a modal finishes presenting can't take focus on iOS (papercut, verified)
+### G33. A one-shot event published before a modal finishes presenting can't take focus on iOS (papercut, verified) [#976](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/976)
 - Trying to: focus the name field when a new item opens (MAUI: `RequestFocus(_nameEntry)`).
 - What happened: publishing `Focus(Name)` in the load callback was held until the screen subscribed (as documented)
   and delivered at once; SwiftUI set `@FocusState` while the modal sheet was still animating and nothing was focused.
@@ -625,8 +644,9 @@ the shared ones (see "Not OAHU").
 - Workaround: the page publishes after `Task.Delay(ShowModalAnimationDelay)`, as MAUI did (`CipherAddEditPage.xaml.cs`).
   Then the name field focused on open on both platforms. Focus after the "Name is required" alert worked without a
   delay (the alert is dismissed by then).
+- **Retested on 0.1.0-preview.gc63d0aba** (step 7): with the page's delay removed the name took focus in 4 of 4 runs (not reproduced); a screen-side retry kept focus only on the 4th attempt (~300 ms). native-screens.md now says the screen should hold the request, but names no moment to apply it (G42).
 
-### G34. iOS multi-line field: a fast keystroke was sometimes dropped (friction, partly verified, cause not isolated)
+### G34. iOS multi-line field: a fast keystroke was sometimes dropped (friction, partly verified, cause not isolated) [#977](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/977)
 - Trying to: type a multi-line note quickly (`TextField(axis: .vertical)` bound to `$model.notes`), typing through the
   simulator's hardware keyboard.
 - What happened: three of four runs with the generated binding lost one character of the first word ("Line ne",
@@ -638,7 +658,7 @@ the shared ones (see "Not OAHU").
   starts right after focus. Not enough runs to call it; not tried on a device.
 - Workaround: none. MAUI's `Editor` had no such report.
 
-### G35. Android: the window pans for the keyboard, hiding MAUI's toolbar (and Save) while a low field has focus (friction, verified)
+### G35. Android: the window pans for the keyboard, hiding MAUI's toolbar (and Save) while a low field has focus (friction, verified) [#978](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/978)
 - Trying to: keep the form usable with the keyboard up (the Compose screen uses `imePadding()`, as in step 4).
 - What happened: focusing a field in the lower half (third URI, a custom field) panned the whole activity window up
   (the app uses MAUI's default `adjustPan`; nothing in the app sets a soft input mode). The MAUI navigation bar with
@@ -648,7 +668,7 @@ the shared ones (see "Not OAHU").
 - Workaround: none. `Application.UseWindowSoftInputModeAdjust(Resize)` would let Compose handle the insets, but it is
   app-wide and changes every MAUI page, so not tried.
 
-### G36. Copy-and-paste per screen: union row text needs a hand-written accessor on each platform (papercut)
+### G36. Copy-and-paste per screen: union row text needs a hand-written accessor on each platform (papercut) [#979](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/979)
 - `OahuRowTexts<Row>(\.text)` takes a key path to a `String`; for the union `EditFieldRow` that means an extension
   property switching over the cases (`editText`), and in Kotlin a `text = { when (it) { … } }` lambda. Small, but the
   generator knows which cases have which fields.
@@ -711,3 +731,84 @@ the shared ones (see "Not OAHU").
 - `MainActivity` has no soft input mode, so MAUI's default pan applies (G35).
 - The iOS "add site" autofill alert and Android's autofill service alert show before the form on a new login, as in
   MAUI (the form is swapped in after `ShowAlertsAsync`).
+
+## Step 7 (retest)
+
+Moved to preview `0.1.0-preview.gc63d0aba` and retested the closed issues; tried D25 (sections as mounted child
+contracts) on the add/edit form. Details in [07-retest.md](07-retest.md). Host load average 17–711 from other sessions;
+Android ran on a read-only `OAHU_Fold_API36` because another session held `OAHU_Pixel_API36` without `-read-only`.
+
+### G37. `init` refuses a managed file that git's line-ending normalisation changed (friction, verified)
+- Trying to: rerun `dotnet tool run oahu init --project src/App/App.csproj --version 0.1.0-preview.gc63d0aba` from a
+  fresh worktree of the app, after putting init's own Package.swift and build.gradle.kts back (G17).
+- What happened: `oahu: /Users/adam/RiderProjects/bw-retest-18315/src/App/.oahu/App/android/gradlew.bat already exists
+  or has local changes. Move your changes aside before retrying.` Nobody edited the file. The app's `.gitattributes`
+  has `* text=auto eol=lf`, so the CRLF `gradlew.bat` init wrote in step 2 was committed as LF and every checkout has LF;
+  its SHA-256 no longer matches the hash `setup.json` recorded, so init treats it as changed. The text output has no
+  code; `--json` gives `OAHUCLI001` with `"fix": null`, and errors.md's OAHUCLI001 says only "The CLI could not read
+  its inputs." Found by hashing each managed file against `setup.json`.
+- Workaround: rewrote `gradlew.bat` with CRLF (hash then matched; git still stores LF, so the next clone has the same
+  problem). A `.gitattributes` line for `gradlew.bat` (`eol=crlf`) would make it stick (not tried).
+- Inferred: any repository that normalises line endings, or a Windows checkout with `core.autocrlf`, breaks init's
+  rerun the same way for every text file init manages.
+
+### G38. An upgrade leaves stale OAHU versions in projects `init` doesn't manage, and the checks don't notice (friction, verified)
+- Trying to: move the app to the new preview with `init --version`.
+- What happened: init updated `.oahu/App/Oahu.targets` (src/App), but the `Oahu.Maui` reference in `src/Core/Core.csproj`
+  and the `Oahu` reference in `src/Core.Contracts/Core.Contracts.csproj` (both added by hand because of G1) stayed at
+  104c58c2. `oahu doctor` then printed "Declared Oahu.Maui: 0.1.0-preview.gc63d0aba; feed 0.1.0-preview.gc63d0aba" and
+  "NuGet restored Oahu 0.1.0-preview.gc63d0aba", and `versions --check` failed only on the missing Gradle report. Nothing
+  named the old references. NuGet picks the newer version for App, so the app builds, while the contract project built
+  on its own would use the old analyzer (inferred).
+- Workaround: `git grep g104c58c2` and edit both lines. An MSBuild property such as `$(OahuVersion)` defined by init,
+  or a doctor check across the project's references, would have caught it.
+
+### G39. Mounted sections need the platform's `Mount` and a teardown hook passed in from MAUI page code (papercut, verified)
+- Trying to: follow contracts.md "Splitting a large screen into sections" in a view model that lives in a MAUI class
+  library and is hosted by `OahuView`.
+- What happened: it works (07-retest.md, "D25 trial"), but `OahuScreens.Mount<T>` lives in `Oahu.iOS` and
+  `Oahu.Android`, so the page passes it in under `#if IOS` / `#elif ANDROID`, and the page has to dispose the mounts
+  after the parent screen closes, which under `OahuView` means subscribing to `TornDown`. The doc's example shows a
+  constructor taking `Func<T, OahuMount>` and a `Dispose`, but nothing about `OahuView`, which the doc says is untried.
+  `maui.md`'s "No mounts" known limit reads as if mounts can't be used at all under `OahuView`; they can, inside a
+  screen.
+- Workaround: `MountSections(...)`/`DisposeSections()` on the view model, called from `CipherAddEditPage.xaml.cs`.
+
+### G40. On iOS a parent screen can't move focus into a mounted section without a round trip through C# (friction, verified)
+- Trying to: keep Return on the name field moving to the identity section's first field, as the flat form did with one
+  `@FocusState`.
+- What happened: the section is a separate SwiftUI view with its own `@FocusState`; the parent's focus enum can't
+  name its fields, and OAHU gives the two screens no shared native channel. The parent contract gained
+  `void MoveFocus(FormFocus target)`; C# forwards it to the section's `IOahuEvents<int> Focus`, whose screen sets its
+  own focus (verified: `MoveFocus`, then the section's `FirstName` focus edits). Compose needed nothing: its default
+  Next traversal crossed into the mounted section (verified, Android).
+- Workaround: the method and event above. A SwiftUI environment value declared in the screen package (a focus
+  request the parent sets and the section reads) would avoid C#, but it is native plumbing the doc doesn't mention.
+- Challenges the design? Mildly: D25 makes each section its own contract, so anything that crosses sections natively
+  (focus order, "scroll to the invalid field") now needs either C# or hand-written environment plumbing.
+
+### G41. `OahuTextField` takes SwiftUI focus but the docs say it doesn't, and it can't place the cursor (doc/papercut, verified)
+- native-screens.md says to "Use `TextField` … for multiline input or SwiftUI focus management", yet `.focused($state)`
+  on an `OahuTextField` focused it on appearing and after the wrong-password alert (lock page, iOS). The view model's
+  cursor request (`SecretFocus.Cursor`, MAUI's "cursor at the end") still has nowhere to go: `OahuTextField` has no
+  selection binding. Cost here: none (UIKit kept the cursor itself across show/hide).
+
+### G42. A held focus request has no moment to wait for (papercut, partly verified)
+- native-screens.md now says the screen should hold a request that arrives while it is being presented, and admits the
+  earliest moment is unknown. Here a retry every 100 ms kept focus only on the 4th attempt; yet with the request sent at
+  once and applied once, the name took focus in 4 of 4 runs. So the screen has to retry or sleep, and the timing it
+  guards against is not reproducible on demand. The app keeps MAUI's 400 ms delay in C#.
+
+### G43. The Compose folder screen and FAB don't take the palette's background and container colors (papercut, app-side)
+- After adding the palette to the folder screens, the Compose `FoldersScreen` still draws no background of its own (the
+  MAUI page shows through) and the floating button uses Material's default container (purple) under Nord, because the
+  app's `PaletteTheme` sets only `primary`, `background`, `surface` and a few text colors. Not OAHU; recorded because
+  "Styling" leaves the full Material mapping to the app.
+
+### Worked, worth recording (step 7)
+- Upgrading the CLI with `dotnet tool update` and rerunning `init --version` (once U1/U2 were out of the way) took 5 s
+  and the app built first time on both targets with no new OAHU diagnostic.
+- A live app-theme change reaches open screens through the shared palette state on both platforms.
+- Sections inherit the parent's SwiftUI environment and Compose composition locals, so a section contract needs no
+  palette member.
+- `OahuTextField` secure mode: one field, focus, keyboard and cursor kept across show/hide; one edit per keystroke.
