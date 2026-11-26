@@ -23,8 +23,18 @@ public struct CipherAddEditScreen: View {
     static let notesMode =
         ProcessInfo.processInfo.environment["BW_OAHU_NOTES_MODE"] ?? (notesLocal ? "local" : "model")
     @State private var stateNotes = ""
+    // Step 6 round 2: BW_OAHU_NOTES_AUTOCORRECT=0 turns autocorrection off on the notes field.
+    static let notesNoAutocorrect = ProcessInfo.processInfo.environment["BW_OAHU_NOTES_AUTOCORRECT"] == "0"
 
     @ViewBuilder private func notesField(_ title: String) -> some View {
+        if Self.notesNoAutocorrect {
+            notesBinding(title).autocorrectionDisabled(true)
+        } else {
+            notesBinding(title)
+        }
+    }
+
+    @ViewBuilder private func notesBinding(_ title: String) -> some View {
         switch Self.notesMode {
         case "state":
             TextField(title, text: $stateNotes, axis: .vertical)

@@ -1,3 +1,4 @@
+import GameController
 import QuartzCore
 import SwiftUI
 import UIKit
@@ -59,6 +60,7 @@ enum OahuKeyProbe {
         private var lastUI: String?
         private var lastModel: String?
         private var injecting = false
+        private weak var notesInput: (UIResponder & UITextInput)?
         private static weak var found: UIResponder?
 
         init(model: @escaping @MainActor () -> String) {
@@ -69,6 +71,40 @@ enum OahuKeyProbe {
             CADisplayLink(target: self, selector: #selector(tick)).add(to: .main, forMode: .common)
             for name in [UITextField.textDidChangeNotification, UITextView.textDidChangeNotification] {
                 NotificationCenter.default.addObserver(self, selector: #selector(changed(_:)), name: name, object: nil)
+            }
+            // Round 2 (hardware-keyboard path): the software keyboard's show/hide, the hardware keyboard's presence
+            // and every HID key the app receives (GameController), independent of UIKit text.
+            let center = NotificationCenter.default
+            center.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { note in
+                let frame = (note.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect) ?? .zero
+                MainActor.assumeIsolated { OahuKeyProbe.log("kbShow", "\(Int(frame.height))") }
+            }
+            center.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { _ in
+                MainActor.assumeIsolated { OahuKeyProbe.log("kbHide", "") }
+            }
+            center.addObserver(forName: .GCKeyboardDidConnect, object: nil, queue: .main) { _ in
+                MainActor.assumeIsolated {
+                    OahuKeyProbe.log("hwKeyboard", "connected")
+                    Sampler.watchKeys()
+                }
+            }
+            center.addObserver(forName: .GCKeyboardDidDisconnect, object: nil, queue: .main) { _ in
+                MainActor.assumeIsolated { OahuKeyProbe.log("hwKeyboard", "disconnected") }
+            }
+            OahuKeyProbe.log("hwKeyboard", GCKeyboard.coalesced == nil ? "none" : "present")
+            Sampler.watchKeys()
+        }
+
+        private static func watchKeys() {
+            guard let input = GCKeyboard.coalesced?.keyboardInput else { return }
+            input.keyChangedHandler = { _, _, keyCode, pressed in
+                let code = "\(keyCode.rawValue)"
+                let kind = pressed ? "hidDown" : "hidUp"
+                if Thread.isMainThread {
+                    MainActor.assumeIsolated { OahuKeyProbe.log(kind, code) }
+                } else {
+                    DispatchQueue.main.async { MainActor.assumeIsolated { OahuKeyProbe.log(kind, code + " (async)") } }
+                }
             }
         }
 
@@ -83,12 +119,24 @@ enum OahuKeyProbe {
                 lastModel = value
                 OahuKeyProbe.log("model", value)
             }
-            guard OahuKeyProbe.notesFocused else { return }
+            guard OahuKeyProbe.notesFocused else {
+                // Round 2: keep sampling the notes field after it loses focus (a hardware Return ends editing), so
+                // the run's final UIKit text is logged.
+                if let input = notesInput, let all = input.textRange(from: input.beginningOfDocument, to: input.endOfDocument) {
+                    let text = input.text(in: all) ?? ""
+                    if text != lastUI {
+                        lastUI = text
+                        OahuKeyProbe.log("uiUnfocused", text)
+                    }
+                }
+                return
+            }
             Self.found = nil
             UIApplication.shared.sendAction(#selector(UIResponder.oahuKeyProbeFound), to: nil, from: nil, for: nil)
             guard let input = Self.found as? UITextInput,
                 let all = input.textRange(from: input.beginningOfDocument, to: input.endOfDocument)
             else { return }
+            if notesInput == nil { notesInput = input as? UIResponder & UITextInput }
             let text = input.text(in: all) ?? ""
             if text != lastUI {
                 if lastUI == nil { OahuKeyProbe.log("focus", text) }
