@@ -38,7 +38,9 @@ public fun FolderAddEditScreen(model: FolderAddEditModel) {
             focus.requestFocus()
         }
     }
-    BitwardenTheme {
+    val palette by model.palette.collectAsState()
+    // Step 7: the app theme through the contract, as the other screens do (was BitwardenTheme, system dark only).
+    PaletteTheme(palette) {
         Column(Modifier.fillMaxSize().padding(16.dp)) {
             OutlinedTextField(
                 state = name.state,

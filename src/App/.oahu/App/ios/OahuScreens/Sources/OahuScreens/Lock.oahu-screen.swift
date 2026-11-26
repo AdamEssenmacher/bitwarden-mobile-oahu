@@ -88,23 +88,42 @@ public struct LockScreen: View {
     private func secretField(layout: LockLayout, copy: LockCopy) -> some View {
         let label = layout.pinEnabled ? copy.pin : copy.masterPassword
         let text = layout.pinEnabled ? $model.pin : $model.masterPassword
-        Group {
-            // MAUI's MonoEntry swapped IsPassword in place; SwiftUI has no secure toggle on one field, so the eye
-            // swaps a SecureField for a TextField and C# asks for focus again (TogglePassword's FocusSecretEntry).
-            if layout.showSecret {
-                TextField(label, text: text)
-            } else {
-                SecureField(label, text: text)
+        if ProcessInfo.processInfo.environment["BW_OAHU_OLDSECURE"] == "1" {
+            // Steps 4-6: SwiftUI has no secure toggle on one field, so the eye swaps a SecureField for a TextField and
+            // C# asks for focus again (TogglePassword's FocusSecretEntry).
+            Group {
+                if layout.showSecret {
+                    TextField(label, text: text)
+                } else {
+                    SecureField(label, text: text)
+                }
             }
+            .focused($secretFocused)
+            .font(.system(.body, design: .monospaced))
+            .keyboardType(layout.pinEnabled ? .numberPad : .default)
+            .textContentType(layout.pinEnabled ? nil : .password)
+            .autocorrectionDisabled()
+            .textInputAutocapitalization(.never)
+            .submitLabel(.go)
+            .onSubmit { model.submit() }
+            .accessibilityIdentifier(layout.pinEnabled ? "PinEntry" : "MasterPasswordEntry")
+        } else {
+            // Step 7: OahuTextField's secure mode (#982) keeps one field across show/hide. It has no focus binding of
+            // its own; .focused() is applied to see whether SwiftUI focus reaches the UIKit field.
+            OahuTextField(
+                label,
+                text: layout.pinEnabled ? $model.pinTextInput : $model.masterPasswordTextInput,
+                keyboard: .init(
+                    keyboardType: layout.pinEnabled ? .numberPad : .default,
+                    autocapitalizationType: .none,
+                    autocorrectionType: .no,
+                    textContentType: layout.pinEnabled ? nil : .password,
+                    returnKeyType: .go),
+                isSecure: !layout.showSecret
+            ) { _ in model.submit() }
+            .focused($secretFocused)
+            .font(.system(.body, design: .monospaced))
+            .accessibilityIdentifier(layout.pinEnabled ? "PinEntry" : "MasterPasswordEntry")
         }
-        .focused($secretFocused)
-        .font(.system(.body, design: .monospaced))
-        .keyboardType(layout.pinEnabled ? .numberPad : .default)
-        .textContentType(layout.pinEnabled ? nil : .password)
-        .autocorrectionDisabled()
-        .textInputAutocapitalization(.never)
-        .submitLabel(.go)
-        .onSubmit { model.submit() }
-        .accessibilityIdentifier(layout.pinEnabled ? "PinEntry" : "MasterPasswordEntry")
     }
 }

@@ -29,6 +29,8 @@ namespace Bit.App.Pages
         // EditMode follows FolderId, which the page sets once, before the screen exists.
         IOahuState<bool> IFolderAddEditViewModel.FocusName => _focusName ??= new StateSource<bool>(!EditMode);
 
+        IOahuState<AppPalette> IFolderAddEditViewModel.Palette => Bit.App.Utilities.OahuPalette.Current;
+
         Task IFolderAddEditViewModel.Submit() => SubmitAsync();
     }
 }

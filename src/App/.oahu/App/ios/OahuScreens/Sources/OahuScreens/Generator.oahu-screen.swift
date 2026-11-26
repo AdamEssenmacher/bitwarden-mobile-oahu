@@ -96,8 +96,8 @@ private struct GeneratedValueRow: View {
             var part = AttributedString(run.text.map { String($0) + "\u{200B}" }.joined())
             switch run.kind {
             case .letters: part.foregroundColor = palette.textColor
-            case .digits: part.foregroundColor = Color(argb: palette.passwordNumber)
-            case .symbols: part.foregroundColor = Color(argb: palette.passwordSpecial)
+            case .digits: part.foregroundColor = palette.passwordNumber.color
+            case .symbols: part.foregroundColor = palette.passwordSpecial.color
             }
             text += part
         }

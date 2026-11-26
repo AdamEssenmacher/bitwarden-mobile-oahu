@@ -7,6 +7,7 @@ import SwiftUI
 public struct CipherAddEditScreen: View {
     @Bindable var model: CipherAddEditModel
     @FocusState private var focus: Focus?
+    @State private var pendingFocus: Focus?
     // One row-text state per keyed list (OAHU "Text fields in rows").
     @State private var uriTexts = OahuRowTexts<EditUriRow>(\.uri)
     @State private var fieldTexts = OahuRowTexts<EditFieldRow>(\.editText)
@@ -129,20 +130,42 @@ public struct CipherAddEditScreen: View {
         .task {
             // One-shot focus requests from C#: the name of a new item, a field Save found invalid, a new URI.
             for await request in model.focus.stream() {
-                switch request.field {
-                case .name: focus = .name
-                case .username: focus = .username
-                case .password: focus = .password
-                case .totp: focus = .totp
-                case .cardholderName: focus = .cardholder
-                case .identityFirstName: focus = .identity(0)
-                case .notes: focus = .notes
-                case .uri: focus = request.rowKey.map { .uri($0) }
-                case .customField: focus = request.rowKey.map { .field($0) }
+                let target: Focus? = switch request.field {
+                case .name: .name
+                case .username: .username
+                case .password: .password
+                case .totp: .totp
+                case .cardholderName: .cardholder
+                case .identityFirstName: .identity(0)
+                case .notes: .notes
+                case .uri: request.rowKey.map { .uri($0) }
+                case .customField: request.rowKey.map { .field($0) }
+                }
+                if Self.holdFocus {
+                    pendingFocus = target
+                } else {
+                    focus = target
                 }
             }
         }
+        .task(id: pendingFocus) {
+            // Step 7, #976: "the screen holds such a request until it can act on it". OAHU gives no moment at which a
+            // presented field accepts focus, so this retries until SwiftUI keeps it (BW_OAHU_FOCUS=held).
+            guard let target = pendingFocus else { return }
+            for attempt in 1...30 {
+                focus = target
+                try? await Task.sleep(for: .milliseconds(100))
+                if focus == target {
+                    print("OAHUDEBUG focus held: kept on attempt \(attempt)")
+                    break
+                }
+                if attempt == 30 { print("OAHUDEBUG focus held: never kept") }
+            }
+            pendingFocus = nil
+        }
     }
+
+    private static let holdFocus = ProcessInfo.processInfo.environment["BW_OAHU_FOCUS"] == "held"
 
     private func nextAfterName(_ kind: EditItemKind) -> Focus? {
         switch kind {
@@ -175,7 +198,7 @@ public struct CipherAddEditScreen: View {
         }
         LabeledField(label: copy.password) {
             HStack {
-                SecretField(label: copy.password, text: $model.password, shown: layout.showPassword && layout.viewPassword)
+                SecretField(label: copy.password, text: $model.password, input: $model.passwordTextInput, shown: layout.showPassword && layout.viewPassword)
                     .focused($focus, equals: .password)
                     .disabled(!layout.viewPassword)
                     .submitLabel(.next)
@@ -218,7 +241,7 @@ public struct CipherAddEditScreen: View {
                 .accessibilityIdentifier("SetupTotpButton")
             } else {
                 HStack {
-                    SecretField(label: copy.authenticatorKey, text: $model.totp, shown: layout.viewPassword)
+                    SecretField(label: copy.authenticatorKey, text: $model.totp, input: $model.totpTextInput, shown: layout.viewPassword)
                         .focused($focus, equals: .totp)
                         .disabled(!layout.viewPassword)
                         .accessibilityIdentifier("LoginTotpEntry")
@@ -251,7 +274,7 @@ public struct CipherAddEditScreen: View {
         }
         LabeledField(label: copy.number) {
             HStack {
-                SecretField(label: copy.number, text: $model.cardNumber, shown: layout.showCardNumber)
+                SecretField(label: copy.number, text: $model.cardNumber, input: $model.cardNumberTextInput, shown: layout.showCardNumber)
                     .focused($focus, equals: .cardNumber)
                     .accessibilityIdentifier("CardNumberEntry")
                 IconButton(glyph: layout.showCardNumber ? BitwardenIcons.eyeSlash : BitwardenIcons.eye,
@@ -275,7 +298,7 @@ public struct CipherAddEditScreen: View {
         }
         LabeledField(label: copy.securityCode) {
             HStack {
-                SecretField(label: copy.securityCode, text: $model.cardCode, shown: layout.showCardCode)
+                SecretField(label: copy.securityCode, text: $model.cardCode, input: $model.cardCodeTextInput, shown: layout.showCardCode)
                     .focused($focus, equals: .code)
                     .keyboardType(.numberPad)
                     .accessibilityIdentifier("CardSecurityCodeEntry")
@@ -492,24 +515,35 @@ private struct IndexPicker: View {
     }
 }
 
-/// MAUI's MonoEntry with IsPassword: SwiftUI has no secure toggle on one field, so it swaps a SecureField for a
-/// TextField (docs/oahu/gaps.md, G28).
+/// MAUI's MonoEntry with IsPassword. Steps 5-6 swapped a SecureField for a TextField (docs/oahu/gaps.md, G28); step 7
+/// uses OahuTextField's secure mode (#982), one UIKit field whose secure entry follows the eye. BW_OAHU_OLDSECURE=1
+/// brings back the swap for comparison.
 private struct SecretField: View {
     let label: String
     @Binding var text: String
+    /// The generated TextInput binding of a string editable, which OahuTextField reads; rows pass none.
+    var input: Binding<String>? = nil
     let shown: Bool
 
     var body: some View {
-        Group {
-            if shown {
-                TextField(label, text: $text)
-            } else {
-                SecureField(label, text: $text)
+        if ProcessInfo.processInfo.environment["BW_OAHU_OLDSECURE"] == "1" {
+            Group {
+                if shown {
+                    TextField(label, text: $text)
+                } else {
+                    SecureField(label, text: $text)
+                }
             }
+            .font(.system(.body, design: .monospaced))
+            .textInputAutocapitalization(.never)
+            .autocorrectionDisabled()
+        } else {
+            OahuTextField(
+                label, text: input ?? $text,
+                keyboard: .init(autocapitalizationType: .none, autocorrectionType: .no),
+                isSecure: !shown)
+                .font(.system(.body, design: .monospaced))
         }
-        .font(.system(.body, design: .monospaced))
-        .textInputAutocapitalization(.never)
-        .autocorrectionDisabled()
     }
 }
 

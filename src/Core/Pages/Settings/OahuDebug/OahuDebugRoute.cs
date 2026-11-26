@@ -17,6 +17,10 @@
 //                                    open its details page once the vault shows.
 //   BW_OAHU_SECURE / bwOahuSecure    1: screen capture not allowed (Android FLAG_SECURE, as the app's setting does).
 //   BW_OAHU_DRILL / bwOahuDrill      1: push Types > Login, then a folder, then a collection, one after the other.
+//   BW_OAHU_THEME_SWITCH / bwOahuThemeSwitch  a theme name: 12 s after start, switch the app to it as the Appearance
+//                                    settings page does (state, ThemeManager.SetTheme, "updatedTheme"), so a theme
+//                                    change reaches screens that are open (step 7).
+//   folders with BW_OAHU_THEME:      installs the fake vault (its folders) so the theme applies to the folder pages.
 //
 // Step 5 (docs/oahu/05-cipher-edit.md): edit, with BW_OAHU_EDIT and the options listed in OahuDebugEdit.cs.
 //
@@ -71,14 +75,30 @@ namespace Bit.App.Pages.OahuDebug
             switch (requested)
             {
                 case "folders" or "folders-empty":
+                    var themed = Option("BW_OAHU_THEME", "bwOahuTheme") != null
+                        || Option("BW_OAHU_THEME_SWITCH", "bwOahuThemeSwitch") != null;
                     if (!_shown)
                     {
                         _shown = true;
-                        ServiceContainer.RegisteredServices["folderService"] =
-                            new FakeFolderService(seed: requested == "folders");
+                        if (themed)
+                        {
+                            InstallVault("vault");
+                        }
+                        else
+                        {
+                            ServiceContainer.RegisteredServices["folderService"] =
+                                new FakeFolderService(seed: requested == "folders");
+                        }
                     }
                     MainThread.BeginInvokeOnMainThread(() =>
-                        Bit.App.App.MainPage = new NavigationPage(new OahuDebugHostPage()));
+                    {
+                        if (themed)
+                        {
+                            ThemeManager.SetTheme(Application.Current.Resources);
+                            Bit.App.Utilities.OahuPalette.Refresh();
+                        }
+                        Bit.App.App.MainPage = new NavigationPage(new OahuDebugHostPage());
+                    });
                     return true;
                 case "vault" or "vault-large" or "vault-empty":
                     if (!_shown)
@@ -179,6 +199,22 @@ namespace Bit.App.Pages.OahuDebug
             _debugState = debugState;
             InstallGenerator(debugState);
             InstallDiagnostics();
+            var switchTo = Option("BW_OAHU_THEME_SWITCH", "bwOahuThemeSwitch");
+            if (switchTo != null)
+            {
+                Task.Run(async () =>
+                {
+                    await Task.Delay(12000);
+                    await MainThread.InvokeOnMainThreadAsync(() =>
+                    {
+                        // As AppearanceSettingsPageViewModel.OnThemeChangingAsync does.
+                        debugState.Theme = switchTo;
+                        ThemeManager.SetTheme(Application.Current.Resources);
+                        messaging.Send(ThemeManager.UPDATED_THEME_MESSAGE_KEY);
+                        Console.WriteLine($"OAHUDEBUG theme switched to {switchTo}");
+                    });
+                });
+            }
             Console.WriteLine($"OAHUDEBUG installed fake vault '{variant}' with {vault.Ciphers.Count} ciphers");
         }
 

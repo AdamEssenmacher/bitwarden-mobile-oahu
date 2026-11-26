@@ -16,7 +16,10 @@ namespace Bit.App.Pages.OahuDebug
 
         private readonly IStateService _inner;
         private readonly FakeVault _vault;
-        private readonly string _theme;
+        private string _theme;
+
+        /// <summary>Step 7: the theme the debug route switches to while a screen is open (BW_OAHU_THEME_SWITCH).</summary>
+        public string Theme { set => _theme = value; }
         private bool _screenCaptureAllowed;
 
         public OahuDebugStateService(IStateService inner, FakeVault vault, string theme, bool screenCaptureAllowed)

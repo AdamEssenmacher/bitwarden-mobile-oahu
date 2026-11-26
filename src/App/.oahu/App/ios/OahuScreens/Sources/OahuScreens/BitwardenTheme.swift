@@ -45,28 +45,15 @@ struct Glyph: View {
     }
 }
 
-extension Color {
-    /// A color from C#'s 0xAARRGGBB (AppPalette).
-    init(argb: Int64) {
-        let v = UInt32(truncatingIfNeeded: argb)
-        self.init(
-            .sRGB,
-            red: Double((v >> 16) & 0xFF) / 255,
-            green: Double((v >> 8) & 0xFF) / 255,
-            blue: Double(v & 0xFF) / 255,
-            opacity: Double((v >> 24) & 0xFF) / 255)
-    }
-}
-
 extension AppPalette {
-    var backgroundColor: Color { Color(argb: background) }
-    var textColor: Color { Color(argb: text) }
-    var mutedColor: Color { Color(argb: muted) }
-    var primaryColor: Color { Color(argb: primary) }
-    var dangerColor: Color { Color(argb: danger) }
-    var headerBackgroundColor: Color { Color(argb: listHeaderBackground) }
-    var headerTextColor: Color { Color(argb: listHeaderText) }
-    var separatorColor: Color { Color(argb: separator) }
+    var backgroundColor: Color { background.color }
+    var textColor: Color { text.color }
+    var mutedColor: Color { muted.color }
+    var primaryColor: Color { primary.color }
+    var dangerColor: Color { danger.color }
+    var headerBackgroundColor: Color { listHeaderBackground.color }
+    var headerTextColor: Color { listHeaderText.color }
+    var separatorColor: Color { separator.color }
     var colorScheme: ColorScheme { isDark ? .dark : .light }
 }
 

@@ -11,6 +11,16 @@ public struct FoldersScreen: View {
     }
 
     public var body: some View {
+        content
+            .scrollContentBackground(.hidden)
+            .background(model.palette.backgroundColor)
+            .foregroundStyle(model.palette.textColor)
+            .tint(model.palette.primaryColor)
+            .environment(\.colorScheme, model.palette.colorScheme)
+    }
+
+    @ViewBuilder
+    private var content: some View {
         if model.showNoData {
             ContentUnavailableView {
                 Label(model.copy.noFolders, systemImage: "folder")
@@ -28,7 +38,7 @@ public struct FoldersScreen: View {
                                 .truncationMode(.tail)
                         } icon: {
                             Image(systemName: "folder")
-                                .foregroundStyle(Color(red: 0.09, green: 0.36, blue: 0.86)) // Bitwarden blue (#175DDC)
+                                .foregroundStyle(model.palette.primaryColor)
                         }
                         Spacer()
                         Image(systemName: "chevron.right")
@@ -37,7 +47,7 @@ public struct FoldersScreen: View {
                     }
                     .contentShape(Rectangle())
                 }
-                .tint(.primary)
+                .tint(model.palette.textColor)
                 .accessibilityIdentifier("FolderCell")
             }
             .listStyle(.insetGrouped)

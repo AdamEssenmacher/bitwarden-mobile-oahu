@@ -4,6 +4,7 @@ using Bit.App.Styles;
 using Bit.Core.Abstractions;
 using Bit.Core.Utilities;
 using Oahu;
+using Oahu.Maui;
 
 namespace Bit.App.Utilities
 {
@@ -42,17 +43,16 @@ namespace Bit.App.Utilities
 
         private static AppPalette Read()
         {
-            long C(string key)
+            // OAHU native-screens.md, "A MAUI app's colors": convert the resource with Oahu.Maui's ToOahuColor().
+            OahuColor C(string key)
             {
                 try
                 {
-                    var c = ThemeManager.GetResourceColor(key);
-                    return ((long)Math.Round(c.Alpha * 255) << 24) | ((long)Math.Round(c.Red * 255) << 16)
-                        | ((long)Math.Round(c.Green * 255) << 8) | (long)Math.Round(c.Blue * 255);
+                    return ThemeManager.GetResourceColor(key).ToOahuColor();
                 }
                 catch
                 {
-                    return 0xFF808080;
+                    return new OahuColor(0x80, 0x80, 0x80);
                 }
             }
 

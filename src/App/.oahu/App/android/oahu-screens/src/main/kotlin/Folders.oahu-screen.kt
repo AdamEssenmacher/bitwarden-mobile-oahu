@@ -35,7 +35,9 @@ public fun FoldersScreen(model: FoldersModel) {
     val copy by model.copy.collectAsState()
     val showNoData by model.showNoData.collectAsState()
     val folders by model.folders.collectAsState()
-    BitwardenTheme {
+    val palette by model.palette.collectAsState()
+    // Step 7: the app theme through the contract, as the other screens do (was BitwardenTheme, system dark only).
+    PaletteTheme(palette) {
         Box(Modifier.fillMaxSize()) {
             if (showNoData) {
                 Column(

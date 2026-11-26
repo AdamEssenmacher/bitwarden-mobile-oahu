@@ -9,6 +9,9 @@ public interface IFoldersViewModel
     /// <summary>Static labels, localized in C# (AppResources).</summary>
     IOahuState<FoldersCopy> Copy { get; }
 
+    /// <summary>The app theme's colors (step 7: every contract carries it; native-screens.md, "Styling").</summary>
+    IOahuState<AppPalette> Palette { get; }
+
     /// <summary>True when there are no folders: the screen shows the empty state.</summary>
     IOahuState<bool> ShowNoData { get; }
 
@@ -31,6 +34,9 @@ public sealed record FoldersCopy(string NoFolders, string AddFolder);
 public interface IFolderAddEditViewModel
 {
     IOahuState<FolderAddEditCopy> Copy { get; }
+
+    /// <summary>The app theme's colors (step 7).</summary>
+    IOahuState<AppPalette> Palette { get; }
 
     /// <summary>The folder's name.</summary>
     IOahuEditable<string> Name { get; }

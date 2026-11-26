@@ -1,5 +1,6 @@
 package com.oahu.appapp
 
+import com.adamessenmacher.oahu.compose.toColor
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -133,7 +134,7 @@ fun CipherDetailsScreen(model: CipherDetailsModel) {
 @Composable
 private fun DetailsBox(title: String, palette: AppPalette, content: @Composable ColumnScope.() -> Unit) {
     Column(Modifier.fillMaxWidth().padding(top = 16.dp)) {
-        Text(title.uppercase(), color = argb(palette.boxHeaderText), fontSize = 13.sp, fontWeight = FontWeight.SemiBold,
+        Text(title.uppercase(), color = palette.boxHeaderText.toColor(), fontSize = 13.sp, fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp))
         HorizontalDivider(color = palette.separatorColor)
         Column(Modifier.padding(horizontal = 16.dp), content = content)
@@ -199,8 +200,8 @@ private fun colored(runs: List<TextRun>, palette: AppPalette): AnnotatedString =
     runs.forEach { run ->
         val color = when (run.kind) {
             TextRunKind.Letters -> palette.textColor
-            TextRunKind.Digits -> argb(palette.passwordNumber)
-            TextRunKind.Symbols -> argb(palette.passwordSpecial)
+            TextRunKind.Digits -> palette.passwordNumber.toColor()
+            TextRunKind.Symbols -> palette.passwordSpecial.toColor()
         }
         withStyle(SpanStyle(color = color)) { append(run.text) }
     }

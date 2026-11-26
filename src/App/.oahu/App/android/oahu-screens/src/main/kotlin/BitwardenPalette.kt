@@ -1,5 +1,6 @@
 package com.oahu.appapp
 
+import com.adamessenmacher.oahu.compose.toColor
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
@@ -41,16 +42,14 @@ internal object BwIcons {
     const val COG = "\ue910"
 }
 
-internal fun argb(value: Long): Color = Color(value.toInt())
-
-internal val AppPalette.backgroundColor get() = argb(background)
-internal val AppPalette.textColor get() = argb(text)
-internal val AppPalette.mutedColor get() = argb(muted)
-internal val AppPalette.primaryColor get() = argb(primary)
-internal val AppPalette.dangerColor get() = argb(danger)
-internal val AppPalette.headerBackgroundColor get() = argb(listHeaderBackground)
-internal val AppPalette.headerTextColor get() = argb(listHeaderText)
-internal val AppPalette.separatorColor get() = argb(separator)
+internal val AppPalette.backgroundColor get() = background.toColor()
+internal val AppPalette.textColor get() = text.toColor()
+internal val AppPalette.mutedColor get() = muted.toColor()
+internal val AppPalette.primaryColor get() = primary.toColor()
+internal val AppPalette.dangerColor get() = danger.toColor()
+internal val AppPalette.headerBackgroundColor get() = listHeaderBackground.toColor()
+internal val AppPalette.headerTextColor get() = listHeaderText.toColor()
+internal val AppPalette.separatorColor get() = separator.toColor()
 
 /** Material colors from the app's own theme (Light, Dark, Black, Nord, Solarized Dark), sent by C#. */
 @Composable

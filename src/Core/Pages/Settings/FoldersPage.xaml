@@ -11,7 +11,10 @@
     xmlns:oahu="clr-namespace:Oahu.Maui;assembly=Oahu.Maui"
     xmlns:contracts="clr-namespace:Bit.App.Contracts;assembly=Core.Contracts"
     x:DataType="pages:FoldersPageViewModel"
+    xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
     x:Name="_page"
+    ios:Page.UseSafeArea="False"
+    SafeAreaEdges="None"
     Title="{Binding PageTitle}">
 
     <ContentPage.BindingContext>
@@ -33,12 +36,15 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
+    <!-- OAHU step 7: maui.md "Whole-page safe areas": the native list draws to the bottom edge (#943, G13). -->
     <AbsoluteLayout
         x:Name="_absLayout"
+        SafeAreaEdges="None"
         VerticalOptions="FillAndExpand"
         HorizontalOptions="FillAndExpand">
         <ContentView
             x:Name="_mainContent"
+            SafeAreaEdges="None"
             AbsoluteLayout.LayoutFlags="All"
             AbsoluteLayout.LayoutBounds="0, 0, 1, 1">
         </ContentView>

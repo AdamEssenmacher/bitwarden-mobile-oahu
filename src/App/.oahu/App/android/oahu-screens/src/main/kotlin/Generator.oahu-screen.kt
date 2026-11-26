@@ -1,5 +1,6 @@
 package com.oahu.appapp
 
+import com.adamessenmacher.oahu.compose.toColor
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -120,8 +121,8 @@ private fun colored(runs: List<TextRun>, palette: AppPalette): AnnotatedString =
     runs.forEach { run ->
         val color = when (run.kind) {
             TextRunKind.Letters -> palette.textColor
-            TextRunKind.Digits -> argb(palette.passwordNumber)
-            TextRunKind.Symbols -> argb(palette.passwordSpecial)
+            TextRunKind.Digits -> palette.passwordNumber.toColor()
+            TextRunKind.Symbols -> palette.passwordSpecial.toColor()
         }
         withStyle(SpanStyle(color = color)) { append(run.text) }
     }

@@ -110,7 +110,7 @@ public struct CipherDetailsScreen: View {
     }
 
     private func header(_ text: String, _ p: AppPalette) -> some View {
-        Text(text).foregroundStyle(Color(argb: p.boxHeaderText))
+        Text(text).foregroundStyle(p.boxHeaderText.color)
     }
 
     @ViewBuilder
@@ -320,8 +320,8 @@ private struct SecretRow<Extra: View>: View {
     private func color(_ kind: TextRunKind) -> Color {
         switch kind {
         case .letters: palette.textColor
-        case .digits: Color(argb: palette.passwordNumber)
-        case .symbols: Color(argb: palette.passwordSpecial)
+        case .digits: palette.passwordNumber.color
+        case .symbols: palette.passwordSpecial.color
         }
     }
 }

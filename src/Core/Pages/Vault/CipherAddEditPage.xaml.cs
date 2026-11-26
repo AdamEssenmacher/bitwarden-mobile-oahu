@@ -126,9 +126,17 @@ namespace Bit.App.Pages
                 {
                     // As RequestFocus(_nameEntry) did: wait for the modal animation. A focus request delivered while the
                     // modal is still presenting is dropped by SwiftUI (docs/oahu/gaps.md, step 5).
+                    var delay = ShowModalAnimationDelay;
+#if DEBUG
+                    // Step 7 (#976): BW_OAHU_FOCUS=now or held publishes at once; held lets the screen hold it.
+                    if (Bit.App.Pages.OahuDebug.OahuDebugRoute.Option("BW_OAHU_FOCUS", "bwOahuFocus") is "now" or "held")
+                    {
+                        delay = 0;
+                    }
+#endif
                     Task.Run(async () =>
                     {
-                        await Task.Delay(ShowModalAnimationDelay);
+                        await Task.Delay(delay);
                         MainThread.BeginInvokeOnMainThread(() => _vm.RequestFocus(Bit.App.Contracts.FormField.Name));
                     });
                 }

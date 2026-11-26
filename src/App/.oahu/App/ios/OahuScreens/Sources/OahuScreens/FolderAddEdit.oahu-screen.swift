@@ -23,6 +23,10 @@ public struct FolderAddEditScreen: View {
                 Text(model.copy.nameLabel)
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(model.palette.backgroundColor)
+        .tint(model.palette.primaryColor)
+        .environment(\.colorScheme, model.palette.colorScheme)
         .task {
             guard model.focusName else { return }
             // Wait for the modal presentation to settle, as the MAUI page's RequestFocus did.

@@ -6,32 +6,32 @@ import OahuRuntime
 public struct AppPalette: Equatable, Hashable, Sendable {
     public var name: String
     public var isDark: Bool
-    public var background: Int64
-    public var listHeaderBackground: Int64
-    public var listHeaderText: Int64
-    public var text: Int64
-    public var muted: Int64
-    public var primary: Int64
-    public var danger: Int64
-    public var separator: Int64
-    public var passwordNumber: Int64
-    public var passwordSpecial: Int64
-    public var boxHeaderText: Int64
+    public var background: OahuColor
+    public var listHeaderBackground: OahuColor
+    public var listHeaderText: OahuColor
+    public var text: OahuColor
+    public var muted: OahuColor
+    public var primary: OahuColor
+    public var danger: OahuColor
+    public var separator: OahuColor
+    public var passwordNumber: OahuColor
+    public var passwordSpecial: OahuColor
+    public var boxHeaderText: OahuColor
 
     public init(
         name: String,
         isDark: Bool,
-        background: Int64,
-        listHeaderBackground: Int64,
-        listHeaderText: Int64,
-        text: Int64,
-        muted: Int64,
-        primary: Int64,
-        danger: Int64,
-        separator: Int64,
-        passwordNumber: Int64,
-        passwordSpecial: Int64,
-        boxHeaderText: Int64
+        background: OahuColor,
+        listHeaderBackground: OahuColor,
+        listHeaderText: OahuColor,
+        text: OahuColor,
+        muted: OahuColor,
+        primary: OahuColor,
+        danger: OahuColor,
+        separator: OahuColor,
+        passwordNumber: OahuColor,
+        passwordSpecial: OahuColor,
+        boxHeaderText: OahuColor
     ) {
         self.name = name
         self.isDark = isDark
@@ -85,32 +85,32 @@ public struct AppPalette: Equatable, Hashable, Sendable {
         AppPalette(
             name: try reader.readString(),
             isDark: try reader.readBool(),
-            background: try reader.readLong(),
-            listHeaderBackground: try reader.readLong(),
-            listHeaderText: try reader.readLong(),
-            text: try reader.readLong(),
-            muted: try reader.readLong(),
-            primary: try reader.readLong(),
-            danger: try reader.readLong(),
-            separator: try reader.readLong(),
-            passwordNumber: try reader.readLong(),
-            passwordSpecial: try reader.readLong(),
-            boxHeaderText: try reader.readLong())
+            background: try reader.readColor(),
+            listHeaderBackground: try reader.readColor(),
+            listHeaderText: try reader.readColor(),
+            text: try reader.readColor(),
+            muted: try reader.readColor(),
+            primary: try reader.readColor(),
+            danger: try reader.readColor(),
+            separator: try reader.readColor(),
+            passwordNumber: try reader.readColor(),
+            passwordSpecial: try reader.readColor(),
+            boxHeaderText: try reader.readColor())
     }
 
     static func write(_ writer: inout OahuWriter, _ value: AppPalette) {
         writer.writeString(value.name)
         writer.writeBool(value.isDark)
-        writer.writeLong(value.background)
-        writer.writeLong(value.listHeaderBackground)
-        writer.writeLong(value.listHeaderText)
-        writer.writeLong(value.text)
-        writer.writeLong(value.muted)
-        writer.writeLong(value.primary)
-        writer.writeLong(value.danger)
-        writer.writeLong(value.separator)
-        writer.writeLong(value.passwordNumber)
-        writer.writeLong(value.passwordSpecial)
-        writer.writeLong(value.boxHeaderText)
+        writer.writeColor(value.background)
+        writer.writeColor(value.listHeaderBackground)
+        writer.writeColor(value.listHeaderText)
+        writer.writeColor(value.text)
+        writer.writeColor(value.muted)
+        writer.writeColor(value.primary)
+        writer.writeColor(value.danger)
+        writer.writeColor(value.separator)
+        writer.writeColor(value.passwordNumber)
+        writer.writeColor(value.passwordSpecial)
+        writer.writeColor(value.boxHeaderText)
     }
 }

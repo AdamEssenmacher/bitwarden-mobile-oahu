@@ -23,6 +23,8 @@ namespace Bit.App.Pages
         IOahuState<FoldersCopy> IFoldersViewModel.Copy => _copy ??=
             new StateSource<FoldersCopy>(new FoldersCopy(AppResources.NoFoldersToList, AppResources.AddFolder));
 
+        IOahuState<AppPalette> IFoldersViewModel.Palette => Bit.App.Utilities.OahuPalette.Current;
+
         IOahuState<bool> IFoldersViewModel.ShowNoData => _showNoDataState ??=
             OahuState.FromProperty(this, nameof(ShowNoData), () => ShowNoData);
 
