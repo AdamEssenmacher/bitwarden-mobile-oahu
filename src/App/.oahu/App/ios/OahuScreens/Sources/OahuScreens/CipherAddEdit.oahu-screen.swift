@@ -52,20 +52,41 @@ public struct CipherAddEditScreen: View {
                     TextField(copy.name, text: $model.name)
                         .focused($focus, equals: .name)
                         .submitLabel(.next)
-                        .onSubmit { focus = nextAfterName(layout.kind) }
+                        .onSubmit {
+                            if layout.kind == .identity && model.sections.identity != 0 {
+                                // The section's fields are out of this view's reach: ask C# to forward the focus.
+                                model.moveFocus(FormFocus(field: .identityFirstName, rowKey: nil))
+                            } else {
+                                focus = nextAfterName(layout.kind)
+                            }
+                        }
                         .accessibilityIdentifier("ItemNameEntry")
                 }
                 switch layout.kind {
                 case .login: loginSection(copy: copy, layout: layout, palette: palette)
                 case .card: cardSection(copy: copy, layout: layout, palette: palette)
-                case .identity: identitySection(copy: copy)
+                case .identity:
+                    if model.sections.identity != 0 {
+                        // Step 7, D25 trial: the identity section is a mounted child contract.
+                        OahuMountView(id: model.sections.identity)
+                    } else {
+                        identitySection(copy: copy)
+                    }
                 case .secureNote: EmptyView()
                 }
             } header: {
                 Text(copy.itemInformation)
             }
             if layout.kind == .login {
-                urisSection(copy: copy, layout: layout, palette: palette)
+                if model.sections.uris != 0 {
+                    Section {
+                        OahuMountView(id: model.sections.uris)
+                    } header: {
+                        Text(copy.uris)
+                    }
+                } else {
+                    urisSection(copy: copy, layout: layout, palette: palette)
+                }
             }
             Section {
                 IndexPicker(label: copy.folder, options: model.choices.folders, selection: $model.folder)
@@ -126,6 +147,7 @@ public struct CipherAddEditScreen: View {
         .scrollContentBackground(.hidden)
         .background(palette.backgroundColor)
         .environment(\.colorScheme, palette.colorScheme)
+        .environment(\.appPalette, palette)
         .tint(palette.primaryColor)
         .task {
             // One-shot focus requests from C#: the name of a new item, a field Save found invalid, a new URI.

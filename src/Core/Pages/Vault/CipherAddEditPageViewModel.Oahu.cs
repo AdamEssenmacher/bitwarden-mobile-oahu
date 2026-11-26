@@ -256,9 +256,15 @@ namespace Bit.App.Pages
         /// <summary>Asks the screen to focus a field (held until the screen listens).</summary>
         public void RequestFocus(FormField field, string? rowKey = null)
         {
+            if (ForwardFocusToSection(field, rowKey))
+            {
+                return;
+            }
             _ = ((ICipherAddEditViewModel)this).Focus;
             _focus!.Publish(new FormFocus(field, rowKey));
         }
+
+        void ICipherAddEditViewModel.MoveFocus(FormFocus target) => RequestFocus(target.Field, target.RowKey);
 
         void ICipherAddEditViewModel.AddUri()
         {

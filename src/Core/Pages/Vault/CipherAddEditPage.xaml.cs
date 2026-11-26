@@ -84,6 +84,8 @@ namespace Bit.App.Pages
             // OAHU: the pickers, Return-key chain and entries are native (docs/oahu/05-cipher-edit.md); the screen
             // asks for the TOTP scan page through the view model.
             _vm.ScanTotpRequested += () => ScanTotp_Clicked(this, EventArgs.Empty);
+            // Step 7, D25 trial: the sections go after the screen that draws them (contracts.md, the Dispose comment).
+            _scrollView.TornDown += (_, _) => _vm.DisposeSections();
 #if ANDROID
             _scrollView.AndroidSavedStateViewId = OahuAndroidIds.Get("oahu_cipher_edit");
 #endif
@@ -121,6 +123,19 @@ namespace Bit.App.Pages
                     return;
                 }
                 AdjustToolbar();
+#if DEBUG
+                // Step 7, D25 trial: BW_OAHU_SECTIONS=1 mounts the identity and URI sections as child contracts.
+                if (Bit.App.Pages.OahuDebug.OahuDebugRoute.Option("BW_OAHU_SECTIONS", "bwOahuSections") == "1")
+                {
+#if IOS
+                    _vm.MountSections(v => Oahu.iOS.OahuScreens.Mount<Bit.App.Contracts.IIdentitySectionViewModel>(v),
+                        v => Oahu.iOS.OahuScreens.Mount<Bit.App.Contracts.IUriSectionViewModel>(v));
+#elif ANDROID
+                    _vm.MountSections(v => Oahu.Android.OahuScreens.Mount<Bit.App.Contracts.IIdentitySectionViewModel>(v),
+                        v => Oahu.Android.OahuScreens.Mount<Bit.App.Contracts.IUriSectionViewModel>(v));
+#endif
+                }
+#endif
                 await ShowAlertsAsync();
                 if (!_vm.EditMode && string.IsNullOrWhiteSpace(_vm.Cipher?.Name))
                 {

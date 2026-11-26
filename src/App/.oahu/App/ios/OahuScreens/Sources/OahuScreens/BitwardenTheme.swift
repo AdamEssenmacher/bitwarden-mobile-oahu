@@ -45,6 +45,12 @@ struct Glyph: View {
     }
 }
 
+extension EnvironmentValues {
+    /// Step 7: the palette a root screen puts in its environment for the screens mounted inside it (native-screens.md,
+    /// "Giving the palette to every screen"). nil outside a root that sets it.
+    @Entry var appPalette: AppPalette? = nil
+}
+
 extension AppPalette {
     var backgroundColor: Color { background.color }
     var textColor: Color { text.color }

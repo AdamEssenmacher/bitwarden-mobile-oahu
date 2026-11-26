@@ -63,6 +63,18 @@ public interface ICipherAddEditViewModel
     /// </summary>
     IOahuEvents<FormFocus> Focus { get; }
 
+    /// <summary>
+    /// Step 7, D25 trial: the mount ids of the identity and URI sections, or 0 while the flat members are drawn
+    /// (CipherAddEditSections.cs).
+    /// </summary>
+    IOahuState<CipherAddEditSections> Sections { get; }
+
+    /// <summary>
+    /// Step 7, D25 trial: the parent screen's Return moving focus into a mounted section. A screen can't reach a
+    /// section's fields, so the request goes through C#, which forwards it to the section's own focus event.
+    /// </summary>
+    void MoveFocus(FormFocus target);
+
     // Rows.
     void AddUri();
     void SetUriText(RowText edit);

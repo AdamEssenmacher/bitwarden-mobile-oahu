@@ -48,6 +48,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.adamessenmacher.oahu.compose.OahuMount
 import com.adamessenmacher.oahu.compose.collectAsMutableState
 import com.adamessenmacher.oahu.compose.rememberTextFieldState
 
@@ -61,6 +62,7 @@ fun CipherAddEditScreen(model: CipherAddEditModel) {
     val palette by model.palette.collectAsState()
     val copy by model.copy.collectAsState()
     val layout by model.layout.collectAsState()
+    val sections by model.sections.collectAsState()
     val focus = remember { FormFocusRequesters() }
     // A focus request for a row waits until the row is composed (a new URI arrives in the same batch as the request).
     var pendingRowFocus by remember { mutableStateOf<String?>(null) }
@@ -95,11 +97,18 @@ fun CipherAddEditScreen(model: CipherAddEditModel) {
             when (layout.kind) {
                 EditItemKind.Login -> LoginSection(model, copy, layout, palette, focus)
                 EditItemKind.Card -> CardSection(model, copy, layout, palette, focus)
-                EditItemKind.Identity -> IdentitySection(model, copy, focus)
+                EditItemKind.Identity ->
+                    // Step 7, D25 trial: the identity section as a mounted child contract when its id is set.
+                    if (sections.identity != 0L) OahuMount(sections.identity) else IdentitySection(model, copy, focus)
                 EditItemKind.SecureNote -> {}
             }
             if (layout.kind == EditItemKind.Login) {
-                UrisSection(model, copy, layout, palette, pendingRowFocus) { pendingRowFocus = null }
+                if (sections.uris != 0L) {
+                    Header(copy.uris, palette)
+                    OahuMount(sections.uris)
+                } else {
+                    UrisSection(model, copy, layout, palette, pendingRowFocus) { pendingRowFocus = null }
+                }
             }
             Header(copy.miscellaneous, palette)
             val choices by model.choices.collectAsState()
@@ -430,14 +439,14 @@ private fun IconGlyphButton(glyph: String, label: String, palette: AppPalette, o
 
 /** A picker over an Int editable that holds the option's index (the view model's *SelectedIndex properties). */
 @Composable
-private fun IndexPicker(label: String, options: List<String>, editable: com.adamessenmacher.oahu.runtime.OahuEditable<Int>, tag: String) {
+internal fun IndexPicker(label: String, options: List<String>, editable: com.adamessenmacher.oahu.runtime.OahuEditable<Int>, tag: String) {
     var selected by editable.collectAsMutableState()
     RowIndexPicker(label, options, selected, tag) { selected = it }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun RowIndexPicker(label: String, options: List<String>, selected: Int, tag: String = "", onSelect: (Int) -> Unit) {
+internal fun RowIndexPicker(label: String, options: List<String>, selected: Int, tag: String = "", onSelect: (Int) -> Unit) {
     var open by remember { mutableStateOf(false) }
     ExposedDropdownMenuBox(expanded = open, onExpandedChange = { open = it }, modifier = Modifier.padding(vertical = 2.dp)) {
         OutlinedTextField(

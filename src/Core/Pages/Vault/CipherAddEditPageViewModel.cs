@@ -764,6 +764,7 @@ namespace Bit.App.Pages
                     uri.Match = _matchDetectionOptions.FirstOrDefault(o => o.Value == matchSelectionClean).Key;
                     // OAHU: LoginUriView raises nothing; re-read the URI rows (docs/oahu/05-cipher-edit.md).
                     _uriRows?.Refresh();
+                    RefreshSectionUris();
                 }
             }
         }
