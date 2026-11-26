@@ -17,7 +17,7 @@
       "rollForward": false
     },
     "oahu.cli": {
-      "version": "0.1.0-preview.g104c58c2",
+      "version": "0.1.0-preview.gc63d0aba",
       "commands": [
         "oahu"
       ],

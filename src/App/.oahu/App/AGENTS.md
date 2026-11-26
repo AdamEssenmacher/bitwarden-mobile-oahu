@@ -1,13 +1,13 @@
 # OAHU in App.csproj
 
-Written by `oahu init` for OAHU 0.1.0-preview.g104c58c2 (mobile). Do not edit it: rerun `dotnet tool run oahu init` to update it.
+Written by `oahu init` for OAHU 0.1.0-preview.gc63d0aba (mobile). Do not edit it: rerun `dotnet tool run oahu init` to update it.
 Paths here are relative to the folder that holds `App.csproj`; run the commands from there. Commands here and each
 diagnostic's `fix` run the CLI as the local tool the docs install, `dotnet tool run oahu`; with a global install, drop
 `dotnet tool run`.
 
 ## Docs for this version
 
-Every OAHU package carries the consumer docs of its version. After a restore they are in `~/.nuget/packages/oahu/0.1.0-preview.g104c58c2/docs/`
+Every OAHU package carries the consumer docs of its version. After a restore they are in `~/.nuget/packages/oahu/0.1.0-preview.gc63d0aba/docs/`
 (under `$NUGET_PACKAGES` if it is set). Read them there, not on the web, so they match the packages in use:
 
 - `README.md`: the index. `protocol.md`: delivery, threading and lifetime rules.
@@ -18,7 +18,7 @@ Every OAHU package carries the consumer docs of its version. After a restore the
 - `packages/Oahu.iOS.md`: hosting on ios.
 - `packages/Oahu.Android.md`: hosting on android.
 
-Before a restore, the same docs are in the feed: `../../../oahu-feed/swift/0.1.0-preview.g104c58c2/OahuRuntime/docs/`.
+Before a restore, the same docs are in the feed: `../../../oahu-feed/swift/0.1.0-preview.gc63d0aba/OahuRuntime/docs/`.
 
 ## Contracts
 
@@ -48,7 +48,7 @@ command ran and failed, 2 the command line is wrong.
 
 Each diagnostic has a stable `code`, a `severity` and a `message`: act on the code, not the message text.
 `fix`, when present, is a command line that addresses it; run it as given. `docs`, when present, links the
-code's section of `errors.md` in the latest docs: read the same section in `~/.nuget/packages/oahu/0.1.0-preview.g104c58c2/docs/errors.md`.
+code's section of `errors.md` in the latest docs: read the same section in `~/.nuget/packages/oahu/0.1.0-preview.gc63d0aba/docs/errors.md`.
 `OAHUCLI005` means build or restore evidence is missing, stale or ambiguous (NuGet assets, the Gradle report,
 the GTK marker). Run its `fix` when it has one, then the command that reported it; otherwise follow the message.
 

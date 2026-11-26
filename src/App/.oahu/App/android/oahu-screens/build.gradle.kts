@@ -16,8 +16,8 @@ kotlin {
     compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17) }
 }
 dependencies {
-    implementation("com.adamessenmacher.oahu:oahu-runtime:0.1.0-preview.g104c58c2")
-    implementation("com.adamessenmacher.oahu:oahu-compose:0.1.0-preview.g104c58c2")
+    implementation("com.adamessenmacher.oahu:oahu-runtime:0.1.0-preview.gc63d0aba")
+    implementation("com.adamessenmacher.oahu:oahu-compose:0.1.0-preview.gc63d0aba")
     implementation(libs.compose.runtime)
     implementation(libs.compose.ui)
     implementation(libs.compose.foundation)
