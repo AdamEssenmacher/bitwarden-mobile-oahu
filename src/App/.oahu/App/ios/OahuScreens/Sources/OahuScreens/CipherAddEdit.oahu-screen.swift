@@ -17,6 +17,30 @@ public struct CipherAddEditScreen: View {
         Binding(get: { localNotes ?? model.notes }, set: { localNotes = $0; model.notes = $0 })
     }
 
+    // DEBUG step 6 keystroke probe (docs/oahu/06-keystroke-repro.md): BW_OAHU_NOTES_MODE picks the notes binding.
+    // model (default; local when BW_OAHU_NOTES_LOCAL=1): as above. state: a plain @State, no OAHU (the model never
+    // sees the text). single: $model.notes in a single-line TextField.
+    static let notesMode =
+        ProcessInfo.processInfo.environment["BW_OAHU_NOTES_MODE"] ?? (notesLocal ? "local" : "model")
+    @State private var stateNotes = ""
+
+    @ViewBuilder private func notesField(_ title: String) -> some View {
+        switch Self.notesMode {
+        case "state":
+            TextField(title, text: $stateNotes, axis: .vertical)
+                .lineLimit(3...)
+                .onChange(of: stateNotes) { _, new in OahuKeyProbe.log("swState", new) }
+        case "single":
+            TextField(title, text: $model.notes)
+        case "local":
+            TextField(title, text: localNotesBinding, axis: .vertical)
+                .lineLimit(3...)
+        default:
+            TextField(title, text: $model.notes, axis: .vertical)
+                .lineLimit(3...)
+        }
+    }
+
     enum Focus: Hashable {
         case name, username, password, totp, cardholder, cardNumber, expYear, code, notes
         case identity(Int)
@@ -91,10 +115,11 @@ public struct CipherAddEditScreen: View {
             Section {
                 // MAUI's Editor with AutoSize: grows with its text. DEBUG A/B (BW_OAHU_NOTES_LOCAL=1): bind a local
                 // @State and copy it to the model, to tell SwiftUI's behavior from OAHU's binding (gaps.md, step 5).
-                TextField(copy.notes, text: Self.notesLocal ? localNotesBinding : $model.notes, axis: .vertical)
-                    .lineLimit(3...)
+                notesField(copy.notes)
                     .focused($focus, equals: .notes)
                     .accessibilityIdentifier("ItemNotesEntry")
+                    .onAppear { OahuKeyProbe.startIfAsked { [model] in model.notesTextInput } }
+                    .onChange(of: focus) { _, new in OahuKeyProbe.notesFocused = new == .notes }
             } header: {
                 Text(copy.notes)
             }

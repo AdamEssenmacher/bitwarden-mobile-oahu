@@ -1,0 +1,313 @@
+variant mode load-bucket runs lost
+local inject <20 13 0
+local inject <40 2 0
+local inject <80 3 0
+local inject >=80 2 0
+local xcui0 <20 12 0
+local xcui0 <40 2 0
+local xcui0 <80 4 0
+local xcui0 >=80 2 0
+local xcui1 <20 13 0
+local xcui1 <40 1 0
+local xcui1 <80 4 0
+local xcui1 >=80 2 0
+model inject <20 18 0
+model inject <80 2 0
+model inject >=80 3 0
+model xcui0 <20 12 0
+model xcui0 <40 6 0
+model xcui0 <80 3 0
+model xcui0 >=80 3 0
+model xcui1 <20 11 0
+model xcui1 <40 4 0
+model xcui1 >=80 5 0
+single inject <20 14 0
+single inject <40 4 0
+single inject <80 3 0
+single inject >=80 2 0
+single xcui0 <20 15 0
+single xcui0 <40 2 0
+single xcui0 <80 3 0
+single xcui0 >=80 3 0
+single xcui1 <20 11 0
+single xcui1 <40 3 0
+single xcui1 <80 2 0
+single xcui1 >=80 4 0
+state inject <20 16 0
+state inject <40 4 0
+state inject <80 2 0
+state inject >=80 1 0
+state xcui0 <20 12 0
+state xcui0 <40 6 1
+state xcui0 <80 4 0
+state xcui0 >=80 2 0
+state xcui1 <20 8 0
+state xcui1 <40 7 0
+state xcui1 <80 3 1
+state xcui1 >=80 2 0
+
+losses by layer
+state xcui0 field-not-delivered 1
+state xcui1 field-not-delivered 1
+
+runs
+bwsmoke-r0-model-xcui0 model xcui0 48.5 5.2 62 offmain=0 ok 
+bwsmoke-r0-state-xcui0 state xcui0 47.8 5.5 12 offmain=0 ok 
+bw1-r0-state-xcui0 state xcui0 94.9 7.3 7 offmain=0 ok 
+bw1-r0-state-xcui1 state xcui1 161.6 5.9 7 offmain=0 ok 
+bw1-r0-model-xcui0 model xcui0 171.9 5.8 62 offmain=0 ok 
+bw1-r0-model-xcui1 model xcui1 198.7 6.5 62 offmain=0 ok 
+bw1-r0-local-xcui0 local xcui0 77.2 5.0 62 offmain=0 ok 
+bw1-r0-local-xcui1 local xcui1 64.5 5.9 62 offmain=0 ok 
+bw1-r0-single-xcui0 single xcui0 55.7 6.5 62 offmain=0 ok 
+bw1-r0-single-xcui1 single xcui1 55.7 5.5 62 offmain=0 ok 
+bw1-r1-model-xcui0 model xcui0 30.8 5.2 62 offmain=0 ok 
+bw1-r1-model-xcui1 model xcui1 27.5 6.2 62 offmain=0 ok 
+bw1-r1-local-xcui0 local xcui0 20.3 4.9 62 offmain=0 ok 
+bw1-r1-local-xcui1 local xcui1 19.7 5.5 62 offmain=0 ok 
+bw1-r1-single-xcui0 single xcui0 16.9 5.6 62 offmain=0 ok 
+bw1-r1-single-xcui1 single xcui1 19.2 6.3 62 offmain=0 ok 
+bw1-r1-state-xcui0 state xcui0 35.9 5.3 15 offmain=0 ok 
+bw1-r1-state-xcui1 state xcui1 38.3 6.4 11 offmain=0 ok 
+bw1-r2-local-xcui0 local xcui0 33.1 5.9 62 offmain=0 ok 
+bw1-r2-local-xcui1 local xcui1 35.4 6.4 62 offmain=0 ok 
+bw1-r2-single-xcui0 single xcui0 79.4 6.2 62 offmain=0 ok 
+bw1-r2-single-xcui1 single xcui1 101.7 6.8 62 offmain=0 ok 
+bw1-r2-state-xcui0 state xcui0 53.9 5.7 27 offmain=0 ok 
+bw1-r2-state-xcui1 state xcui1 48.9 6.6 28 offmain=0 ok 
+bw1-r2-model-xcui0 model xcui0 28.2 5.4 62 offmain=0 ok 
+bw1-r2-model-xcui1 model xcui1 30.0 5.4 62 offmain=0 ok 
+bw1-r3-single-xcui0 single xcui0 23.8 4.9 62 offmain=0 ok 
+bw1-r3-single-xcui1 single xcui1 21.4 5.9 62 offmain=0 ok 
+bw1-r3-state-xcui0 state xcui0 13.2 4.9 29 offmain=0 ok 
+bw1-r3-state-xcui1 state xcui1 23.1 5.9 29 offmain=0 ok 
+bw1-r3-model-xcui0 model xcui0 76.0 5.6 62 offmain=0 ok 
+bw1-r3-model-xcui1 model xcui1 81.6 6.3 62 offmain=0 ok 
+bw1-r3-local-xcui0 local xcui0 71.4 5.6 62 offmain=0 ok 
+bw1-r3-local-xcui1 local xcui1 71.7 6.3 62 offmain=0 ok 
+bw1-r4-state-xcui0 state xcui0 51.2 4.8 29 offmain=0 ok 
+bw1-r4-state-xcui1 state xcui1 43.1 5.9 28 offmain=0 ok 
+bw1-r4-model-xcui0 model xcui0 23.7 4.8 62 offmain=0 ok 
+bw1-r4-model-xcui1 model xcui1 21.1 5.7 62 offmain=0 ok 
+bw1-r4-local-xcui0 local xcui0 14.8 4.7 62 offmain=0 ok 
+bw1-r4-local-xcui1 local xcui1 12.5 5.6 62 offmain=0 ok 
+bw1-r4-single-xcui0 single xcui0 7.9 4.8 62 offmain=0 ok 
+bw1-r4-single-xcui1 single xcui1 7.5 5.7 62 offmain=0 ok 
+bw2-r0-state-xcui0 state xcui0 24.6 4.7 25 offmain=0 ok 
+bw2-r0-state-xcui1 state xcui1 20.2 5.7 27 offmain=0 ok 
+bw2-r0-state-inject state inject 16.6 5.6 30 offmain=0 ok 
+bw2-r0-model-xcui0 model xcui0 14.0 4.7 62 offmain=0 ok 
+bw2-r0-model-xcui1 model xcui1 11.9 5.6 62 offmain=0 ok 
+bw2-r0-model-inject model inject 10.0 5.5 62 offmain=0 ok 
+bw2-r0-local-xcui0 local xcui0 8.7 4.8 62 offmain=0 ok 
+bw2-r0-local-xcui1 local xcui1 7.7 5.6 62 offmain=0 ok 
+bw2-r0-local-inject local inject 7.1 5.5 62 offmain=0 ok 
+bw2-r0-single-xcui0 single xcui0 7.2 5.1 62 offmain=0 ok 
+bw2-r0-single-xcui1 single xcui1 7.3 6.0 62 offmain=0 ok 
+bw2-r0-single-inject single inject 6.7 6.1 62 offmain=0 ok 
+bw2-r1-model-xcui0 model xcui0 6.1 4.8 62 offmain=0 ok 
+bw2-r1-model-xcui1 model xcui1 6.9 5.6 62 offmain=0 ok 
+bw2-r1-model-inject model inject 6.8 5.7 62 offmain=0 ok 
+bw2-r1-local-xcui0 local xcui0 6.3 4.5 62 offmain=0 ok 
+bw2-r1-local-xcui1 local xcui1 5.9 5.6 62 offmain=0 ok 
+bw2-r1-local-inject local inject 5.6 5.9 62 offmain=0 ok 
+bw2-r1-single-xcui0 single xcui0 5.6 4.6 62 offmain=0 ok 
+bw2-r1-single-xcui1 single xcui1 5.3 5.6 62 offmain=0 ok 
+bw2-r1-single-inject single inject 6.0 5.6 62 offmain=0 ok 
+bw2-r1-state-xcui0 state xcui0 8.6 5.2 23 offmain=0 ok 
+bw2-r1-state-xcui1 state xcui1 11.4 5.7 30 offmain=0 ok 
+bw2-r1-state-inject state inject 12.4 5.7 30 offmain=0 ok 
+bw2-r2-local-xcui0 local xcui0 12.6 5.2 62 offmain=0 ok 
+bw2-r2-local-xcui1 local xcui1 13.6 6.2 62 offmain=0 ok 
+bw2-r2-local-inject local inject 13.6 6.8 62 offmain=0 ok 
+bw2-r2-single-xcui0 single xcui0 15.5 5.3 62 offmain=0 ok 
+bw2-r2-single-xcui1 single xcui1 21.5 6.3 62 offmain=0 ok 
+bw2-r2-single-inject single inject 24.5 6.8 62 offmain=0 ok 
+bw2-r2-state-xcui0 state xcui0 28.4 5.7 11 offmain=0 ok 
+bw2-r2-state-xcui1 state xcui1 33.3 6.1 26 offmain=0 ok 
+bw2-r2-state-inject state inject 51.1 7.4 30 offmain=0 ok 
+bw2-r2-model-xcui0 model xcui0 76.0 5.9 62 offmain=0 ok 
+bw2-r2-model-xcui1 model xcui1 111.8 7.6 62 offmain=0 ok 
+bw2-r2-model-inject model inject 169.3 8.5 62 offmain=0 ok 
+bw2-r3-single-xcui0 single xcui0 211.0 6.2 62 offmain=0 ok 
+bw2-r3-single-xcui1 single xcui1 211.3 6.7 62 offmain=0 ok 
+bw2-r3-single-inject single inject 194.3 7.8 62 offmain=0 ok 
+bw2-r3-state-xcui0 state xcui0 188.8 5.8 9 offmain=0 ok 
+bw2-r3-state-xcui1 state xcui1 172.7 6.1 26 offmain=0 ok 
+bw2-r3-state-inject state inject 144.7 6.7 30 offmain=0 ok 
+bw2-r3-model-xcui0 model xcui0 121.0 4.9 62 offmain=0 ok 
+bw2-r3-model-xcui1 model xcui1 102.8 6.0 62 offmain=0 ok 
+bw2-r3-model-inject model inject 86.0 5.7 62 offmain=0 ok 
+bw2-r3-local-xcui0 local xcui0 69.0 4.6 62 offmain=0 ok 
+bw2-r3-local-xcui1 local xcui1 55.7 5.8 62 offmain=0 ok 
+bw2-r3-local-inject local inject 45.0 5.7 62 offmain=0 ok 
+bw2-r4-state-xcui0 state xcui0 36.7 4.8 28 offmain=0 ok 
+bw2-r4-state-xcui1 state xcui1 30.3 5.8 25 offmain=0 ok 
+bw2-r4-state-inject state inject 25.1 5.7 30 offmain=0 ok 
+bw2-r4-model-xcui0 model xcui0 20.8 4.7 62 offmain=0 ok 
+bw2-r4-model-xcui1 model xcui1 17.3 5.7 62 offmain=0 ok 
+bw2-r4-model-inject model inject 15.1 6.0 62 offmain=0 ok 
+bw2-r4-local-xcui0 local xcui0 13.7 4.8 62 offmain=0 ok 
+bw2-r4-local-xcui1 local xcui1 12.0 5.7 62 offmain=0 ok 
+bw2-r4-local-inject local inject 10.7 6.2 62 offmain=0 ok 
+bw2-r4-single-xcui0 single xcui0 9.6 4.9 62 offmain=0 ok 
+bw2-r4-single-xcui1 single xcui1 8.8 5.9 62 offmain=0 ok 
+bw2-r4-single-inject single inject 8.3 6.4 62 offmain=0 ok 
+bw3-r0-state-xcui0 state xcui0 8.0 4.1 29 offmain=0 ok 
+bw3-r0-state-xcui1 state xcui1 7.6 5.7 29 offmain=0 ok 
+bw3-r0-state-inject state inject 7.2 5.7 30 offmain=0 ok 
+bw3-r0-model-xcui0 model xcui0 7.3 4.7 62 offmain=0 ok 
+bw3-r0-model-xcui1 model xcui1 7.4 5.7 62 offmain=0 ok 
+bw3-r0-model-inject model inject 7.1 5.7 62 offmain=0 ok 
+bw3-r0-local-xcui0 local xcui0 6.8 4.8 62 offmain=0 ok 
+bw3-r0-local-xcui1 local xcui1 6.7 6.3 62 offmain=0 ok 
+bw3-r0-local-inject local inject 7.0 6.5 62 offmain=0 ok 
+bw3-r0-single-xcui0 single xcui0 7.3 4.8 62 offmain=0 ok 
+bw3-r0-single-xcui1 single xcui1 7.2 5.5 62 offmain=0 ok 
+bw3-r0-single-inject single inject 6.7 5.8 62 offmain=0 ok 
+bw3-r1-model-xcui0 model xcui0 6.6 4.3 62 offmain=0 ok 
+bw3-r1-model-xcui1 model xcui1 6.5 5.3 62 offmain=0 ok 
+bw3-r1-model-inject model inject 5.7 5.8 62 offmain=0 ok 
+bw3-r1-local-xcui0 local xcui0 5.3 4.5 62 offmain=0 ok 
+bw3-r1-local-xcui1 local xcui1 6.6 5.8 62 offmain=0 ok 
+bw3-r1-local-inject local inject 7.9 5.7 62 offmain=0 ok 
+bw3-r1-single-xcui0 single xcui0 7.3 4.4 62 offmain=0 ok 
+bw3-r1-single-xcui1 single xcui1 7.0 5.9 62 offmain=0 ok 
+bw3-r1-single-inject single inject 9.1 6.5 62 offmain=0 ok 
+bw3-r1-state-xcui0 state xcui0 11.8 4.7 23 offmain=0 ok 
+bw3-r1-state-xcui1 state xcui1 12.6 5.9 22 offmain=0 ok 
+bw3-r1-state-inject state inject 12.2 6.6 30 offmain=0 ok 
+bw3-r2-local-xcui0 local xcui0 11.8 4.6 62 offmain=0 ok 
+bw3-r2-local-xcui1 local xcui1 12.0 6.1 62 offmain=0 ok 
+bw3-r2-local-inject local inject 15.9 7.9 62 offmain=0 ok 
+bw3-r2-single-xcui0 single xcui0 22.9 5.4 62 offmain=0 ok 
+bw3-r2-single-xcui1 single xcui1 27.5 6.6 62 offmain=0 ok 
+bw3-r2-single-inject single inject 29.0 7.4 62 offmain=0 ok 
+bw3-r2-state-xcui0 state xcui0 31.1 5.2 11 offmain=0 LOST lost index 27 ('v') -> field-not-delivered; field='The quick brown fox jumps over' model='The quick brown fox jumps o'
+bw3-r2-state-xcui1 state xcui1 29.9 5.3 25 offmain=0 ok 
+bw3-r2-state-inject state inject 24.8 6.0 30 offmain=0 ok 
+bw3-r2-model-xcui0 model xcui0 20.6 4.3 62 offmain=0 ok 
+bw3-r2-model-xcui1 model xcui1 17.0 5.2 62 offmain=0 ok 
+bw3-r2-model-inject model inject 14.4 6.5 62 offmain=0 ok 
+bw3-r3-single-xcui0 single xcui0 12.2 4.5 62 offmain=0 ok 
+bw3-r3-single-xcui1 single xcui1 12.0 6.0 62 offmain=0 ok 
+bw3-r3-single-inject single inject 12.8 6.9 62 offmain=0 ok 
+bw3-r3-state-xcui0 state xcui0 12.4 4.6 23 offmain=0 ok 
+bw3-r3-state-xcui1 state xcui1 11.7 5.6 23 offmain=0 ok 
+bw3-r3-state-inject state inject 11.0 6.9 30 offmain=0 ok 
+bw3-r3-model-xcui0 model xcui0 11.7 4.8 62 offmain=0 ok 
+bw3-r3-model-xcui1 model xcui1 14.4 5.3 62 offmain=0 ok 
+bw3-r3-model-inject model inject 13.2 5.6 62 offmain=0 ok 
+bw3-r3-local-xcui0 local xcui0 12.0 4.5 62 offmain=0 ok 
+bw3-r3-local-xcui1 local xcui1 11.1 5.3 62 offmain=0 ok 
+bw3-r3-local-inject local inject 10.8 7.1 62 offmain=0 ok 
+bw3-r4-state-xcui0 state xcui0 12.3 5.1 15 offmain=0 ok 
+bw3-r4-state-xcui1 state xcui1 12.8 5.4 25 offmain=0 ok 
+bw3-r4-state-inject state inject 11.6 6.3 30 offmain=0 ok 
+bw3-r4-model-xcui0 model xcui0 10.7 4.4 62 offmain=0 ok 
+bw3-r4-model-xcui1 model xcui1 10.5 6.2 62 offmain=0 ok 
+bw3-r4-model-inject model inject 11.5 6.3 62 offmain=0 ok 
+bw3-r4-local-xcui0 local xcui0 13.9 5.5 62 offmain=0 ok 
+bw3-r4-local-xcui1 local xcui1 15.2 6.4 62 offmain=0 ok 
+bw3-r4-local-inject local inject 13.9 6.0 62 offmain=0 ok 
+bw3-r4-single-xcui0 single xcui0 12.8 4.8 62 offmain=0 ok 
+bw3-r4-single-xcui1 single xcui1 11.9 5.5 62 offmain=0 ok 
+bw3-r4-single-inject single inject 10.7 6.2 62 offmain=0 ok 
+bw4-r0-state-xcui0 state xcui0 10.8 4.4 19 offmain=0 ok 
+bw4-r0-state-xcui1 state xcui1 9.9 5.7 24 offmain=0 ok 
+bw4-r0-state-inject state inject 8.9 6.3 30 offmain=0 ok 
+bw4-r0-model-xcui0 model xcui0 9.4 5.2 62 offmain=0 ok 
+bw4-r0-model-xcui1 model xcui1 15.3 6.5 62 offmain=0 ok 
+bw4-r0-model-inject model inject 51.1 11.2 62 offmain=0 ok 
+bw4-r0-local-xcui0 local xcui0 84.3 4.8 62 offmain=0 ok 
+bw4-r0-local-xcui1 local xcui1 92.2 5.9 62 offmain=0 ok 
+bw4-r0-local-inject local inject 110.0 8.4 62 offmain=0 ok 
+bw4-r0-single-xcui0 single xcui0 120.8 5.8 62 offmain=0 ok 
+bw4-r0-single-xcui1 single xcui1 123.9 7.0 62 offmain=0 ok 
+bw4-r0-single-inject single inject 125.5 8.5 62 offmain=0 ok 
+bw4-r1-model-xcui0 model xcui0 131.4 6.1 62 offmain=0 ok 
+bw4-r1-model-xcui1 model xcui1 134.6 7.1 62 offmain=0 ok 
+bw4-r1-model-inject model inject 135.5 9.2 62 offmain=0 ok 
+bw4-r1-local-xcui0 local xcui0 129.0 5.4 62 offmain=0 ok 
+bw4-r1-local-xcui1 local xcui1 114.0 6.4 62 offmain=0 ok 
+bw4-r1-local-inject local inject 94.8 8.9 62 offmain=0 ok 
+bw4-r1-single-xcui0 single xcui0 88.1 5.3 62 offmain=0 ok 
+bw4-r1-single-xcui1 single xcui1 91.2 5.7 62 offmain=0 ok 
+bw4-r1-single-inject single inject 79.8 6.0 62 offmain=0 ok 
+bw4-r1-state-xcui0 state xcui0 70.4 4.6 22 offmain=0 ok 
+bw4-r1-state-xcui1 state xcui1 64.6 6.0 9 offmain=0 LOST lost index 26 ('o') -> field-not-delivered; field='The quick brown fox jumps over' model='The quick brown fox jumps '
+bw4-r1-state-inject state inject 61.9 7.7 30 offmain=0 ok 
+bw4-r2-local-xcui0 local xcui0 58.9 5.6 62 offmain=0 ok 
+bw4-r2-local-xcui1 local xcui1 56.2 6.7 62 offmain=0 ok 
+bw4-r2-local-inject local inject 53.0 7.3 62 offmain=0 ok 
+bw4-r2-single-xcui0 single xcui0 49.6 5.0 62 offmain=0 ok 
+bw4-r2-single-xcui1 single xcui1 46.7 5.7 62 offmain=0 ok 
+bw4-r2-single-inject single inject 42.4 6.7 62 offmain=0 ok 
+bw4-r2-state-xcui0 state xcui0 37.4 4.8 24 offmain=0 ok 
+bw4-r2-state-xcui1 state xcui1 31.8 5.5 20 offmain=0 ok 
+bw4-r2-state-inject state inject 27.3 6.1 30 offmain=0 ok 
+bw4-r2-model-xcui0 model xcui0 23.5 5.1 62 offmain=0 ok 
+bw4-r2-model-xcui1 model xcui1 20.2 5.9 62 offmain=0 ok 
+bw4-r2-model-inject model inject 17.5 6.3 62 offmain=0 ok 
+bw4-r3-single-xcui0 single xcui0 16.3 4.4 62 offmain=0 ok 
+bw4-r3-single-xcui1 single xcui1 15.7 5.8 62 offmain=0 ok 
+bw4-r3-single-inject single inject 15.3 6.6 62 offmain=0 ok 
+bw4-r3-state-xcui0 state xcui0 14.4 4.6 23 offmain=0 ok 
+bw4-r3-state-xcui1 state xcui1 13.5 5.6 23 offmain=0 ok 
+bw4-r3-state-inject state inject 12.9 5.8 30 offmain=0 ok 
+bw4-r3-model-xcui0 model xcui0 12.4 4.4 62 offmain=0 ok 
+bw4-r3-model-xcui1 model xcui1 13.3 5.8 62 offmain=0 ok 
+bw4-r3-model-inject model inject 13.9 6.5 62 offmain=0 ok 
+bw4-r3-local-xcui0 local xcui0 12.7 4.4 62 offmain=0 ok 
+bw4-r3-local-xcui1 local xcui1 11.2 5.7 62 offmain=0 ok 
+bw4-r3-local-inject local inject 10.7 5.8 62 offmain=0 ok 
+bw4-r4-state-xcui0 state xcui0 10.4 4.5 25 offmain=0 ok 
+bw4-r4-state-xcui1 state xcui1 9.8 5.4 25 offmain=0 ok 
+bw4-r4-state-inject state inject 9.5 6.0 30 offmain=0 ok 
+bw4-r4-model-xcui0 model xcui0 9.4 4.6 62 offmain=0 ok 
+bw4-r4-model-xcui1 model xcui1 11.3 5.8 62 offmain=0 ok 
+bw4-r4-model-inject model inject 12.4 7.0 62 offmain=0 ok 
+bw4-r4-local-xcui0 local xcui0 11.1 4.4 62 offmain=0 ok 
+bw4-r4-local-xcui1 local xcui1 10.2 5.2 62 offmain=0 ok 
+bw4-r4-local-inject local inject 9.2 5.7 62 offmain=0 ok 
+bw4-r4-single-xcui0 single xcui0 8.2 4.3 62 offmain=0 ok 
+bw4-r4-single-xcui1 single xcui1 7.4 5.3 62 offmain=0 ok 
+bw4-r4-single-inject single inject 7.0 5.8 62 offmain=0 ok 
+bw5-r0-state-inject state inject 6.7 5.8 30 offmain=0 ok 
+bw5-r0-model-inject model inject 8.4 7.0 62 offmain=0 ok 
+bw5-r0-local-inject local inject 24.3 8.9 62 offmain=0 ok 
+bw5-r0-single-inject single inject 38.5 9.4 62 offmain=0 ok 
+bw5-r1-model-inject model inject 48.2 6.8 62 offmain=0 ok 
+bw5-r1-local-inject local inject 52.8 7.0 62 offmain=0 ok 
+bw5-r1-single-inject single inject 43.6 5.6 62 offmain=0 ok 
+bw5-r1-state-inject state inject 35.5 5.8 30 offmain=0 ok 
+bw5-r2-local-inject local inject 28.6 5.7 62 offmain=0 ok 
+bw5-r2-single-inject single inject 23.2 5.7 62 offmain=0 ok 
+bw5-r2-state-inject state inject 19.4 5.7 30 offmain=0 ok 
+bw5-r2-model-inject model inject 16.3 5.8 62 offmain=0 ok 
+bw5-r3-single-inject single inject 14.0 5.7 62 offmain=0 ok 
+bw5-r3-state-inject state inject 11.8 5.7 30 offmain=0 ok 
+bw5-r3-model-inject model inject 10.0 5.7 62 offmain=0 ok 
+bw5-r3-local-inject local inject 9.3 5.6 62 offmain=0 ok 
+bw5-r4-state-inject state inject 8.7 5.7 30 offmain=0 ok 
+bw5-r4-model-inject model inject 7.2 5.7 62 offmain=0 ok 
+bw5-r4-local-inject local inject 6.8 6.3 62 offmain=0 ok 
+bw5-r4-single-inject single inject 7.5 6.3 62 offmain=0 ok 
+burnbw1-r0-state-xcui0 state xcui0 17.3 4.7 27 offmain=0 ok 
+burnbw1-r0-state-inject state inject 16.2 6.4 30 offmain=0 ok 
+burnbw1-r0-model-xcui0 model xcui0 15.1 4.7 62 offmain=0 ok 
+burnbw1-r0-model-inject model inject 14.4 6.4 62 offmain=0 ok 
+burnbw1-r0-single-xcui0 single xcui0 13.5 4.3 62 offmain=0 ok 
+burnbw1-r0-single-inject single inject 16.5 6.7 62 offmain=0 ok 
+burnbw1-r1-model-xcui0 model xcui0 18.8 4.7 62 offmain=0 ok 
+burnbw1-r1-model-inject model inject 17.1 6.4 62 offmain=0 ok 
+burnbw1-r1-single-xcui0 single xcui0 15.9 4.3 62 offmain=0 ok 
+burnbw1-r1-single-inject single inject 14.7 6.4 62 offmain=0 ok 
+burnbw1-r1-state-xcui0 state xcui0 14.1 4.6 27 offmain=0 ok 
+burnbw1-r1-state-inject state inject 13.4 6.4 30 offmain=0 ok 
+burnbw1-r2-single-xcui0 single xcui0 12.7 4.3 62 offmain=0 ok 
+burnbw1-r2-single-inject single inject 12.6 6.4 62 offmain=0 ok 
+burnbw1-r2-state-xcui0 state xcui0 12.4 4.7 23 offmain=0 ok 
+burnbw1-r2-state-inject state inject 12.1 6.4 30 offmain=0 ok 
+burnbw1-r2-model-xcui0 model xcui0 11.9 4.7 62 offmain=0 ok 
+burnbw1-r2-model-inject model inject 11.9 6.5 62 offmain=0 ok 

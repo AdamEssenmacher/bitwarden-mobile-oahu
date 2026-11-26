@@ -205,8 +205,17 @@ namespace Bit.App.Pages
         IOahuEditable<string> ICipherAddEditViewModel.CardCode => _cardCode ??= CipherText(
             nameof(ICipherAddEditViewModel.CardCode), () => Cipher?.Card?.Code, v => Cipher!.Card.Code = v);
 
+#if DEBUG
+        // Step 6 keystroke probe (docs/oahu/06-keystroke-repro.md): with BW_OAHU_REPRO_RUN set, log every read
+        // (what C# publishes) and every edit C# receives for Notes.
+        IOahuEditable<string> ICipherAddEditViewModel.Notes => _notes ??= CipherText(
+            nameof(ICipherAddEditViewModel.Notes),
+            () => { var v = Cipher?.Notes; OahuDebug.OahuDebugKeyLog.Log("csGet", v); return v; },
+            v => { OahuDebug.OahuDebugKeyLog.Log("csSet", v); Cipher!.Notes = v; });
+#else
         IOahuEditable<string> ICipherAddEditViewModel.Notes => _notes ??= CipherText(
             nameof(ICipherAddEditViewModel.Notes), () => Cipher?.Notes, v => Cipher!.Notes = v);
+#endif
 
         IOahuEditable<IdentityFields> ICipherAddEditViewModel.Identity => _identity ??= OahuEditable.FromProperty(
             this, nameof(Cipher), ReadIdentity, WriteIdentity);

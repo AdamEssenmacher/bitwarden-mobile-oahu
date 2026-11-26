@@ -1,0 +1,14 @@
+set amb1 start load { 22.38 32.14 43.41 } burn=0
+set amb1 end load { 22.74 47.07 51.79 }
+set amb2 start load { 22.74 47.07 51.79 } burn=0
+set amb2 end load { 15.56 32.85 47.98 }
+set amb3 start load { 15.56 32.85 47.98 } burn=0
+set amb3 end load { 67.37 38.61 40.73 }
+set amb4 start load { 67.37 38.61 40.73 } burn=0
+set amb4 end load { 100.86 98.94 100.50 }
+set ctl1 start load { 70.86 91.68 97.78 } burn=0
+set ctl1 end load { 133.89 112.15 105.41 }
+set clean1 start load { 107.24 107.72 104.03 } burn=0
+set clean1 end load { 20.09 54.01 80.01 }
+set burn1 start load { 7.41 11.14 22.21 } burn=8
+set burn1 end load { 17.66 16.17 21.55 }

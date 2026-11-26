@@ -1,0 +1,423 @@
+diff --git a/tests/native/apple/EditableLab/EditableLab/EditableLabApp.swift b/tests/native/apple/EditableLab/EditableLab/EditableLabApp.swift
+index 9a999eb9..cc77846f 100644
+--- a/tests/native/apple/EditableLab/EditableLab/EditableLabApp.swift
++++ b/tests/native/apple/EditableLab/EditableLab/EditableLabApp.swift
+@@ -8,11 +8,16 @@ import SwiftUI
+ struct EditableLabApp: App {
+     @State private var model = LabModel.make(arguments: ProcessInfo.processInfo.arguments)
+     @State private var rows = RowLabModel(arguments: ProcessInfo.processInfo.arguments)
++    @State private var repro977Model: EverythingModel? =
++        ProcessInfo.processInfo.arguments.contains("-repro977")
++        ? Repro977Config.from(ProcessInfo.processInfo.arguments).makeModel() : nil
+ 
+     var body: some Scene {
+         WindowGroup {
+             // Row text fields (docs/row-text.md) have a screen of their own, so their rows stay on screen.
+-            if ProcessInfo.processInfo.arguments.contains("-rows") {
++            if let repro977Model {
++                Repro977Screen(config: Repro977Config.from(ProcessInfo.processInfo.arguments), model: repro977Model)
++            } else if ProcessInfo.processInfo.arguments.contains("-rows") {
+                 RowLabScreen(model: rows)
+             } else if ProcessInfo.processInfo.arguments.contains("-ime") {
+                 MarkedTextScreen(model: model)
+diff --git a/tests/native/apple/EditableLab/EditableLab/Repro977Screen.swift b/tests/native/apple/EditableLab/EditableLab/Repro977Screen.swift
+new file mode 100644
+index 00000000..57172426
+--- /dev/null
++++ b/tests/native/apple/EditableLab/EditableLab/Repro977Screen.swift
+@@ -0,0 +1,220 @@
++import EverythingScreens
++import Observation
++import QuartzCore
++import SwiftUI
++import UIKit
++
++// Issue 977 reproduction harness (not part of OAHU's checks). One text field per launch, chosen by `-variant`:
++//   A  plain SwiftUI @State, multi-line (no OAHU)
++//   O  plain @Observable class, multi-line (no OAHU)
++//   B  generated $model.title, multi-line, view model accepts as typed
++//   C  generated $model.title, single-line, accepts
++//   D  generated $model.title, multi-line, view model upper-cases (the hold engages on every edit)
++//   S  generated $model.title, multi-line, accepts after a 30 ms main-thread stall per edit (a slow view model)
++//   L  positive control: generated $model.title, multi-line, accepts, then re-publishes each proposal 30 ms later
++// Every layer logs into Repro977Log with a sequence number and a time: "key" (a character the app itself injects),
++// "edit" (a proposal reaching the view model, i.e. the binding setter), "answer" (what the view model publishes back),
++// "uiChange" (UIKit's text-did-change notification) and "ui" (the field's UIKit text, sampled every frame, logged when
++// it changes, so programmatic rewrites show up too). "Read" writes the log to Documents/repro977/<runId>.jsonl.
++
++@MainActor
++final class Repro977Log {
++    static let shared = Repro977Log()
++    private let t0 = CACurrentMediaTime()
++    private var seq = 0
++    private(set) var lines: [String] = []
++
++    func log(_ kind: String, _ text: String) {
++        seq += 1
++        let ms = (CACurrentMediaTime() - t0) * 1000
++        let escaped = text.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\"", with: "\\\"")
++            .replacingOccurrences(of: "\n", with: "\\n")
++        lines.append(String(format: "{\"seq\":%d,\"ms\":%.1f,\"kind\":\"%@\",\"text\":\"%@\"}", seq, ms, kind, escaped))
++    }
++
++    func write(runId: String, summary: String) {
++        log("summary", summary)
++        let fm = FileManager.default
++        guard let docs = fm.urls(for: .documentDirectory, in: .userDomainMask).first else { return }
++        let dir = docs.appendingPathComponent("repro977", isDirectory: true)
++        try? fm.createDirectory(at: dir, withIntermediateDirectories: true)
++        let url = dir.appendingPathComponent("\(runId).jsonl")
++        try? (lines.joined(separator: "\n") + "\n").write(to: url, atomically: true, encoding: .utf8)
++    }
++}
++
++@Observable
++@MainActor
++final class Repro977Plain {
++    var text = "" {
++        didSet { Repro977Log.shared.log("edit", text) }
++    }
++}
++
++struct Repro977Config {
++    let variant: String
++    let mode: String
++    let runId: String
++    let text: String
++
++    static func from(_ arguments: [String]) -> Repro977Config {
++        func value(_ name: String, _ fallback: String) -> String {
++            guard let i = arguments.firstIndex(of: name), i + 1 < arguments.count else { return fallback }
++            return arguments[i + 1]
++        }
++        return Repro977Config(
++            variant: value("-variant", "B"), mode: value("-mode", "xcui0"), runId: value("-runId", "manual"),
++            text: value("-text", "The quick brown fox jumps over"))
++    }
++
++    var usesOahu: Bool { ["B", "C", "D", "S", "L"].contains(variant) }
++
++    @MainActor
++    func makeModel() -> EverythingModel {
++        let variant = variant
++        return EverythingModel.preview(
++            screen: nil, counter: 0,
++            title: "", titleError: nil, notify: false, volume: 0.5, guests: 2, size: .small, theme: nil,
++            startsAt: Date(timeIntervalSince1970: 1_800_000_000), selectedKey: nil, selected: [],
++            window: Window(start: Date(timeIntervalSince1970: 1_800_000_000), length: .seconds(3600))
++        ) { preview in
++            preview.onEditTitle { proposed in
++                Repro977Log.shared.log("edit", proposed)
++                var answer = proposed
++                if variant == "D" { answer = proposed.uppercased() }
++                if variant == "S" { Thread.sleep(forTimeInterval: 0.03) }
++                if variant == "L" {
++                    // Positive control: a view model that re-publishes each proposal 30 ms later, by then stale.
++                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.03) {
++                        Repro977Log.shared.log("lateEcho", proposed)
++                        preview.setTitle(proposed)
++                    }
++                }
++                Repro977Log.shared.log("answer", answer)
++                return answer
++            }
++        }
++    }
++}
++
++struct Repro977Screen: View {
++    let config: Repro977Config
++    @Bindable var model: EverythingModel
++    @State private var plain = Repro977Plain()
++    @State private var local = ""
++    @State private var result = ""
++    @State private var injected = "no"
++    @State private var sampler: Repro977Sampler?
++
++    var body: some View {
++        VStack(spacing: 16) {
++            field
++                .accessibilityIdentifier("probe.field")
++            Button("Read") { read() }
++                .accessibilityIdentifier("probe.read")
++            Text(verbatim: injected).accessibilityIdentifier("probe.injected")
++            Text(verbatim: result).accessibilityIdentifier("probe.result")
++            Spacer()
++        }
++        .padding()
++        .onAppear {
++            Repro977Log.shared.log("start", "\(config.variant) \(config.mode) \(config.runId)")
++            let sampler = Repro977Sampler(config: config) { injected = $0 }
++            sampler.start()
++            self.sampler = sampler
++        }
++    }
++
++    @ViewBuilder private var field: some View {
++        switch config.variant {
++        case "A":
++            TextField("Title", text: $local, axis: .vertical)
++                .onChange(of: local) { _, new in Repro977Log.shared.log("edit", new) }
++        case "O":
++            TextField("Title", text: $plain.text, axis: .vertical)
++        case "C":
++            TextField("Title", text: $model.title)
++        default:
++            TextField("Title", text: $model.title, axis: .vertical)
++        }
++    }
++
++    private func read() {
++        let fieldText: String
++        if let input = FirstResponder.find() as? UITextInput,
++            let all = input.textRange(from: input.beginningOfDocument, to: input.endOfDocument)
++        {
++            fieldText = input.text(in: all) ?? ""
++        } else {
++            fieldText = "<no focused field>"
++        }
++        let modelText: String
++        switch config.variant {
++        case "A": modelText = local
++        case "O": modelText = plain.text
++        default: modelText = model.titleTextInput
++        }
++        let summary = "field=\(fieldText)|model=\(modelText)"
++        Repro977Log.shared.write(runId: config.runId, summary: summary)
++        result = summary
++    }
++}
++
++/// Samples the focused field's UIKit text every frame and, in "inject" mode, types the text itself once a field is
++/// focused: one `insertText` every 50 ms (20 characters a second), starting on the frame focus is seen.
++@MainActor
++final class Repro977Sampler: NSObject {
++    private let config: Repro977Config
++    private let report: (String) -> Void
++    private var link: CADisplayLink?
++    private var last: String?
++    private var injecting = false
++
++    init(config: Repro977Config, report: @escaping (String) -> Void) {
++        self.config = config
++        self.report = report
++    }
++
++    func start() {
++        let link = CADisplayLink(target: self, selector: #selector(tick))
++        link.add(to: .main, forMode: .common)
++        self.link = link
++        for name in [UITextField.textDidChangeNotification, UITextView.textDidChangeNotification] {
++            NotificationCenter.default.addObserver(self, selector: #selector(changed(_:)), name: name, object: nil)
++        }
++    }
++
++    @objc private func changed(_ note: Notification) {
++        let text = (note.object as? UITextField)?.text ?? (note.object as? UITextView)?.text ?? "?"
++        Repro977Log.shared.log("uiChange", text)
++    }
++
++    @objc private func tick() {
++        guard let input = FirstResponder.find() as? UITextInput,
++            let all = input.textRange(from: input.beginningOfDocument, to: input.endOfDocument)
++        else { return }
++        let text = input.text(in: all) ?? ""
++        if text != last {
++            if last == nil { Repro977Log.shared.log("focus", text) }
++            last = text
++            Repro977Log.shared.log("ui", text)
++        }
++        if config.mode == "inject" && !injecting {
++            injecting = true
++            inject(into: input)
++        }
++    }
++
++    private func inject(into input: UITextInput) {
++        let characters = Array(config.text)
++        let report = report
++        Task { @MainActor in
++            for character in characters {
++                Repro977Log.shared.log("key", String(character))
++                input.insertText(String(character))
++                try? await Task.sleep(for: .milliseconds(50))
++            }
++            report("done")
++        }
++    }
++}
+diff --git a/tests/native/apple/EditableLab/EditableLabUITests/Repro977BitwardenUITests.swift b/tests/native/apple/EditableLab/EditableLabUITests/Repro977BitwardenUITests.swift
+new file mode 100644
+index 00000000..dc7ef8d0
+--- /dev/null
++++ b/tests/native/apple/EditableLab/EditableLabUITests/Repro977BitwardenUITests.swift
+@@ -0,0 +1,84 @@
++import Darwin
++import XCTest
++
++/// Issue 977 harness, second host: drives the Bitwarden MAUI app's DEBUG add-note route (com.8bit.bitwarden, built
++/// from the fork's oahu/06-keystroke-repro branch and installed on the same simulator). Same typing modes as
++/// Repro977UITests; variants are BW_OAHU_NOTES_MODE values (state, model, local, single). Prints one
++/// `REPRO977 RESULT` line per run with the field's final accessibility value; the app's own logs hold the rest.
++/// Configured by REPRO_ROUNDS, REPRO_VARIANTS, REPRO_MODES, REPRO_TAG, REPRO_TEXT (TEST_RUNNER_ prefix).
++@MainActor
++final class Repro977BitwardenUITests: XCTestCase {
++    private func load() -> String {
++        var values = [Double](repeating: 0, count: 3)
++        guard getloadavg(&values, 3) == 3 else { return "?" }
++        return String(format: "%.2f", values[0])
++    }
++
++    func testRepro977Bitwarden() {
++        let env = ProcessInfo.processInfo.environment
++        let rounds = Int(env["REPRO_ROUNDS"] ?? "1") ?? 1
++        let variants = (env["REPRO_VARIANTS"] ?? "state,model,local,single").split(separator: ",").map(String.init)
++        let modes = (env["REPRO_MODES"] ?? "xcui0").split(separator: ",").map(String.init)
++        let tag = env["REPRO_TAG"] ?? "bw"
++        let text = env["REPRO_TEXT"] ?? "The quick brown fox jumps over"
++        continueAfterFailure = true
++        for round in 0..<rounds {
++            let shift = round % variants.count
++            for variant in Array(variants[shift...] + variants[..<shift]) {
++                for mode in modes {
++                    runOne(tag: tag, round: round, variant: variant, mode: mode, text: text)
++                }
++            }
++        }
++    }
++
++    private func runOne(tag: String, round: Int, variant: String, mode: String, text: String) {
++        let runId = "\(tag)-r\(round)-\(variant)-\(mode)"
++        let load0 = load()
++        let app = XCUIApplication(bundleIdentifier: "com.8bit.bitwarden")
++        app.launchEnvironment = [
++            "BW_OAHU_DEBUG": "edit", "BW_OAHU_EDIT": "add-note", "BW_OAHU_NOTES_MODE": variant,
++            "BW_OAHU_REPRO_RUN": runId, "BW_OAHU_REPRO_MODE": mode, "BW_OAHU_REPRO_TEXT": text,
++        ]
++        app.launch()
++        let field = app.descendants(matching: .any).matching(identifier: "ItemNotesEntry").firstMatch
++        guard field.waitForExistence(timeout: 90) else {
++            print("REPRO977 RESULT run=\(runId) status=nofield load0=\(load0) load1=\(load())")
++            app.terminate()
++            return
++        }
++        let started = Date()
++        field.tap()
++        switch mode {
++        case "xcui0":
++            field.typeText(text)
++        case "xcui1":
++            Thread.sleep(forTimeInterval: 1.0)
++            field.typeText(text)
++        default:
++            break  // inject: the app types
++        }
++        // Wait until the field's value stops changing for 2 s (at most 60 s): the host can draw seconds late.
++        var last = ""
++        var stableSince = Date()
++        let deadline = Date().addingTimeInterval(60)
++        while Date() < deadline {
++            let value = (field.value as? String) ?? ""
++            if value != last {
++                last = value
++                stableSince = Date()
++            } else if Date().timeIntervalSince(stableSince) > 2, !value.isEmpty {
++                break
++            }
++            Thread.sleep(forTimeInterval: 0.25)
++        }
++        let seconds = Date().timeIntervalSince(started)
++        // Let the app's logs flush (one second after the last entry).
++        Thread.sleep(forTimeInterval: 1.5)
++        print(
++            "REPRO977 RESULT run=\(runId) tag=\(tag) round=\(round) variant=\(variant) mode=\(mode) load0=\(load0) "
++                + "load1=\(load()) seconds=\(String(format: "%.1f", seconds)) "
++                + "field=\(last.replacingOccurrences(of: "\n", with: "\\n"))|model=?")
++        app.terminate()
++    }
++}
+diff --git a/tests/native/apple/EditableLab/EditableLabUITests/Repro977UITests.swift b/tests/native/apple/EditableLab/EditableLabUITests/Repro977UITests.swift
+new file mode 100644
+index 00000000..0ab976ab
+--- /dev/null
++++ b/tests/native/apple/EditableLab/EditableLabUITests/Repro977UITests.swift
+@@ -0,0 +1,79 @@
++import Darwin
++import XCTest
++
++/// Issue 977 harness: launches the lab's repro screen once per run, focuses the field with a real tap and types a fixed
++/// string, then reads back the field's UIKit text and the model's value. It never fails on a lost character: it prints
++/// one `REPRO977 RESULT` line per run (with the host load average before and after) for the host script to count.
++/// Configured by environment (pass with the TEST_RUNNER_ prefix to xcodebuild): REPRO_ROUNDS, REPRO_VARIANTS,
++/// REPRO_MODES, REPRO_TAG, REPRO_TEXT. Modes: xcui0 (typeText right after the tap), xcui1 (tap, 1 s pause, typeText),
++/// xcuichar (tap, then one typeText per character, no added gap), inject (the app types 20 characters a second).
++@MainActor
++final class Repro977UITests: XCTestCase {
++    private func load() -> String {
++        var values = [Double](repeating: 0, count: 3)
++        guard getloadavg(&values, 3) == 3 else { return "?" }
++        return String(format: "%.2f", values[0])
++    }
++
++    func testRepro977() {
++        let env = ProcessInfo.processInfo.environment
++        let rounds = Int(env["REPRO_ROUNDS"] ?? "1") ?? 1
++        let variants = (env["REPRO_VARIANTS"] ?? "A,O,B,C,D,S").split(separator: ",").map(String.init)
++        let modes = (env["REPRO_MODES"] ?? "xcui0,inject").split(separator: ",").map(String.init)
++        let tag = env["REPRO_TAG"] ?? "set"
++        let text = env["REPRO_TEXT"] ?? "The quick brown fox jumps over"
++        continueAfterFailure = true
++        for round in 0..<rounds {
++            // Interleave: rotate the variant order each round so no variant always runs first or last.
++            let shift = round % variants.count
++            let order = Array(variants[shift...] + variants[..<shift])
++            for variant in order {
++                for mode in modes {
++                    runOne(tag: tag, round: round, variant: variant, mode: mode, text: text)
++                }
++            }
++        }
++    }
++
++    private func runOne(tag: String, round: Int, variant: String, mode: String, text: String) {
++        let runId = "\(tag)-r\(round)-\(variant)-\(mode)"
++        let load0 = load()
++        let started = Date()
++        let app = XCUIApplication()
++        app.launchArguments = ["-repro977", "-variant", variant, "-mode", mode, "-runId", runId, "-text", text]
++        app.launch()
++        let field = app.descendants(matching: .any).matching(identifier: "probe.field").firstMatch
++        guard field.waitForExistence(timeout: 30) else {
++            print("REPRO977 RESULT run=\(runId) status=nofield load0=\(load0) load1=\(load())")
++            app.terminate()
++            return
++        }
++        field.tap()
++        switch mode {
++        case "xcui0":
++            field.typeText(text)
++        case "xcui1":
++            Thread.sleep(forTimeInterval: 1.0)
++            field.typeText(text)
++        case "xcuichar":
++            for character in text { field.typeText(String(character)) }
++        default:
++            let injected = app.staticTexts["probe.injected"]
++            let done = NSPredicate(format: "label == %@", "done")
++            let expectation = XCTNSPredicateExpectation(predicate: done, object: injected)
++            _ = XCTWaiter().wait(for: [expectation], timeout: 60)
++        }
++        let typedSeconds = Date().timeIntervalSince(started)
++        // Let any hold release (50 ms) and late redraw settle before reading.
++        Thread.sleep(forTimeInterval: 1.5)
++        app.buttons["probe.read"].tap()
++        let result = app.staticTexts["probe.result"]
++        let ready = NSPredicate(format: "label BEGINSWITH %@", "field=")
++        _ = XCTWaiter().wait(for: [XCTNSPredicateExpectation(predicate: ready, object: result)], timeout: 30)
++        let summary = result.label.replacingOccurrences(of: "\n", with: "\\n")
++        print(
++            "REPRO977 RESULT run=\(runId) tag=\(tag) round=\(round) variant=\(variant) mode=\(mode) load0=\(load0) "
++                + "load1=\(load()) seconds=\(String(format: "%.1f", typedSeconds)) \(summary)")
++        app.terminate()
++    }
++}

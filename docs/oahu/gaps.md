@@ -637,6 +637,15 @@ the shared ones (see "Not OAHU").
   keystroke here (G26). Inferred: the generated binding's write-back interacts with the vertical field when typing
   starts right after focus. Not enough runs to call it; not tried on a device.
 - Workaround: none. MAUI's `Editor` had no such report.
+- Step 6 reproduction ([06-keystroke-repro.md](06-keystroke-repro.md), OAHU issue 977): not reproduced. There were 708
+  scripted runs in two hosts (OAHU's EditableLab on arm64, and this form under MAUI on x86_64), typed with XCUITest's
+  software keyboard and with direct `insertText`, at load averages from 5 to over 200. No variant lost a character:
+  plain `@State` or `@Observable`, the generated binding multi-line or single-line, a normalizing or slow view model.
+  That includes 72 runs of this form's `$model.notes`. A stale-echo positive control lost characters in 6 of 10 runs,
+  so the harness sees losses. In this form, all 12,266 notes edits were answered with the edit itself, so OAHU's text
+  hold never started. Not tried: the Simulator app's hardware keyboard (the step 5 path) and a device. Severity
+  unchanged until the hardware-keyboard path is tried; the cause is still unknown, and OAHU is not implicated by the
+  evidence.
 
 ### G35. Android: the window pans for the keyboard, hiding MAUI's toolbar (and Save) while a low field has focus (friction, verified)
 - Trying to: keep the form usable with the keyboard up (the Compose screen uses `imePadding()`, as in step 4).

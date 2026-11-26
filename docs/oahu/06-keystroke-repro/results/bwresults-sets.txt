@@ -1,0 +1,15 @@
+set bwsmoke start load { 48.29 58.79 78.16 } burn=0
+set bwsmoke end load { 47.80 57.29 76.62 }
+set bw1 start load { 60.07 59.28 76.87 } burn=0
+set bw1 end load { 23.40 27.31 41.71 }
+set bw2 start load { 23.40 27.31 41.71 } burn=0
+set bw2 start load { 26.86 33.26 42.62 } burn=0
+set bw2 end load { 8.01 42.12 45.62 }
+set bw3 start load { 8.01 42.12 45.62 } burn=0
+set bw3 end load { 10.97 13.94 23.69 }
+set bw4 start load { 10.97 13.94 23.69 } burn=0
+set bw4 end load { 7.29 20.76 32.99 }
+set bw5 start load { 7.29 20.76 32.99 } burn=0
+set bw5 end load { 7.99 17.97 28.71 }
+set burnbw1 start load { 17.66 16.17 21.55 } burn=8
+set burnbw1 end load { 12.22 14.27 19.30 }

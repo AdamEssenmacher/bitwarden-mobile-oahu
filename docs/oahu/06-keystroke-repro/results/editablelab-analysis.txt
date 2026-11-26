@@ -1,0 +1,534 @@
+variant mode load-bucket load-kind runs lost hold-starts
+A inject <20 ambient 3 0 0
+A inject <20 synthetic 3 0 0
+A inject <40 ambient 9 0 0
+A inject <40 synthetic 1 0 0
+A inject <80 ambient 5 0 0
+A inject >=80 ambient 6 0 0
+A xcui0 <20 ambient 3 0 0
+A xcui0 <20 synthetic 3 0 0
+A xcui0 <40 ambient 9 0 0
+A xcui0 <40 synthetic 1 0 0
+A xcui0 <80 ambient 5 0 0
+A xcui0 >=80 ambient 6 0 0
+A xcui1 <20 ambient 2 0 0
+A xcui1 <40 ambient 9 0 0
+A xcui1 <80 ambient 4 0 0
+A xcui1 >=80 ambient 5 0 0
+B inject <20 ambient 3 0 0
+B inject <20 synthetic 4 0 0
+B inject <40 ambient 7 0 0
+B inject <80 ambient 8 0 0
+B inject >=80 ambient 5 0 0
+B xcui0 <20 ambient 3 0 0
+B xcui0 <20 synthetic 3 0 0
+B xcui0 <40 ambient 6 0 0
+B xcui0 <40 synthetic 1 0 0
+B xcui0 <80 ambient 8 0 0
+B xcui0 >=80 ambient 6 0 0
+B xcui1 <20 ambient 3 0 0
+B xcui1 <40 ambient 4 0 0
+B xcui1 <80 ambient 7 0 0
+B xcui1 >=80 ambient 6 0 0
+C inject <20 ambient 2 0 0
+C inject <20 synthetic 3 0 0
+C inject <40 ambient 6 0 0
+C inject <40 synthetic 1 0 0
+C inject <80 ambient 10 0 0
+C inject >=80 ambient 5 0 0
+C xcui0 <20 ambient 2 0 0
+C xcui0 <20 synthetic 4 0 0
+C xcui0 <40 ambient 6 0 0
+C xcui0 <80 ambient 10 0 0
+C xcui0 >=80 ambient 5 0 0
+C xcui1 <20 ambient 2 0 0
+C xcui1 <40 ambient 3 0 0
+C xcui1 <80 ambient 10 0 0
+C xcui1 >=80 ambient 5 0 0
+D inject <20 ambient 3 0 144
+D inject <20 synthetic 3 0 144
+D inject <40 ambient 5 0 246
+D inject <40 synthetic 1 0 48
+D inject <80 ambient 11 0 530
+D inject >=80 ambient 4 0 194
+D xcui0 <20 ambient 3 0 174
+D xcui0 <20 synthetic 3 0 174
+D xcui0 <40 ambient 7 0 406
+D xcui0 <40 synthetic 1 0 58
+D xcui0 <80 ambient 9 0 522
+D xcui0 >=80 ambient 4 0 232
+D xcui1 <20 ambient 3 0 174
+D xcui1 <40 ambient 5 0 290
+D xcui1 <80 ambient 7 0 406
+D xcui1 >=80 ambient 5 0 290
+L inject >=80 ambient 5 1 0
+L xcui0 >=80 ambient 5 5 0
+O inject <20 ambient 4 0 0
+O inject <40 ambient 6 0 0
+O inject <80 ambient 7 0 0
+O inject >=80 ambient 6 0 0
+O xcui0 <20 ambient 5 0 0
+O xcui0 <40 ambient 7 0 0
+O xcui0 <80 ambient 5 0 0
+O xcui0 >=80 ambient 6 0 0
+O xcui1 <20 ambient 4 0 0
+O xcui1 <40 ambient 6 0 0
+O xcui1 <80 ambient 5 0 0
+O xcui1 >=80 ambient 5 0 0
+S inject <20 ambient 2 0 0
+S inject <40 ambient 8 0 0
+S inject <80 ambient 7 0 0
+S inject >=80 ambient 6 0 0
+S xcui0 <20 ambient 3 0 0
+S xcui0 <40 ambient 6 0 0
+S xcui0 <80 ambient 9 0 0
+S xcui0 >=80 ambient 5 0 0
+S xcui1 <20 ambient 3 0 0
+S xcui1 <40 ambient 4 0 0
+S xcui1 <80 ambient 7 0 0
+S xcui1 >=80 ambient 6 0 0
+
+losses by layer
+L inject setter-then-lost 1
+L xcui0 never-in-field 1
+L xcui0 setter-then-lost 4
+
+runs
+amb1-r0-A-xcui0 A xcui0 21.5 4.5 30 0 ok 
+amb1-r0-A-xcui1 A xcui1 20.9 5.2 30 0 ok 
+amb1-r0-A-inject A inject 20.4 5.7 30 0 ok 
+amb1-r0-O-xcui0 O xcui0 19.7 4.3 62 0 ok 
+amb1-r0-O-xcui1 O xcui1 24.1 5.2 62 0 ok 
+amb1-r0-O-inject O inject 25.1 5.7 62 0 ok 
+amb1-r0-B-xcui0 B xcui0 34.1 4.5 62 0 ok 
+amb1-r0-B-xcui1 B xcui1 49.8 5.4 62 0 ok 
+amb1-r0-B-inject B inject 60.0 5.6 62 0 ok 
+amb1-r0-C-xcui0 C xcui0 62.5 4.6 62 0 ok 
+amb1-r0-C-xcui1 C xcui1 61.9 5.5 62 0 ok 
+amb1-r0-C-inject C inject 63.3 6.3 62 0 ok 
+amb1-r0-D-xcui0 D xcui0 65.9 4.5 62 58 ok 
+amb1-r0-D-xcui1 D xcui1 69.2 5.3 62 58 ok 
+amb1-r0-D-inject D inject 71.0 5.6 62 48 ok 
+amb1-r0-S-xcui0 S xcui0 73.0 5.8 62 0 ok 
+amb1-r0-S-xcui1 S xcui1 76.2 6.7 62 0 ok 
+amb1-r0-S-inject S inject 72.9 7.3 62 0 ok 
+amb1-r1-O-xcui0 O xcui0 64.3 4.3 62 0 ok 
+amb1-r1-O-xcui1 O xcui1 58.8 5.4 62 0 ok 
+amb1-r1-O-inject O inject 55.2 5.6 62 0 ok 
+amb1-r1-B-xcui0 B xcui0 52.5 4.2 62 0 ok 
+amb1-r1-B-xcui1 B xcui1 52.7 5.3 62 0 ok 
+amb1-r1-B-inject B inject 51.3 5.6 62 0 ok 
+amb1-r1-C-xcui0 C xcui0 48.5 4.7 62 0 ok 
+amb1-r1-C-xcui1 C xcui1 45.5 5.5 62 0 ok 
+amb1-r1-C-inject C inject 44.3 5.7 62 0 ok 
+amb1-r1-D-xcui0 D xcui0 47.3 4.6 62 58 ok 
+amb1-r1-D-xcui1 D xcui1 49.4 5.6 62 58 ok 
+amb1-r1-D-inject D inject 53.6 5.9 62 48 ok 
+amb1-r1-S-xcui0 S xcui0 56.0 6.0 62 0 ok 
+amb1-r1-S-xcui1 S xcui1 56.8 7.0 62 0 ok 
+amb1-r1-S-inject S inject 53.1 7.2 62 0 ok 
+amb1-r1-A-xcui0 A xcui0 48.5 4.4 30 0 ok 
+amb1-r1-A-xcui1 A xcui1 46.4 5.2 30 0 ok 
+amb1-r1-A-inject A inject 42.4 5.6 30 0 ok 
+amb1-r2-B-xcui0 B xcui0 38.1 4.4 62 0 ok 
+amb1-r2-B-xcui1 B xcui1 34.9 5.2 62 0 ok 
+amb1-r2-B-inject B inject 32.2 5.5 62 0 ok 
+amb1-r2-C-xcui0 C xcui0 33.9 4.4 62 0 ok 
+amb1-r2-C-xcui1 C xcui1 43.2 5.9 62 0 ok 
+amb1-r2-C-inject C inject 55.8 6.1 62 0 ok 
+amb1-r2-D-xcui0 D xcui0 70.2 4.7 62 58 ok 
+amb1-r2-D-xcui1 D xcui1 96.5 6.0 62 58 ok 
+amb1-r2-D-inject D inject 120.0 6.0 62 48 ok 
+amb1-r2-S-xcui0 S xcui0 126.8 6.3 62 0 ok 
+amb1-r2-S-xcui1 S xcui1 135.5 6.5 62 0 ok 
+amb1-r2-S-inject S inject 140.0 7.6 62 0 ok 
+amb1-r2-A-xcui0 A xcui0 133.7 5.3 22 0 ok 
+amb1-r2-A-xcui1 A xcui1 136.0 6.1 30 0 ok 
+amb1-r2-A-inject A inject 137.7 6.0 30 0 ok 
+amb1-r2-O-xcui0 O xcui0 126.2 4.6 62 0 ok 
+amb1-r2-O-xcui1 O xcui1 118.7 5.4 62 0 ok 
+amb1-r2-O-inject O inject 113.2 6.0 62 0 ok 
+amb1-r3-C-xcui0 C xcui0 108.9 4.5 62 0 ok 
+amb1-r3-C-xcui1 C xcui1 103.5 5.5 62 0 ok 
+amb1-r3-C-inject C inject 95.9 5.7 62 0 ok 
+amb1-r3-D-xcui0 D xcui0 89.4 4.7 62 58 ok 
+amb1-r3-D-xcui1 D xcui1 84.1 5.4 62 58 ok 
+amb1-r3-D-inject D inject 78.8 5.6 62 48 ok 
+amb1-r3-S-xcui0 S xcui0 76.5 5.8 62 0 ok 
+amb1-r3-S-xcui1 S xcui1 73.6 6.8 62 0 ok 
+amb1-r3-S-inject S inject 68.3 7.2 62 0 ok 
+amb1-r3-A-xcui0 A xcui0 59.3 4.3 24 0 ok 
+amb1-r3-A-xcui1 A xcui1 53.7 5.2 30 0 ok 
+amb1-r3-A-inject A inject 47.1 5.5 30 0 ok 
+amb1-r3-O-xcui0 O xcui0 43.7 4.3 62 0 ok 
+amb1-r3-O-xcui1 O xcui1 42.0 5.3 62 0 ok 
+amb1-r3-O-inject O inject 44.0 5.8 62 0 ok 
+amb1-r3-B-xcui0 B xcui0 44.5 4.4 62 0 ok 
+amb1-r3-B-xcui1 B xcui1 42.1 5.5 62 0 ok 
+amb1-r3-B-inject B inject 40.9 5.7 62 0 ok 
+amb1-r4-D-xcui0 D xcui0 40.9 4.5 62 58 ok 
+amb1-r4-D-xcui1 D xcui1 37.6 5.4 62 58 ok 
+amb1-r4-D-inject D inject 51.9 6.0 62 48 ok 
+amb1-r4-S-xcui0 S xcui0 52.5 6.0 62 0 ok 
+amb1-r4-S-xcui1 S xcui1 50.8 6.8 62 0 ok 
+amb1-r4-S-inject S inject 45.1 7.4 62 0 ok 
+amb1-r4-A-xcui0 A xcui0 41.0 4.3 30 0 ok 
+amb1-r4-A-xcui1 A xcui1 36.7 5.3 30 0 ok 
+amb1-r4-A-inject A inject 35.8 5.5 30 0 ok 
+amb1-r4-O-xcui0 O xcui0 35.4 4.3 62 0 ok 
+amb1-r4-O-xcui1 O xcui1 33.6 6.0 62 0 ok 
+amb1-r4-O-inject O inject 30.7 5.6 62 0 ok 
+amb1-r4-B-xcui0 B xcui0 28.5 4.3 62 0 ok 
+amb1-r4-B-xcui1 B xcui1 25.9 5.3 62 0 ok 
+amb1-r4-B-inject B inject 26.1 5.6 62 0 ok 
+amb1-r4-C-xcui0 C xcui0 25.5 4.3 62 0 ok 
+amb1-r4-C-xcui1 C xcui1 23.9 5.3 62 0 ok 
+amb1-r4-C-inject C inject 22.9 5.5 62 0 ok 
+amb2-r0-A-xcui0 A xcui0 21.8 4.6 30 0 ok 
+amb2-r0-A-xcui1 A xcui1 20.5 5.2 30 0 ok 
+amb2-r0-A-inject A inject 19.3 5.6 30 0 ok 
+amb2-r0-O-xcui0 O xcui0 18.2 4.3 62 0 ok 
+amb2-r0-O-xcui1 O xcui1 19.2 5.3 62 0 ok 
+amb2-r0-O-inject O inject 23.3 5.7 62 0 ok 
+amb2-r0-B-xcui0 B xcui0 26.7 4.4 62 0 ok 
+amb2-r0-B-xcui1 B xcui1 29.0 5.5 62 0 ok 
+amb2-r0-B-inject B inject 38.1 5.9 62 0 ok 
+amb2-r0-C-xcui0 C xcui0 45.7 4.6 62 0 ok 
+amb2-r0-C-xcui1 C xcui1 48.4 5.7 62 0 ok 
+amb2-r0-C-inject C inject 56.6 5.7 62 0 ok 
+amb2-r0-D-xcui0 D xcui0 62.4 4.5 62 58 ok 
+amb2-r0-D-xcui1 D xcui1 63.1 5.6 62 58 ok 
+amb2-r0-D-inject D inject 68.0 5.9 62 48 ok 
+amb2-r0-S-xcui0 S xcui0 77.1 5.9 62 0 ok 
+amb2-r0-S-xcui1 S xcui1 81.6 6.7 62 0 ok 
+amb2-r0-S-inject S inject 82.3 7.4 62 0 ok 
+amb2-r1-O-xcui0 O xcui0 88.8 4.4 62 0 ok 
+amb2-r1-O-xcui1 O xcui1 98.3 5.5 62 0 ok 
+amb2-r1-O-inject O inject 106.2 6.0 62 0 ok 
+amb2-r1-B-xcui0 B xcui0 111.7 4.5 62 0 ok 
+amb2-r1-B-xcui1 B xcui1 115.4 6.4 62 0 ok 
+amb2-r1-B-inject B inject 119.6 5.7 62 0 ok 
+amb2-r1-C-xcui0 C xcui0 117.5 4.7 62 0 ok 
+amb2-r1-C-xcui1 C xcui1 118.0 5.4 62 0 ok 
+amb2-r1-C-inject C inject 114.6 5.7 62 0 ok 
+amb2-r1-D-xcui0 D xcui0 112.3 4.6 62 58 ok 
+amb2-r1-D-xcui1 D xcui1 117.4 5.4 62 58 ok 
+amb2-r1-D-inject D inject 123.7 5.8 62 48 ok 
+amb2-r1-S-xcui0 S xcui0 132.7 5.7 62 0 ok 
+amb2-r1-S-xcui1 S xcui1 130.9 6.8 62 0 ok 
+amb2-r1-S-inject S inject 123.9 7.3 62 0 ok 
+amb2-r1-A-xcui0 A xcui0 117.0 4.3 30 0 ok 
+amb2-r1-A-xcui1 A xcui1 103.5 5.9 17 0 ok 
+amb2-r1-A-inject A inject 93.4 6.3 30 0 ok 
+amb2-r2-B-xcui0 B xcui0 89.7 4.4 62 0 ok 
+amb2-r2-B-xcui1 B xcui1 85.4 5.5 62 0 ok 
+amb2-r2-B-inject B inject 78.5 5.8 62 0 ok 
+amb2-r2-C-xcui0 C xcui0 72.2 4.4 62 0 ok 
+amb2-r2-C-xcui1 C xcui1 67.9 5.4 62 0 ok 
+amb2-r2-C-inject C inject 66.1 5.9 62 0 ok 
+amb2-r2-D-xcui0 D xcui0 64.7 5.0 62 58 ok 
+amb2-r2-D-xcui1 D xcui1 67.0 5.6 62 58 ok 
+amb2-r2-D-inject D inject 67.1 6.1 62 48 ok 
+amb2-r2-S-xcui0 S xcui0 67.6 5.8 62 0 ok 
+amb2-r2-S-xcui1 S xcui1 68.6 6.8 62 0 ok 
+amb2-r2-S-inject S inject 66.3 7.8 62 0 ok 
+amb2-r2-A-xcui0 A xcui0 64.9 4.6 28 0 ok 
+amb2-r2-A-xcui1 A xcui1 64.1 5.4 30 0 ok 
+amb2-r2-A-inject A inject 58.2 5.6 30 0 ok 
+amb2-r2-O-xcui0 O xcui0 53.4 4.2 62 0 ok 
+amb2-r2-O-xcui1 O xcui1 48.9 5.2 62 0 ok 
+amb2-r2-O-inject O inject 44.8 5.6 62 0 ok 
+amb2-r3-C-xcui0 C xcui0 42.0 4.5 62 0 ok 
+amb2-r3-C-xcui1 C xcui1 40.3 5.2 62 0 ok 
+amb2-r3-C-inject C inject 38.9 5.6 62 0 ok 
+amb2-r3-D-xcui0 D xcui0 39.5 4.2 62 58 ok 
+amb2-r3-D-xcui1 D xcui1 40.0 5.4 62 58 ok 
+amb2-r3-D-inject D inject 39.9 5.6 62 48 ok 
+amb2-r3-S-xcui0 S xcui0 37.5 5.6 62 0 ok 
+amb2-r3-S-xcui1 S xcui1 34.9 6.6 62 0 ok 
+amb2-r3-S-inject S inject 30.1 7.3 62 0 ok 
+amb2-r3-A-xcui0 A xcui0 27.7 4.2 29 0 ok 
+amb2-r3-A-xcui1 A xcui1 26.2 5.3 23 0 ok 
+amb2-r3-A-inject A inject 24.2 5.6 30 0 ok 
+amb2-r3-O-xcui0 O xcui0 22.2 4.3 62 0 ok 
+amb2-r3-O-xcui1 O xcui1 21.0 5.2 62 0 ok 
+amb2-r3-O-inject O inject 19.5 5.5 62 0 ok 
+amb2-r3-B-xcui0 B xcui0 18.2 4.2 62 0 ok 
+amb2-r3-B-xcui1 B xcui1 17.2 5.2 62 0 ok 
+amb2-r3-B-inject B inject 16.5 5.6 62 0 ok 
+amb2-r4-D-xcui0 D xcui0 16.1 4.2 62 58 ok 
+amb2-r4-D-xcui1 D xcui1 15.6 5.4 62 58 ok 
+amb2-r4-D-inject D inject 15.1 5.5 62 48 ok 
+amb2-r4-S-xcui0 S xcui0 17.4 5.6 62 0 ok 
+amb2-r4-S-xcui1 S xcui1 19.2 6.6 62 0 ok 
+amb2-r4-S-inject S inject 17.9 7.1 62 0 ok 
+amb2-r4-A-xcui0 A xcui0 17.0 4.1 30 0 ok 
+amb2-r4-A-xcui1 A xcui1 16.7 5.2 30 0 ok 
+amb2-r4-A-inject A inject 15.6 5.5 30 0 ok 
+amb2-r4-O-xcui0 O xcui0 14.7 4.2 62 0 ok 
+amb2-r4-O-xcui1 O xcui1 13.4 5.2 62 0 ok 
+amb2-r4-O-inject O inject 13.0 5.5 62 0 ok 
+amb2-r4-B-xcui0 B xcui0 12.3 4.2 62 0 ok 
+amb2-r4-B-xcui1 B xcui1 12.3 5.2 62 0 ok 
+amb2-r4-B-inject B inject 11.9 5.6 62 0 ok 
+amb2-r4-C-xcui0 C xcui0 11.8 4.3 62 0 ok 
+amb2-r4-C-xcui1 C xcui1 12.0 5.3 62 0 ok 
+amb2-r4-C-inject C inject 13.9 5.6 62 0 ok 
+amb3-r0-A-xcui0 A xcui0 22.0 4.8 30 0 ok 
+amb3-r0-A-xcui1 A xcui1 32.2 5.4 30 0 ok 
+amb3-r0-A-inject A inject 42.1 5.7 30 0 ok 
+amb3-r0-O-xcui0 O xcui0 43.8 4.5 62 0 ok 
+amb3-r0-O-xcui1 O xcui1 44.9 5.5 62 0 ok 
+amb3-r0-O-inject O inject 47.6 5.7 62 0 ok 
+amb3-r0-B-xcui0 B xcui0 50.6 4.3 62 0 ok 
+amb3-r0-B-xcui1 B xcui1 50.4 5.3 62 0 ok 
+amb3-r0-B-inject B inject 49.6 5.7 62 0 ok 
+amb3-r0-C-xcui0 C xcui0 49.8 4.3 62 0 ok 
+amb3-r0-C-xcui1 C xcui1 47.2 5.2 62 0 ok 
+amb3-r0-C-inject C inject 42.9 5.7 62 0 ok 
+amb3-r0-D-xcui0 D xcui0 39.0 4.3 62 58 ok 
+amb3-r0-D-xcui1 D xcui1 36.1 5.3 62 58 ok 
+amb3-r0-D-inject D inject 32.3 5.6 62 50 ok 
+amb3-r0-S-xcui0 S xcui0 28.4 5.5 62 0 ok 
+amb3-r0-S-xcui1 S xcui1 26.5 6.5 62 0 ok 
+amb3-r0-S-inject S inject 28.5 7.1 62 0 ok 
+amb3-r1-O-xcui0 O xcui0 38.7 4.3 62 0 ok 
+amb3-r1-O-xcui1 O xcui1 48.8 5.3 62 0 ok 
+amb3-r1-O-inject O inject 51.0 5.6 62 0 ok 
+amb3-r1-B-xcui0 B xcui0 53.6 4.3 62 0 ok 
+amb3-r1-B-xcui1 B xcui1 50.2 5.2 62 0 ok 
+amb3-r1-B-inject B inject 46.5 5.5 62 0 ok 
+amb3-r1-C-xcui0 C xcui0 43.2 4.3 62 0 ok 
+amb3-r1-C-xcui1 C xcui1 40.7 5.2 62 0 ok 
+amb3-r1-C-inject C inject 39.6 5.5 62 0 ok 
+amb3-r1-D-xcui0 D xcui0 38.4 4.2 62 58 ok 
+amb3-r1-D-xcui1 D xcui1 40.2 5.4 62 58 ok 
+amb3-r1-D-inject D inject 43.2 5.7 62 48 ok 
+amb3-r1-S-xcui0 S xcui0 45.0 5.2 62 0 ok 
+amb3-r1-S-xcui1 S xcui1 47.4 6.6 62 0 ok 
+amb3-r1-S-inject S inject 50.2 7.2 62 0 ok 
+amb3-r1-A-xcui0 A xcui0 50.0 4.2 30 0 ok 
+amb3-r1-A-xcui1 A xcui1 46.8 5.3 27 0 ok 
+amb3-r1-A-inject A inject 47.5 5.6 30 0 ok 
+amb3-r2-B-xcui0 B xcui0 45.1 4.2 62 0 ok 
+amb3-r2-B-xcui1 B xcui1 42.0 5.3 62 0 ok 
+amb3-r2-B-inject B inject 38.5 5.6 62 0 ok 
+amb3-r2-C-xcui0 C xcui0 36.0 4.3 62 0 ok 
+amb3-r2-C-xcui1 C xcui1 33.3 5.3 62 0 ok 
+amb3-r2-C-inject C inject 30.0 5.7 62 0 ok 
+amb3-r2-D-xcui0 D xcui0 26.9 4.3 62 58 ok 
+amb3-r2-D-xcui1 D xcui1 24.9 5.2 62 58 ok 
+amb3-r2-D-inject D inject 26.6 5.7 62 48 ok 
+amb3-r2-S-xcui0 S xcui0 24.5 5.7 62 0 ok 
+amb3-r2-S-xcui1 S xcui1 22.4 6.6 62 0 ok 
+amb3-r2-S-inject S inject 20.2 7.2 62 0 ok 
+amb3-r2-A-xcui0 A xcui0 19.1 4.3 23 0 ok 
+amb3-r2-A-xcui1 A xcui1 21.9 5.2 30 0 ok 
+amb3-r2-A-inject A inject 20.4 5.6 30 0 ok 
+amb3-r2-O-xcui0 O xcui0 19.0 4.2 62 0 ok 
+amb3-r2-O-xcui1 O xcui1 18.9 5.2 62 0 ok 
+amb3-r2-O-inject O inject 19.7 5.6 62 0 ok 
+amb3-r3-C-xcui0 C xcui0 19.5 4.3 62 0 ok 
+amb3-r3-C-xcui1 C xcui1 19.0 5.3 62 0 ok 
+amb3-r3-C-inject C inject 19.9 5.8 62 0 ok 
+amb3-r3-D-xcui0 D xcui0 20.9 4.3 62 58 ok 
+amb3-r3-D-xcui1 D xcui1 23.8 5.3 62 58 ok 
+amb3-r3-D-inject D inject 36.4 6.1 62 50 ok 
+amb3-r3-S-xcui0 S xcui0 33.3 5.7 62 0 ok 
+amb3-r3-S-xcui1 S xcui1 29.6 6.7 62 0 ok 
+amb3-r3-S-inject S inject 25.6 7.3 62 0 ok 
+amb3-r3-A-xcui0 A xcui0 23.6 4.1 30 0 ok 
+amb3-r3-A-xcui1 A xcui1 21.1 5.2 23 0 ok 
+amb3-r3-A-inject A inject 19.2 5.5 30 0 ok 
+amb3-r3-O-xcui0 O xcui0 17.6 4.2 62 0 ok 
+amb3-r3-O-xcui1 O xcui1 16.8 5.2 62 0 ok 
+amb3-r3-O-inject O inject 14.9 5.5 62 0 ok 
+amb3-r3-B-xcui0 B xcui0 13.5 4.2 62 0 ok 
+amb3-r3-B-xcui1 B xcui1 12.7 5.2 62 0 ok 
+amb3-r3-B-inject B inject 11.8 5.6 62 0 ok 
+amb3-r4-D-xcui0 D xcui0 11.3 4.3 62 58 ok 
+amb3-r4-D-xcui1 D xcui1 10.9 5.3 62 58 ok 
+amb3-r4-D-inject D inject 10.9 5.4 62 48 ok 
+amb3-r4-S-xcui0 S xcui0 10.6 5.6 62 0 ok 
+amb3-r4-S-xcui1 S xcui1 10.5 6.6 62 0 ok 
+amb3-r4-S-inject S inject 12.5 7.3 62 0 ok 
+amb3-r4-A-xcui0 A xcui0 17.9 4.5 30 0 ok 
+amb3-r4-A-xcui1 A xcui1 17.4 5.2 30 0 ok 
+amb3-r4-A-inject A inject 25.7 5.7 30 0 ok 
+amb3-r4-O-xcui0 O xcui0 34.1 4.5 62 0 ok 
+amb3-r4-O-xcui1 O xcui1 35.9 5.4 62 0 ok 
+amb3-r4-O-inject O inject 49.1 5.6 62 0 ok 
+amb3-r4-B-xcui0 B xcui0 46.1 4.4 62 0 ok 
+amb3-r4-B-xcui1 B xcui1 47.2 5.3 62 0 ok 
+amb3-r4-B-inject B inject 49.1 6.2 62 0 ok 
+amb3-r4-C-xcui0 C xcui0 54.0 4.7 62 0 ok 
+amb3-r4-C-xcui1 C xcui1 59.5 5.5 62 0 ok 
+amb3-r4-C-inject C inject 66.8 5.8 62 0 ok 
+amb4-r0-A-xcui0 A xcui0 80.1 4.8 29 0 ok 
+amb4-r0-A-xcui1 A xcui1 94.8 5.6 29 0 ok 
+amb4-r0-A-inject A inject 117.1 5.9 30 0 ok 
+amb4-r0-O-xcui0 O xcui0 146.3 4.7 62 0 ok 
+amb4-r0-O-xcui1 O xcui1 204.4 6.0 62 0 ok 
+amb4-r0-O-inject O inject 299.4 5.9 62 0 ok 
+amb4-r0-B-xcui0 B xcui0 380.1 4.4 62 0 ok 
+amb4-r0-B-xcui1 B xcui1 429.5 5.4 62 0 ok 
+amb4-r0-B-inject B inject 457.5 6.3 62 0 ok 
+amb4-r0-C-xcui0 C xcui0 443.9 4.6 62 0 ok 
+amb4-r0-C-xcui1 C xcui1 421.1 5.6 62 0 ok 
+amb4-r0-C-inject C inject 440.2 5.8 62 0 ok 
+amb4-r0-D-xcui0 D xcui0 474.2 4.4 62 58 ok 
+amb4-r0-D-xcui1 D xcui1 492.6 5.4 62 58 ok 
+amb4-r0-D-inject D inject 508.5 6.0 62 50 ok 
+amb4-r0-S-xcui0 S xcui0 510.7 5.9 62 0 ok 
+amb4-r0-S-xcui1 S xcui1 511.5 6.8 62 0 ok 
+amb4-r0-S-inject S inject 497.6 7.5 62 0 ok 
+amb4-r1-O-xcui0 O xcui0 442.4 4.4 62 0 ok 
+amb4-r1-O-xcui1 O xcui1 416.6 5.8 62 0 ok 
+amb4-r1-O-inject O inject 387.2 5.8 62 0 ok 
+amb4-r1-B-xcui0 B xcui0 356.9 4.5 62 0 ok 
+amb4-r1-B-xcui1 B xcui1 329.1 5.4 62 0 ok 
+amb4-r1-B-inject B inject 310.8 5.7 62 0 ok 
+amb4-r1-C-xcui0 C xcui0 300.9 4.5 62 0 ok 
+amb4-r1-C-xcui1 C xcui1 292.4 5.4 62 0 ok 
+amb4-r1-C-inject C inject 278.6 5.9 62 0 ok 
+amb4-r1-D-xcui0 D xcui0 255.8 4.7 62 58 ok 
+amb4-r1-D-xcui1 D xcui1 232.4 5.6 62 58 ok 
+amb4-r1-D-inject D inject 217.2 5.9 62 48 ok 
+amb4-r1-S-xcui0 S xcui0 202.1 5.7 62 0 ok 
+amb4-r1-S-xcui1 S xcui1 189.4 6.3 62 0 ok 
+amb4-r1-S-inject S inject 177.6 7.4 62 0 ok 
+amb4-r1-A-xcui0 A xcui0 163.2 4.4 27 0 ok 
+amb4-r1-A-xcui1 A xcui1 149.6 5.3 29 0 ok 
+amb4-r1-A-inject A inject 130.4 5.6 30 0 ok 
+amb4-r2-B-xcui0 B xcui0 113.2 4.2 62 0 ok 
+amb4-r2-B-xcui1 B xcui1 101.7 5.2 62 0 ok 
+amb4-r2-B-inject B inject 88.3 5.6 62 0 ok 
+amb4-r2-C-xcui0 C xcui0 79.6 4.3 62 0 ok 
+amb4-r2-C-xcui1 C xcui1 69.4 5.2 62 0 ok 
+amb4-r2-C-inject C inject 65.3 5.6 62 0 ok 
+amb4-r2-D-xcui0 D xcui0 63.0 4.2 62 58 ok 
+amb4-r2-D-xcui1 D xcui1 59.1 5.2 62 58 ok 
+amb4-r2-D-inject D inject 54.2 5.6 62 50 ok 
+amb4-r2-S-xcui0 S xcui0 47.4 5.6 62 0 ok 
+amb4-r2-S-xcui1 S xcui1 42.4 6.6 62 0 ok 
+amb4-r2-S-inject S inject 37.1 7.2 62 0 ok 
+amb4-r2-A-xcui0 A xcui0 34.3 4.2 24 0 ok 
+amb4-r2-A-xcui1 A xcui1 32.2 5.2 29 0 ok 
+amb4-r2-A-inject A inject 29.5 5.5 30 0 ok 
+amb4-r2-O-xcui0 O xcui0 26.9 4.2 62 0 ok 
+amb4-r2-O-xcui1 O xcui1 26.9 5.2 62 0 ok 
+amb4-r2-O-inject O inject 26.8 5.7 62 0 ok 
+amb4-r3-C-xcui0 C xcui0 25.1 4.2 62 0 ok 
+amb4-r3-C-xcui1 C xcui1 23.1 5.2 62 0 ok 
+amb4-r3-C-inject C inject 20.4 5.5 62 0 ok 
+amb4-r3-D-xcui0 D xcui0 18.8 4.2 62 58 ok 
+amb4-r3-D-xcui1 D xcui1 18.6 5.2 62 58 ok 
+amb4-r3-D-inject D inject 18.7 5.6 62 48 ok 
+amb4-r3-S-xcui0 S xcui0 17.5 5.6 62 0 ok 
+amb4-r3-S-xcui1 S xcui1 17.4 6.6 62 0 ok 
+amb4-r3-S-inject S inject 23.8 7.2 62 0 ok 
+amb4-r3-A-xcui0 A xcui0 27.8 4.2 29 0 ok 
+amb4-r3-A-xcui1 A xcui1 31.6 5.4 29 0 ok 
+amb4-r3-A-inject A inject 34.3 5.7 30 0 ok 
+amb4-r3-O-xcui0 O xcui0 31.8 4.2 62 0 ok 
+amb4-r3-O-xcui1 O xcui1 29.3 5.2 62 0 ok 
+amb4-r3-O-inject O inject 27.8 5.5 62 0 ok 
+amb4-r3-B-xcui0 B xcui0 26.6 4.2 62 0 ok 
+amb4-r3-B-xcui1 B xcui1 26.8 5.4 62 0 ok 
+amb4-r3-B-inject B inject 28.6 5.6 62 0 ok 
+amb4-r4-D-xcui0 D xcui0 32.2 4.7 62 58 ok 
+amb4-r4-D-xcui1 D xcui1 45.2 5.5 62 58 ok 
+amb4-r4-D-inject D inject 64.9 5.7 62 48 ok 
+amb4-r4-S-xcui0 S xcui0 82.6 4.6 62 0 ok 
+amb4-r4-S-xcui1 S xcui1 100.2 5.7 62 0 ok 
+amb4-r4-S-inject S inject 111.4 7.9 62 0 ok 
+amb4-r4-A-xcui0 A xcui0 110.3 4.7 29 0 ok 
+amb4-r4-A-xcui1 A xcui1 110.9 5.4 29 0 ok 
+amb4-r4-A-inject A inject 112.3 5.7 30 0 ok 
+amb4-r4-O-xcui0 O xcui0 109.9 4.7 62 0 ok 
+amb4-r4-O-xcui1 O xcui1 110.8 5.5 62 0 ok 
+amb4-r4-O-inject O inject 118.2 5.7 62 0 ok 
+amb4-r4-B-xcui0 B xcui0 125.6 4.6 62 0 ok 
+amb4-r4-B-xcui1 B xcui1 125.8 5.4 62 0 ok 
+amb4-r4-B-inject B inject 119.5 5.7 62 0 ok 
+amb4-r4-C-xcui0 C xcui0 111.4 4.4 62 0 ok 
+amb4-r4-C-xcui1 C xcui1 104.5 5.4 62 0 ok 
+amb4-r4-C-inject C inject 101.9 5.2 62 0 ok 
+ctl1-r0-L-xcui0 L xcui0 85.3 5.2 54 0 LOST lost index 1 ('h') -> setter-then-lost (seq 15); field='T quichk brown fox jumpsover' model='T quichk brown fox jumpsover'
+ctl1-r0-L-inject L inject 122.0 5.6 62 0 ok 
+ctl1-r1-L-xcui0 L xcui0 150.3 4.3 52 0 LOST lost index 1 ('h') -> setter-then-lost (seq 15); field='T quick brown ox jums over' model='T quick brown ox jums over'
+ctl1-r1-L-inject L inject 170.0 5.7 62 0 ok 
+ctl1-r2-L-xcui0 L xcui0 163.7 4.4 50 0 LOST lost index 3 (' ') -> never-in-field (seq None); field='Theuckbrown fox jump oer' model='Theuckbrown fox jump oer'
+ctl1-r2-L-inject L inject 150.2 5.6 62 0 ok 
+ctl1-r3-L-xcui0 L xcui0 140.4 4.3 52 0 LOST lost index 1 ('h') -> setter-then-lost (seq 15); field='T quickrown fox jmps oer' model='T quickrown fox jmps oer'
+ctl1-r3-L-inject L inject 129.6 5.7 62 0 LOST lost index 0 ('T') -> setter-then-lost (seq 9); field='he quick brown fox jumps over' model='he quick brown fox jumps over'
+ctl1-r4-L-xcui0 L xcui0 126.3 4.4 54 0 LOST lost index 1 ('h') -> setter-then-lost (seq 15); field='T quik browfx jms ovr' model='T quik browfx jms ovr'
+ctl1-r4-L-inject L inject 130.6 5.8 62 0 ok 
+clean1-r0-A-xcui0 A xcui0 110.2 4.9 29 0 ok 
+clean1-r0-A-inject A inject 107.4 5.6 30 0 ok 
+clean1-r0-O-xcui0 O xcui0 97.0 4.7 62 0 ok 
+clean1-r0-O-inject O inject 85.7 5.7 62 0 ok 
+clean1-r0-B-xcui0 B xcui0 76.6 4.7 62 0 ok 
+clean1-r0-B-inject B inject 69.2 5.6 62 0 ok 
+clean1-r0-C-xcui0 C xcui0 61.8 4.4 62 0 ok 
+clean1-r0-C-inject C inject 59.0 6.0 62 0 ok 
+clean1-r0-D-xcui0 D xcui0 57.3 4.3 62 58 ok 
+clean1-r0-D-inject D inject 53.4 5.6 62 48 ok 
+clean1-r0-S-xcui0 S xcui0 54.8 5.8 62 0 ok 
+clean1-r0-S-inject S inject 49.3 7.2 62 0 ok 
+clean1-r1-O-xcui0 O xcui0 47.6 4.3 62 0 ok 
+clean1-r1-O-inject O inject 46.0 5.7 62 0 ok 
+clean1-r1-B-xcui0 B xcui0 42.0 4.2 62 0 ok 
+clean1-r1-B-inject B inject 37.8 5.6 62 0 ok 
+clean1-r1-C-xcui0 C xcui0 39.0 4.3 62 0 ok 
+clean1-r1-C-inject C inject 42.4 5.6 62 0 ok 
+clean1-r1-D-xcui0 D xcui0 40.8 4.3 62 58 ok 
+clean1-r1-D-inject D inject 40.3 5.6 62 48 ok 
+clean1-r1-S-xcui0 S xcui0 39.4 5.7 62 0 ok 
+clean1-r1-S-inject S inject 38.2 7.2 62 0 ok 
+clean1-r1-A-xcui0 A xcui0 35.7 4.3 26 0 ok 
+clean1-r1-A-inject A inject 33.2 5.6 30 0 ok 
+clean1-r2-B-xcui0 B xcui0 34.5 4.3 62 0 ok 
+clean1-r2-B-inject B inject 32.7 5.6 62 0 ok 
+clean1-r2-C-xcui0 C xcui0 29.9 4.3 62 0 ok 
+clean1-r2-C-inject C inject 28.9 5.6 62 0 ok 
+clean1-r2-D-xcui0 D xcui0 28.6 4.2 62 58 ok 
+clean1-r2-D-inject D inject 28.9 5.7 62 50 ok 
+clean1-r2-S-xcui0 S xcui0 29.2 5.7 62 0 ok 
+clean1-r2-S-inject S inject 27.0 7.2 62 0 ok 
+clean1-r2-A-xcui0 A xcui0 23.1 4.2 29 0 ok 
+clean1-r2-A-inject A inject 21.3 5.6 30 0 ok 
+clean1-r2-O-xcui0 O xcui0 20.4 4.2 62 0 ok 
+clean1-r2-O-inject O inject 20.0 5.6 62 0 ok 
+burn1-r0-A-xcui0 A xcui0 8.5 4.2 29 0 ok 
+burn1-r0-A-inject A inject 9.6 5.1 30 0 ok 
+burn1-r0-B-xcui0 B xcui0 13.7 3.8 62 0 ok 
+burn1-r0-B-inject B inject 17.2 5.1 62 0 ok 
+burn1-r0-C-xcui0 C xcui0 16.2 3.7 62 0 ok 
+burn1-r0-C-inject C inject 15.5 5.0 62 0 ok 
+burn1-r0-D-xcui0 D xcui0 14.9 3.7 62 58 ok 
+burn1-r0-D-inject D inject 14.3 5.0 62 48 ok 
+burn1-r1-B-xcui0 B xcui0 13.8 3.7 62 0 ok 
+burn1-r1-B-inject B inject 15.4 5.0 62 0 ok 
+burn1-r1-C-xcui0 C xcui0 18.8 3.8 62 0 ok 
+burn1-r1-C-inject C inject 20.2 5.2 62 0 ok 
+burn1-r1-D-xcui0 D xcui0 19.0 3.7 62 58 ok 
+burn1-r1-D-inject D inject 17.8 5.0 62 48 ok 
+burn1-r1-A-xcui0 A xcui0 16.9 3.7 29 0 ok 
+burn1-r1-A-inject A inject 16.2 5.0 30 0 ok 
+burn1-r2-C-xcui0 C xcui0 15.5 3.7 62 0 ok 
+burn1-r2-C-inject C inject 16.2 5.1 62 0 ok 
+burn1-r2-D-xcui0 D xcui0 16.3 3.7 62 58 ok 
+burn1-r2-D-inject D inject 17.3 5.1 62 48 ok 
+burn1-r2-A-xcui0 A xcui0 19.3 3.8 29 0 ok 
+burn1-r2-A-inject A inject 19.6 5.1 30 0 ok 
+burn1-r2-B-xcui0 B xcui0 18.7 3.8 62 0 ok 
+burn1-r2-B-inject B inject 19.0 5.1 62 0 ok 
+burn1-r3-D-xcui0 D xcui0 28.1 3.7 62 58 ok 
+burn1-r3-D-inject D inject 26.0 5.1 62 48 ok 
+burn1-r3-A-xcui0 A xcui0 24.1 3.7 29 0 ok 
+burn1-r3-A-inject A inject 22.5 5.1 30 0 ok 
+burn1-r3-B-xcui0 B xcui0 20.7 3.7 62 0 ok 
+burn1-r3-B-inject B inject 19.4 5.1 62 0 ok 
+burn1-r3-C-xcui0 C xcui0 18.0 3.7 62 0 ok 
+burn1-r3-C-inject C inject 17.8 5.1 62 0 ok 

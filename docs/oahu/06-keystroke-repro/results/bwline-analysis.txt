@@ -1,0 +1,29 @@
+variant mode load-bucket runs lost
+local xcui0 <20 5 0
+model xcui0 <20 5 0
+single xcui0 <20 5 0
+state xcui0 <20 5 0
+
+losses by layer
+
+runs
+bwline1-r0-state-xcui0 state xcui0 7.0 4.1 3 offmain=0 ok 
+bwline1-r0-model-xcui0 model xcui0 5.7 4.1 18 offmain=0 ok 
+bwline1-r0-local-xcui0 local xcui0 5.4 4.6 18 offmain=0 ok 
+bwline1-r0-single-xcui0 single xcui0 5.5 4.3 18 offmain=0 ok 
+bwline1-r1-model-xcui0 model xcui0 5.2 4.2 18 offmain=0 ok 
+bwline1-r1-local-xcui0 local xcui0 5.4 4.4 18 offmain=0 ok 
+bwline1-r1-single-xcui0 single xcui0 7.9 4.4 18 offmain=0 ok 
+bwline1-r1-state-xcui0 state xcui0 9.7 4.1 5 offmain=0 ok 
+bwline1-r2-local-xcui0 local xcui0 9.6 4.2 18 offmain=0 ok 
+bwline1-r2-single-xcui0 single xcui0 9.6 4.6 18 offmain=0 ok 
+bwline1-r2-state-xcui0 state xcui0 8.7 4.2 5 offmain=0 ok 
+bwline1-r2-model-xcui0 model xcui0 7.4 4.2 18 offmain=0 ok 
+bwline1-r3-single-xcui0 single xcui0 6.3 4.4 18 offmain=0 ok 
+bwline1-r3-state-xcui0 state xcui0 6.8 4.2 5 offmain=0 ok 
+bwline1-r3-model-xcui0 model xcui0 7.6 4.2 18 offmain=0 ok 
+bwline1-r3-local-xcui0 local xcui0 6.5 4.2 18 offmain=0 ok 
+bwline1-r4-state-xcui0 state xcui0 5.9 4.2 5 offmain=0 ok 
+bwline1-r4-model-xcui0 model xcui0 6.0 4.4 18 offmain=0 ok 
+bwline1-r4-local-xcui0 local xcui0 8.2 4.1 18 offmain=0 ok 
+bwline1-r4-single-xcui0 single xcui0 10.2 4.5 18 offmain=0 ok 
