@@ -833,6 +833,7 @@ upward "which section has focus" across the identity section, native first, on i
 a read-only `OAHU_Fold_API36` (port 5712).
 
 ### G44. The docs don't say which native channels cross a mount, so view-only cross-section work lands in the contract (doc/friction, verified)
+- Issue: [AdamE.Oahu#1084](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/1084)
 - Trying to: move focus into a section, scroll to a field inside it, traverse fields across it, and show in the parent
   which section has focus, on a form split per D25.
 - What happened: everything tried works natively on both platforms, because `OahuMountView` returns the mounted
@@ -852,6 +853,7 @@ a read-only `OAHU_Fold_API36` (port 5712).
 - Challenges the design? No. It removes G40's objection to D25: crossing sections needs native code, not C#.
 
 ### G45. On iOS a focus request forwarded to a section's own event does nothing when the field is off screen in a Form (friction, verified)
+- Issue: [AdamE.Oahu#1085](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/1085)
 - Trying to: after a failed Save, focus the invalid field (identity Email) far down the mounted identity section, with
   focus in the parent's Notes below, using G40's route (C# forwards the request to the section's focus event, the
   section sets its own `@FocusState`).
@@ -868,6 +870,7 @@ a read-only `OAHU_Fold_API36` (port 5712).
   for D25. Relates to G42 (no moment at which focus is known to stick).
 
 ### G46. Keyboard-attached UI doesn't work reliably in a screen hosted by `OahuView` (papercut, verified; cause inferred)
+- Issue: [AdamE.Oahu#1086](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/1086)
 - Trying to: put a Previous/Next bar above the keyboard in the hosted add/edit screen.
 - What happened: iOS `ToolbarItemGroup(placement: .keyboard)` showed in 1 of about 4 keyboard presentations (only after
   the keyboard came back following a MAUI alert; never on first focus in three launches). Android `imePadding()` on the
