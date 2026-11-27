@@ -8,6 +8,9 @@ import SwiftUI
 public struct IdentitySectionScreen: View {
     @Bindable var model: IdentitySectionModel
     @FocusState private var focus: Int?
+    // Step 8: the parent's shared focus order (CrossSection.swift), when it provides one.
+    @Environment(\.formAdvance) private var advance
+    @Environment(\.formOrder) private var order
 
     public init(model: IdentitySectionModel) {
         self.model = model
@@ -47,6 +50,7 @@ public struct IdentitySectionScreen: View {
     public var body: some View {
         let copy = model.copy
         let all = lines(copy)
+        let _ = order?.declare("identity", all.map { "identity." + $0.id })
         Picker(copy.title, selection: $model.title) {
             ForEach(copy.titleOptions.indices, id: \.self) { i in
                 Text(copy.titleOptions[i]).tag(i)
@@ -61,17 +65,25 @@ public struct IdentitySectionScreen: View {
         }
         ForEach(all.indices, id: \.self) { i in
             let line = all[i]
+            let fieldID = "identity." + line.id
             VStack(alignment: .leading, spacing: 4) {
                 Text(line.label).font(.caption).foregroundStyle(.secondary)
                 TextField(line.label, text: $model[dynamicMember: line.path])
-                    .focused($focus, equals: i)
+                    .formField(fieldID, local: $focus, equals: i)
                     .keyboardType(line.keyboard)
                     .textContentType(line.content)
                     .textInputAutocapitalization(line.capitalization)
-                    .submitLabel(i < all.count - 1 ? .next : .done)
-                    .onSubmit { focus = i < all.count - 1 ? i + 1 : nil }
+                    .submitLabel(advance != nil || i < all.count - 1 ? .next : .done)
+                    .onSubmit {
+                        if let advance {
+                            advance(fieldID)   // step 8: the parent's order, which may leave the section
+                        } else {
+                            focus = i < all.count - 1 ? i + 1 : nil
+                        }
+                    }
                     .accessibilityIdentifier(line.id)
             }
+            .id(fieldID)   // step 8: a scroll target for the parent's ScrollViewReader
         }
     }
 }

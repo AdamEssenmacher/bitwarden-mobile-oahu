@@ -13,6 +13,7 @@ public enum FormField: Equatable, Hashable, Sendable, CaseIterable {
     case notes
     case uri
     case customField
+    case identityEmail
 
     static func read(_ reader: inout OahuReader) throws -> FormField {
         switch try reader.readCount() {
@@ -25,6 +26,7 @@ public enum FormField: Equatable, Hashable, Sendable, CaseIterable {
         case 6: return .notes
         case 7: return .uri
         case 8: return .customField
+        case 9: return .identityEmail
         case let index: throw OahuFormatError("FormField has no member \(index).")
         }
     }
@@ -40,6 +42,7 @@ public enum FormField: Equatable, Hashable, Sendable, CaseIterable {
         case .notes: writer.writeCount(6)
         case .uri: writer.writeCount(7)
         case .customField: writer.writeCount(8)
+        case .identityEmail: writer.writeCount(9)
         }
     }
 }

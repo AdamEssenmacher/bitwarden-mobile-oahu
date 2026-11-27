@@ -8,6 +8,13 @@ public struct CipherAddEditScreen: View {
     @Bindable var model: CipherAddEditModel
     @FocusState private var focus: Focus?
     @State private var pendingFocus: Focus?
+    // Step 8 (CrossSection.swift, BW_OAHU_CROSS=native): one focus shared with the mounted sections, the order of
+    // every field in it (collected through a preference), for Return and the keyboard bar.
+    @FocusState private var shared: FormFieldID?
+    @State private var order: [FormFieldID] = []
+    @State private var formOrder = FormOrder()
+    @State private var focusRequest = 0
+    @FocusedValue(\.formEditingSection) private var focusedSection   // probe: does a focused value cross the mount?
     // One row-text state per keyed list (OAHU "Text fields in rows").
     @State private var uriTexts = OahuRowTexts<EditUriRow>(\.uri)
     @State private var fieldTexts = OahuRowTexts<EditFieldRow>(\.editText)
@@ -33,6 +40,8 @@ public struct CipherAddEditScreen: View {
         let copy = model.copy
         let layout = model.layout
         let palette = model.palette
+        let _ = formOrder.declare("parent", ["parent.name", "@identity", "parent.notes"])
+        ScrollViewReader { proxy in
         Form {
             if layout.ownershipPolicyInEffect {
                 Section {
@@ -50,10 +59,12 @@ public struct CipherAddEditScreen: View {
                 }
                 LabeledField(label: copy.name) {
                     TextField(copy.name, text: $model.name)
-                        .focused($focus, equals: .name)
+                        .formField("parent.name", local: $focus, equals: .name)
                         .submitLabel(.next)
                         .onSubmit {
-                            if layout.kind == .identity && model.sections.identity != 0 {
+                            if CrossSection.native {
+                                move(from: "parent.name", by: 1, proxy)   // step 8: no C#
+                            } else if layout.kind == .identity && model.sections.identity != 0 {
                                 // The section's fields are out of this view's reach: ask C# to forward the focus.
                                 model.moveFocus(FormFocus(field: .identityFirstName, rowKey: nil))
                             } else {
@@ -62,6 +73,7 @@ public struct CipherAddEditScreen: View {
                         }
                         .accessibilityIdentifier("ItemNameEntry")
                 }
+                .id("parent.name")
                 switch layout.kind {
                 case .login: loginSection(copy: copy, layout: layout, palette: palette)
                 case .card: cardSection(copy: copy, layout: layout, palette: palette)
@@ -75,7 +87,12 @@ public struct CipherAddEditScreen: View {
                 case .secureNote: EmptyView()
                 }
             } header: {
-                Text(copy.itemInformation)
+                // Step 8: which section has focus, read from the shared focus the section's fields set.
+                if CrossSection.native, let section = CrossSection.section(of: shared) {
+                    Text("\(copy.itemInformation) · editing \(section)").accessibilityIdentifier("EditingSectionLabel")
+                } else {
+                    Text(copy.itemInformation)
+                }
             }
             if layout.kind == .login {
                 if model.sections.uris != 0 {
@@ -115,8 +132,9 @@ public struct CipherAddEditScreen: View {
                 // @State and copy it to the model, to tell SwiftUI's behavior from OAHU's binding (gaps.md, step 5).
                 TextField(copy.notes, text: Self.notesLocal ? localNotesBinding : $model.notes, axis: .vertical)
                     .lineLimit(3...)
-                    .focused($focus, equals: .notes)
+                    .formField("parent.notes", local: $focus, equals: .notes)
                     .accessibilityIdentifier("ItemNotesEntry")
+                    .id("parent.notes")
             } header: {
                 Text(copy.notes)
             }
@@ -149,6 +167,34 @@ public struct CipherAddEditScreen: View {
         .environment(\.colorScheme, palette.colorScheme)
         .environment(\.appPalette, palette)
         .tint(palette.primaryColor)
+        .environment(\.formFocus, CrossSection.native ? $shared : nil)
+        .environment(\.formOrder, CrossSection.native ? formOrder : nil)
+        .environment(\.formAdvance, CrossSection.native ? { move(from: $0, by: 1, proxy) } : nil)
+        .onPreferenceChange(FormFieldOrderKey.self) { value in
+            MainActor.assumeIsolated {
+                if value != order { print("OAHUDEBUG cross order (\(value.count)): \(value.joined(separator: " "))") }
+                order = value
+            }
+        }
+        .onChange(of: shared) { _, now in print("OAHUDEBUG cross focus now \(now ?? "nil")") }
+        .onChange(of: focusedSection) { _, now in print("OAHUDEBUG cross focusedValue section \(now ?? "nil")") }
+        // A previous/next bar while a field has focus. Not ToolbarItemGroup(placement: .keyboard): under OahuView in
+        // the MAUI page it showed only some of the time (08-cross-section.md), so this is the screen's own bottom inset,
+        // which the keyboard pushes up.
+        .safeAreaInset(edge: .bottom) {
+            if CrossSection.native, let current = shared {
+                HStack(spacing: 20) {
+                    Button("Previous") { move(from: current, by: -1, proxy) }
+                        .accessibilityIdentifier("KeyboardPreviousButton")
+                    Button("Next") { move(from: current, by: 1, proxy) }
+                        .accessibilityIdentifier("KeyboardNextButton")
+                    Spacer()
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .background(.bar)
+            }
+        }
         .task {
             // One-shot focus requests from C#: the name of a new item, a field Save found invalid, a new URI.
             for await request in model.focus.stream() {
@@ -159,9 +205,14 @@ public struct CipherAddEditScreen: View {
                 case .totp: .totp
                 case .cardholderName: .cardholder
                 case .identityFirstName: .identity(0)
+                case .identityEmail: .identity(8)
                 case .notes: .notes
                 case .uri: request.rowKey.map { .uri($0) }
                 case .customField: request.rowKey.map { .field($0) }
+                }
+                if CrossSection.native, let id = sharedID(request.field) {
+                    focusShared(id, proxy)   // step 8: into a section without C# forwarding
+                    continue
                 }
                 if Self.holdFocus {
                     pendingFocus = target
@@ -184,6 +235,51 @@ public struct CipherAddEditScreen: View {
                 if attempt == 30 { print("OAHUDEBUG focus held: never kept") }
             }
             pendingFocus = nil
+        }
+        }
+    }
+
+    // MARK: Step 8, shared focus (BW_OAHU_CROSS=native)
+
+    private func sharedID(_ field: FormField) -> FormFieldID? {
+        switch field {
+        case .name: "parent.name"
+        case .notes: "parent.notes"
+        case .identityFirstName: "identity.IdentityFirstNameEntry"
+        case .identityEmail: "identity.IdentityEmailEntry"
+        default: nil
+        }
+    }
+
+    /// Return and the keyboard bar: the next or previous field in the collected order, across sections.
+    private func move(from id: FormFieldID, by step: Int, _ proxy: ScrollViewProxy) {
+        let all = formOrder.all
+        guard let i = all.firstIndex(of: id) else {
+            print("OAHUDEBUG cross move: \(id) not in order (\(all.count))")
+            return
+        }
+        let j = i + step
+        guard all.indices.contains(j) else { shared = nil; return }
+        focusShared(all[j], proxy)
+    }
+
+    /// Scrolls the field's row into view (it may be in a mounted section and not yet built), then focuses it.
+    private func focusShared(_ id: FormFieldID, _ proxy: ScrollViewProxy) {
+        withAnimation { proxy.scrollTo(id, anchor: .center) }
+        shared = id
+        focusRequest += 1
+        let request = focusRequest
+        Task { @MainActor in
+            for attempt in 1...10 {
+                if request != focusRequest { return }   // a newer move superseded this one
+                if shared == id {
+                    print("OAHUDEBUG cross focus \(id): kept on attempt \(attempt)")
+                    return
+                }
+                try? await Task.sleep(for: .milliseconds(50))
+                shared = id
+            }
+            print("OAHUDEBUG cross focus \(id): never kept")
         }
     }
 

@@ -56,6 +56,20 @@ namespace Bit.App.Pages
         /// <summary>Focus requests the parent forwards into a section.</summary>
         internal bool ForwardFocusToSection(FormField field, string? rowKey)
         {
+#if DEBUG
+            // Step 8: BW_OAHU_CROSS=native leaves cross-section focus to the screens (the parent routes the request
+            // into the section through a shared SwiftUI focus binding or a Compose focus registry), so C# forwards
+            // nothing and the request goes to the parent's own Focus event.
+            if (Bit.App.Pages.OahuDebug.OahuDebugRoute.Option("BW_OAHU_CROSS", "bwOahuCross") == "native")
+            {
+                return false;
+            }
+#endif
+            if (field == FormField.IdentityEmail && _identitySection != null)
+            {
+                _identitySection.RequestFocus(8);   // the section's line index for Email
+                return true;
+            }
             if (field == FormField.IdentityFirstName && _identitySection != null)
             {
                 _identitySection.RequestFocus(0);

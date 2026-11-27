@@ -2,7 +2,7 @@
 // change the C# contract and rebuild (docs/codegen.md). The screen is yours to write, in this package:
 // @Composable fun CipherAddEditScreen(model: CipherAddEditModel).
 //
-// Contract hash 3946269057232147140, over its signature:
+// Contract hash 4476510867606657836, over its signature:
 //   oahu/1 contract CipherAddEdit
 //   stream 0 state Copy: CipherAddEditCopy
 //   stream 1 state Palette: AppPalette
@@ -79,7 +79,7 @@
 //   type EditFieldRow = union {Text {Key: string, Name: string, Value: string}, Hidden {Key: string, Name: string, Value: string, Shown: bool, CanReveal: bool}, Toggle {Key: string, Name: string, Value: bool}, Linked {Key: string, Name: string, Selected: int, Options: list<string>}}
 //   type CollectionCheckRow = record {Key: string, Name: string, Checked: bool}
 //   type FormFocus = record {Field: FormField, RowKey: string?}
-//   type FormField = enum {Name, Username, Password, Totp, CardholderName, IdentityFirstName, Notes, Uri, CustomField}
+//   type FormField = enum {Name, Username, Password, Totp, CardholderName, IdentityFirstName, Notes, Uri, CustomField, IdentityEmail}
 //   type CipherAddEditSections = record {Identity: long, Uris: long}
 //   type RowText = record {Key: string, Text: string}
 //   type RowBool = record {Key: string, Value: bool}
@@ -106,7 +106,7 @@ internal object CipherAddEditContract {
     const val NAME: String = "CipherAddEdit"
 
     /** FNV-1a 64 of CipherAddEdit's signature (above). The .NET host refuses the screen when its own hash differs. */
-    const val HASH: Long = 3946269057232147140L
+    const val HASH: Long = 4476510867606657836L
 
     const val STREAM_COPY: Int = 0
     const val STREAM_PALETTE: Int = 1

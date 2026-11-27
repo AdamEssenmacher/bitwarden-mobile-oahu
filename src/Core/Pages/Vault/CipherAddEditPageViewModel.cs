@@ -505,6 +505,19 @@ namespace Bit.App.Pages
                 RequestFocus(Contracts.FormField.Name);
                 return false;
             }
+#if DEBUG
+            // Step 8 (docs/oahu/08-cross-section.md): a DEBUG-only rule whose invalid field sits far down the identity
+            // section, so Save has to reach a field in a mounted section that is off screen.
+            if (Cipher.Type == CipherType.Identity
+                && Bit.App.Pages.OahuDebug.OahuDebugRoute.Option("BW_OAHU_REQEMAIL", "bwOahuReqEmail") == "1"
+                && string.IsNullOrWhiteSpace(Cipher.Identity?.Email))
+            {
+                await Page.DisplayAlert(AppResources.AnErrorHasOccurred,
+                    string.Format(AppResources.ValidationFieldRequired, AppResources.Email), AppResources.Ok);
+                RequestFocus(Contracts.FormField.IdentityEmail);
+                return false;
+            }
+#endif
 
             if ((!EditMode || CloneMode) && !AllowPersonal && string.IsNullOrWhiteSpace(Cipher.OrganizationId))
             {

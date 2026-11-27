@@ -790,6 +790,12 @@ Android ran on a read-only `OAHU_Fold_API36` because another session held `OAHU_
   request the parent sets and the section reads) would avoid C#, but it is native plumbing the doc doesn't mention.
 - Challenges the design? Mildly: D25 makes each section its own contract, so anything that crosses sections natively
   (focus order, "scroll to the invalid field") now needs either C# or hand-written environment plumbing.
+- **Retested (step 8, [08-cross-section.md](08-cross-section.md))**: C# is not needed. A mounted section is drawn in
+  the parent's own view tree, so the parent can put its `@FocusState` binding in the environment and the section's
+  fields bind to it; Return on Name then focuses First name with no contract member (verified, iOS). The same holds for
+  scroll-to-invalid-field, previous/next across the section in both directions and leaving it, and the parent reading
+  which section has focus (all verified on iOS and Android). The step 7 C# route also turned out not to work for an
+  off-screen field on iOS (G45). The cost moves to native plumbing the docs don't describe (G44). Not a pattern.
 
 ### G41. `OahuTextField` takes SwiftUI focus but the docs say it doesn't, and it can't place the cursor (doc/papercut, verified)
 - Issue: [AdamE.Oahu#1050](https://github.com/AdamEssenmacher/AdamE.Oahu/issues/1050)
@@ -818,3 +824,63 @@ Android ran on a read-only `OAHU_Fold_API36` because another session held `OAHU_
 - Sections inherit the parent's SwiftUI environment and Compose composition locals, so a section contract needs no
   palette member.
 - `OahuTextField` secure mode: one field, focus, keyboard and cursor kept across show/hide; one edit per keystroke.
+
+## Step 8 (cross-section interactions)
+
+Asked whether G40 is a one-off or a pattern: built scroll-and-focus on a failed Save, previous/next traversal and an
+upward "which section has focus" across the identity section, native first, on iOS and Android. Details in
+[08-cross-section.md](08-cross-section.md). Same preview (`0.1.0-preview.gc63d0aba`). Host load average 12–76; Android on
+a read-only `OAHU_Fold_API36` (port 5712).
+
+### G44. The docs don't say which native channels cross a mount, so view-only cross-section work lands in the contract (doc/friction, verified)
+- Trying to: move focus into a section, scroll to a field inside it, traverse fields across it, and show in the parent
+  which section has focus, on a form split per D25.
+- What happened: everything tried works natively on both platforms, because `OahuMountView` returns the mounted
+  screen's view directly inside the parent's tree and `OahuMount` calls its composable inside the parent's composition.
+  Crossed: SwiftUI environment values including a `FocusState` binding and closures, the parent's `@FocusState` bound
+  by the section's fields, preferences, `focusedValue`, `ScrollViewReader.scrollTo` with an id inside the section;
+  Compose `CompositionLocal`, `FocusRequester`s registered through it, `FocusManager.moveFocus`, `onFocusChanged`
+  around the mount, bring-into-view. contracts.md "Splitting a large screen into sections" mentions only the
+  environment and composition locals, and nothing about focus, scrolling or order, so step 7 added a contract method
+  and C# forwarding for a view-only concern (G40).
+- Workaround: an app-side `CrossSection.swift` (83 lines: shared focus binding, field order, a field modifier) and
+  `CrossSection.kt` (60 lines: a focus registry), plus per-screen wiring (field ids, the parent's order with a
+  placeholder per section, the field-enum-to-id mapping).
+- Suggested: say in the sectioning doc that focus, scrolling and traversal between a parent and its sections are native
+  work, and show the recipe; the SwiftUI half is general enough to ship as a small helper (a shared focus binding and
+  field modifier in OahuRuntime), the Compose half needs almost nothing beyond the doc.
+- Challenges the design? No. It removes G40's objection to D25: crossing sections needs native code, not C#.
+
+### G45. On iOS a focus request forwarded to a section's own event does nothing when the field is off screen in a Form (friction, verified)
+- Trying to: after a failed Save, focus the invalid field (identity Email) far down the mounted identity section, with
+  focus in the parent's Notes below, using G40's route (C# forwards the request to the section's focus event, the
+  section sets its own `@FocusState`).
+- What happened: nothing scrolled and focus stayed in Notes. The row isn't built in the parent's lazy `Form`, and the
+  section has no handle on the parent's scroll position. The native route (the parent calls `scrollTo` with the
+  section row's id, then sets the shared focus) worked, but focus stuck only on the 5th attempt (~200 ms); moving to an
+  unbuilt row also dropped focus to nil for a moment. In the same `Form` a preference from the section carried only the
+  rows built so far, in the order they were built, so field order can't be collected that way; each screen declares
+  it. Android was fine either way (non-lazy scrolling `Column`; focus brings the field into view).
+- Workaround: the parent scrolls and focuses (G44's recipe) and retries every 50 ms until the focus holds, cancelling
+  an older retry when a newer move starts (an uncancelled retry pulled focus back to an earlier field).
+- Inferred: any lazy parent container (SwiftUI `List`/`Form`, Compose `LazyColumn`) has the same off-screen problem; it
+  is SwiftUI/Compose behaviour, but it makes "forward to the section's focus event" an unreliable pattern to document
+  for D25. Relates to G42 (no moment at which focus is known to stick).
+
+### G46. Keyboard-attached UI doesn't work reliably in a screen hosted by `OahuView` (papercut, verified; cause inferred)
+- Trying to: put a Previous/Next bar above the keyboard in the hosted add/edit screen.
+- What happened: iOS `ToolbarItemGroup(placement: .keyboard)` showed in 1 of about 4 keyboard presentations (only after
+  the keyboard came back following a MAUI alert; never on first focus in three launches). Android `imePadding()` on the
+  screen's root had no effect: the page pans for the keyboard and the bar stays behind it. Neither involves sections.
+- Workaround: iOS `.safeAreaInset(edge: .bottom)` (shown whenever a field has focus; the keyboard pushes it up);
+  Android: none tried (the bar works only with the keyboard dismissed).
+- Inferred: maui.md says a hosted screen's toolbar items don't reach MAUI's bar, and the keyboard placement likely goes
+  through the same toolbar bridging; on Android MAUI's default soft-input mode (pan) means the `ComposeView` gets no IME
+  insets. maui.md "Known limits" lists keyboard avoidance as not measured.
+
+### Worked, worth recording (step 8)
+- Return, Previous/Next and "scroll to the invalid field" crossing a mounted section in both directions, iOS and
+  Android, with no contract member and no C#.
+- Compose needs nothing for traversal: the section's fields are in the parent's focus tree, and `onFocusChanged` around
+  `OahuMount` tells the parent when a section has focus.
+- A SwiftUI `focusedValue` set inside a section reaches the parent's `@FocusedValue`.

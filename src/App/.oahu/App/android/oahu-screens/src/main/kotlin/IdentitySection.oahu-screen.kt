@@ -32,9 +32,10 @@ import com.adamessenmacher.oahu.runtime.OahuEditable
 @Composable
 fun IdentitySectionScreen(model: IdentitySectionModel) {
     val copy by model.copy.collectAsState()
-    val first = remember { FocusRequester() }
+    // One requester per line (step 8: C# may forward a request for any line, such as Email after a failed Save).
+    val requesters = remember { List(17) { FocusRequester() } }
     LaunchedEffect(model) {
-        model.focus.collect { first.requestFocus() }
+        model.focus.collect { line -> requesters.getOrNull(line)?.requestFocus() }
     }
     val lines: List<Triple<String, OahuEditable<String>, String>> = listOf(
         Triple(copy.firstName, model.firstName, "IdentityFirstNameEntry"),
@@ -74,7 +75,8 @@ fun IdentitySectionScreen(model: IdentitySectionModel) {
                     },
                     imeAction = if (i < lines.size - 1) ImeAction.Next else ImeAction.Done),
                 modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp).testTag(tag)
-                    .let { if (i == 0) it.focusRequester(first) else it },
+                    .focusRequester(requesters[i])
+                    .formField("identity.$tag"),   // step 8: also reachable through the parent's registry
             )
         }
     }

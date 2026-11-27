@@ -109,7 +109,8 @@ public sealed record RowIndex(string Key, int Index);
 /// <param name="RowKey">For a URI or custom field, the row's key.</param>
 public sealed record FormFocus(FormField Field, string? RowKey);
 
-public enum FormField { Name, Username, Password, Totp, CardholderName, IdentityFirstName, Notes, Uri, CustomField }
+/// <remarks>Step 8 added IdentityEmail: the field a DEBUG validation rule (BW_OAHU_REQEMAIL=1) reports.</remarks>
+public enum FormField { Name, Username, Password, Totp, CardholderName, IdentityFirstName, Notes, Uri, CustomField, IdentityEmail }
 
 public enum EditItemKind { Login, Card, Identity, SecureNote }
 

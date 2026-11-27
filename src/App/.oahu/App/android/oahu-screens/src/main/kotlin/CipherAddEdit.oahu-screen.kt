@@ -2,6 +2,7 @@ package com.oahu.appapp
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,6 +28,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -36,8 +38,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -66,8 +71,20 @@ fun CipherAddEditScreen(model: CipherAddEditModel) {
     val focus = remember { FormFocusRequesters() }
     // A focus request for a row waits until the row is composed (a new URI arrives in the same batch as the request).
     var pendingRowFocus by remember { mutableStateOf<String?>(null) }
+    // Step 8 (CrossSection.kt, bwOahuCross=native): a focus registry shared with the mounted sections, and whether
+    // focus is inside the form or a section (onFocusChanged on a parent sees its children's focus, sections included).
+    val native = crossSectionNative()
+    val registry = remember { FormFocusRegistry() }
+    var formHasFocus by remember { mutableStateOf(false) }
+    var identityHasFocus by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
     LaunchedEffect(model) {
         model.focus.collect { request ->
+            if (native && request.field == FormField.IdentityEmail && sections.identity != 0L) {
+                val ok = registry.requestFocus("identity.IdentityEmailEntry")   // no C# forwarding
+                android.util.Log.i("OAHUDEBUG", "cross focus identity.IdentityEmailEntry registered=$ok")
+                return@collect
+            }
             when (request.field) {
                 FormField.Name -> focus.name.requestFocus()
                 FormField.Username -> focus.username.requestFocus()
@@ -75,21 +92,26 @@ fun CipherAddEditScreen(model: CipherAddEditModel) {
                 FormField.Totp -> focus.totp.requestFocus()
                 FormField.CardholderName -> focus.cardholder.requestFocus()
                 FormField.IdentityFirstName -> focus.identityFirst.requestFocus()
+                FormField.IdentityEmail -> focus.identityEmail.requestFocus()
                 FormField.Notes -> focus.notes.requestFocus()
                 FormField.Uri, FormField.CustomField -> pendingRowFocus = request.rowKey
             }
         }
     }
     PaletteTheme(palette) {
+      CompositionLocalProvider(LocalFormFocus provides if (native) registry else null) {
+      Column(Modifier.fillMaxSize().background(palette.backgroundColor).imePadding()) {
         Column(
-            Modifier.fillMaxSize().background(palette.backgroundColor).imePadding()
+            Modifier.weight(1f).fillMaxWidth().onFocusChanged { formHasFocus = it.hasFocus }
                 .verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 8.dp),
         ) {
             if (layout.ownershipPolicyInEffect) {
                 Text(copy.personalOwnershipPolicyInEffect, color = palette.mutedColor, fontWeight = FontWeight.Bold,
                     fontSize = 13.sp, modifier = Modifier.padding(vertical = 8.dp))
             }
-            Header(copy.itemInformation, palette)
+            // Step 8: which section has focus, without the section's help (onFocusChanged around its mount).
+            Header(if (native && identityHasFocus) "${copy.itemInformation} · editing identity" else copy.itemInformation,
+                palette)
             if (layout.showTypePicker) {
                 IndexPicker(copy.type, copy.typeOptions, model.type, "ItemTypePicker")
             }
@@ -99,7 +121,11 @@ fun CipherAddEditScreen(model: CipherAddEditModel) {
                 EditItemKind.Card -> CardSection(model, copy, layout, palette, focus)
                 EditItemKind.Identity ->
                     // Step 7, D25 trial: the identity section as a mounted child contract when its id is set.
-                    if (sections.identity != 0L) OahuMount(sections.identity) else IdentitySection(model, copy, focus)
+                    if (sections.identity != 0L) {
+                        Box(Modifier.onFocusChanged { identityHasFocus = it.hasFocus }) { OahuMount(sections.identity) }
+                    } else {
+                        IdentitySection(model, copy, focus)
+                    }
                 EditItemKind.SecureNote -> {}
             }
             if (layout.kind == EditItemKind.Login) {
@@ -155,6 +181,18 @@ fun CipherAddEditScreen(model: CipherAddEditModel) {
                 }
             }
         }
+        // Step 8: a previous/next bar above the keyboard, over the whole form including the mounted sections. The
+        // composition's FocusManager moves in its default order; the sections are part of the same focus tree.
+        if (native && formHasFocus) {
+            Row(Modifier.fillMaxWidth().background(palette.backgroundColor).padding(horizontal = 8.dp)) {
+                TextButton(onClick = { focusManager.moveFocus(FocusDirection.Previous) },
+                    modifier = Modifier.testTag("KeyboardPreviousButton")) { Text("Previous") }
+                TextButton(onClick = { focusManager.moveFocus(FocusDirection.Next) },
+                    modifier = Modifier.testTag("KeyboardNextButton")) { Text("Next") }
+            }
+        }
+      }
+      }
     }
 }
 
@@ -165,6 +203,7 @@ private class FormFocusRequesters {
     val totp = FocusRequester()
     val cardholder = FocusRequester()
     val identityFirst = FocusRequester()
+    val identityEmail = FocusRequester()
     val notes = FocusRequester()
 }
 
@@ -284,7 +323,8 @@ private fun IdentitySection(model: CipherAddEditModel, copy: CipherAddEditCopy, 
             keyboardOptions = KeyboardOptions(capitalization = line.capitalization, keyboardType = line.keyboardType,
                 imeAction = if (i < lines.size - 1) ImeAction.Next else ImeAction.Done),
             modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp).testTag(line.tag)
-                .let { if (i == 0) it.focusRequester(focus.identityFirst) else it },
+                .let { if (i == 0) it.focusRequester(focus.identityFirst) else it }
+                .let { if (i == 8) it.focusRequester(focus.identityEmail) else it },
         )
     }
 }

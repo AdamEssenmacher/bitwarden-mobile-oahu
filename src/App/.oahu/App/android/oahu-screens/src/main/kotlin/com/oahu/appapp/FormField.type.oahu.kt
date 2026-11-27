@@ -16,6 +16,7 @@ public enum class FormField {
     Notes,
     Uri,
     CustomField,
+    IdentityEmail,
 }
 
 /** The codec for FormField. */
@@ -30,6 +31,7 @@ internal object FormFieldOahuCodec {
         6 -> FormField.Notes
         7 -> FormField.Uri
         8 -> FormField.CustomField
+        9 -> FormField.IdentityEmail
         else -> throw OahuFormatException("FormField has no member $index.")
     }
 
@@ -45,6 +47,7 @@ internal object FormFieldOahuCodec {
                 FormField.Notes -> 6
                 FormField.Uri -> 7
                 FormField.CustomField -> 8
+                FormField.IdentityEmail -> 9
             },
         )
     }
